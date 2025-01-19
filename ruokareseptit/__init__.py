@@ -24,7 +24,8 @@ def create_app():
     db.init_app(app)
 
     from . import home
-    # import and register other features here
+    from . import auth
     app.register_blueprint(home.bp)
+    app.register_blueprint(auth.bp)
 
     return app
