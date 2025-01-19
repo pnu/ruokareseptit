@@ -28,6 +28,8 @@ def register_submit():
         flash("Vähintään 4 merkkiä pitkä käyttäjätunnus on pakollinen.", "error")
     elif not strong_password(password1):
         flash("Salasanan tulee olla vähintään 8 merkkiä pitkä.", "error")
+    elif username == password1:
+        flash("Salasana ei voi olla sama kuin käyttätunnus.", "error")
     elif password1 != password2:
         flash("Salasanat eivät täsmää.", "error")
     elif not insert_user(username, password1):

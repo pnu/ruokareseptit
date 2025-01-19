@@ -9,18 +9,28 @@
 <body>
 
   <nav>
-    <h1><a href="{{ url_for('home.index') }}">Etusivu</a></h1>
+    <h1><a href="{{ url_for('home.index') }}">Ruokareseptit</a></h1>
     <ul>
-      <li><a href="{{ url_for('auth.register') }}">Registeröidy</a>
+      <li><a href="{{ url_for('home.index') }}">Etusivu</a></li>
+      <li><a href="{{ url_for('auth.register') }}">Registeröidy</a></li>
     </ul>
   </nav>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <section class="status">
+    <ul class=flashes>
+      {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+  {% endwith %}
+
   <section class="content">
     <header>{% block header %}{% endblock %}</header>
-
-    {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-    {% endfor %} {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
   </section>
 </body>
 
