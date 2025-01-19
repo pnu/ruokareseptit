@@ -23,18 +23,15 @@ source venv/bin/activate
 pip install flask
 ```
 
-Alusta tietokanta sovelluksen määrittelemällä `init-db` komennolla.
-Sovelluksen käyttämä tietokannan skeema löytyy tiedostosta
-`ruokareseptit/schema.sql`.
+Alusta tietokanta `init-db` komennolla.
+Tämä komento poistaa kaikki tiedot jos
+tietokanta on jo olemassa.
 
 ```
 flask --app ruokareseptit init-db
 ```
 
-Tietokannan data-tiedosto ja muut asennuskohtaiset tiedostot
-löytyvät `instance` hakemistosta. Se luodaan tarvittaessa
-automaattisesti sovelluksen alustuksen yhteydessä. Käynnistä
-sovellus `flask run` komennolla.
+Käynnistä sovellus `flask run` komennolla.
 
 ```
 flask --app ruokareseptit --debug run
@@ -47,7 +44,7 @@ Sovellus on tämän jälkeen käytettävissä osoitteessa `http://localhost:5000
 Sovelluksen oletusasetukset on määritelty tiedostossa
 `ruokareseptit/default_settings.py`. Tämä on osa
 versionhallintaa, joten sinne ei tule määritellä mitään
-asennuskohtaisia tai salaisia asetuksia.
+asennuskohtaisia tai salassa pidettäviä asetuksia.
 
 Asennuskohtaiset asetukset luetaan tiedostosta 
 `instance/config.py`. Näillä voidaan yliajaa sovelluksen
