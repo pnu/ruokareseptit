@@ -13,24 +13,95 @@
 
 ## Sovelluksen asennus
 
-Asenna `flask`-kirjasto:
+Kloonaa git-repositorio omaan ympäristöösi ja siirry sen
+juurihakemistoon. Ota käyttöön `venv` ympäristö ja asenna
+`flask`-kirjasto.
 
 ```
-$ pip install flask
+python3 -m venv venv
+source venv/bin/activate
+pip install flask
 ```
 
-Luo tietokannan taulut ja lisää alkutiedot:
+Alusta tietokanta sovelluksen määrittelemällä `init-db` komennolla.
+Sovelluksen käyttämä tietokannan skeema löytyy tiedostosta
+`ruokareseptit/schema.sql`.
 
 ```
-$ sqlite3 database.db < schema.sql
-$ sqlite3 database.db < init.sql
+flask --app ruokareseptit init-db
 ```
 
-Käynnistä sovellus:
+Tietokannan data-tiedosto ja muut asennuskohtaiset tiedostot
+löytyvät `instance` hakemistosta. Se luodaan tarvittaessa
+automaattisesti sovelluksen alustuksen yhteydessä. Käynnistä
+sovellus `flask run` komennolla.
 
 ```
-$ flask run
+flask --app ruokareseptit --debug run
 ```
+
+Sovellus on tämän jälkeen käytettävissä osoitteessa `http://localhost:5000/`
+
+## Asetukset ja tuotantoon vieminen
+
+Sovelluksen oletusasetukset on määritelty tiedostossa
+`ruokareseptit/default_settings.py`. Tämä on osa
+versionhallintaa, joten sinne ei tule määritellä mitään
+asennuskohtaisia tai salaisia asetuksia.
+
+Asennuskohtaiset asetukset luetaan tiedostosta 
+`instance/config.py`. Näillä voidaan yliajaa sovelluksen
+oletusasetuksia.
+
+Esimerkiksi `SECRET_KEY` asetuksen arvoa käytetään sessioevästeiden
+allekirjoittamisessa. Tuotantokäytössä tälle tulee asettaa
+satunnainen arvo, joka kuitenkin säilyy sovelluksen käynnistyskerrasta
+toiseen, jotta käyttäjien sessiot eivät katkea.
+
+Tämä tehdään lisäämällä `instance/config.py` tiedostoon esimerkiksi
+alla näkyvän komennon tuloste. 
+
+```
+python -c 'import secrets; print("SECRET_KEY =",secrets.token_hex())'
+```
+
+## Sovelluksen hakemistorakenne
+
+Sovellus on toteutettu Python pakettina, joka löytyy
+sovelluksen juuresta `ruokareseptit` hakemistosta.
+
+```
+/polku/sovelluksen/juureen/
+├── ruokareseptit/              # sovelluksen paketti
+│   ├── __init__.py             # flask app sovellustehdas
+│   ├── db.py                   # tietokannan käsittely
+│   ├── default_settings.py     # sovelluksen asetukset
+│   ├── schema.sql              # tietokannan skeema
+│   ├── auth.py                 # pääsyoikeuksien käsittely
+│   ├── xxx.py                  # jne. muut toiminnot
+│   ...
+│   ├── templates/
+│   │   ├── base.html           # yhteinen sivupohja
+│   │   ├── auth/
+│   │   │   ├── login.html      # auth.py vastaavat näkymät
+│   │   │   └── register.html   # esim.
+│   │   ├── xxx/
+│   │   │   ├── toiminto.html   # jne. muiden toimintojen näkymät
+│   │   │   └── index.html      # ryhmiteltyinä omiin polkuihin
+│   │   ...
+│   │
+│   └── static/
+│       └── style.css           # sovelluksen CSS tyylit
+├── instance/
+│   ├── ruokareseptit.sqlite    # SQLite tietokanta
+│   └── config.py               # asennuskohtaiset asetukset
+├── venv/                       # käyttäjän asentama venv ympäristö
+└── README.md                   # projektin kuvaus ja asennusohjeet
+```
+
+Hakemistot `instance` ja `venv` gieivät ole osa versionhallintaa. Ne
+syntyvät automaattisesti sovelluksen alustuksen yhteydessä. 
+Kts. asennusohjeet edellä.
 
 ## Vaatimusmäärittely
 
