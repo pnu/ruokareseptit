@@ -96,7 +96,7 @@ sovelluksen juuresta `ruokareseptit` hakemistosta.
 └── README.md                   # projektin kuvaus ja asennusohjeet
 ```
 
-Hakemistot `instance` ja `venv` gieivät ole osa versionhallintaa. Ne
+Hakemistot `instance` ja `venv` eivät ole osa versionhallintaa. Ne
 syntyvät automaattisesti sovelluksen alustuksen yhteydessä. 
 Kts. asennusohjeet edellä.
 

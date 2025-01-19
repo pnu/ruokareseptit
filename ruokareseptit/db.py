@@ -1,3 +1,5 @@
+"""Database connection and utilities"""
+
 import sqlite3
 from datetime import datetime
 import click
@@ -19,7 +21,7 @@ def get_db():
     return g.db
 
 
-def close_db(e=None):
+def close_db():
     """If this request connected to the database, close the
     connection.
     """

@@ -1,7 +1,10 @@
+"""Ruokareseptit application module"""
+
 import os
 from flask import Flask
 
 def create_app():
+    """Flask application factory."""
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev', # used for signing the session cookie
@@ -14,6 +17,8 @@ def create_app():
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    # pylint: disable=import-outside-toplevel
 
     from . import db
     db.init_app(app)
