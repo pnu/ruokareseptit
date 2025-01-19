@@ -21,12 +21,13 @@ def get_db():
     return g.db
 
 
-def close_db():
+def close_db(e=None):
     """If this request connected to the database, close the
     connection.
     """
+    if e is not None:
+        print("Database teardown function was called because of an unhandled exception:", e)
     db = g.pop("db", None)
-
     if db is not None:
         db.close()
 
