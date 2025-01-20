@@ -5,28 +5,33 @@
 {% endblock %}
 
 {% block content %}
-<form method="post">
+<form class="registration-form" method="post">
   {% with errors = get_flashed_messages(category_filter=["form_validation_error"]) %}
   {% if errors %}
-  <div class="form-validation-errors">
-    <ul>
-      {%- for error in errors %}
-      <li>{{ error }}</li>
-      {% endfor -%}
-    </ul>
+  <ul class="message-box field-row">
+    {%- for error in errors %}
+    <li class="field-container warning">{{ error }}</li>
+    {% endfor -%}
+  </ul>
+  {% endif %} {% endwith %}
+
+  <div class="field-row">
+    <label class="field-container min" for="username">Käyttäjätunnus</label>
+    <input class="field-container" type="text" name="username" id="username" required />
   </div>
-  {% endif %}
-  {% endwith %}
 
-  <label for="username">Käyttäjätunnus</label>
-  <input type="text" name="username" id="username" required>
+  <div class="field-row">
+    <label class="field-container min" for="password1">Valitse salasana</label>
+    <input class="field-container" type="password" name="password1" id="password1" required />
+  </div>
 
-  <label for="password1">Valitse salasana</label>
-  <input type="password" name="password1" id="password1" required>
+  <div class="field-row">
+    <label class="field-container min" for="password2">Toista salasana</label>
+    <input class="field-container" type="password" name="password2" id="password2" required />
+  </div>
 
-  <label for="password2">Anna salasana uudestaan</label>
-  <input type="password" name="password2" id="password2" required>
-
-  <input type="submit" value="Rekisteröidy!">
+  <div class="field-row">
+    <input class="field-container min" type="submit" value="Luo uusi tunnus" />
+  </div>
 </form>
 {% endblock %}
