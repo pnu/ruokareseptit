@@ -35,7 +35,7 @@ def register_submit():
     elif not insert_user(username, password1):
         flash_error("Käyttäjätunnus on jo varattu tai muutoin epäkelvollinen.")
     else:
-        flash("Rekisteröityminen onnistui. Voit nyt kirjautua palveluun.")
+        flash(f"Uusi käyttäjätunnus '{username}' on luotu. Voit nyt kirjautua palveluun.")
         return redirect(url_for("home.index"))
 
     return render_template("auth/register.html")

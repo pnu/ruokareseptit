@@ -5,6 +5,7 @@ body {
 
 .registration-form {
   min-width: min-content;
+  max-width: 30em;
   outline-style: solid;
   padding: 1em;
   background-color: antiquewhite;
@@ -27,6 +28,9 @@ ul.message-box {
 
   .warning {
     background-color: lightpink;
+  }
+  .message {
+    background-color: lightgreen;
   }
 }
 

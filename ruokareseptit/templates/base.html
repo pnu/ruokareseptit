@@ -19,13 +19,11 @@
   <section class="content">
     {% with messages = get_flashed_messages(category_filter=["message"]) %}
     {% if messages %}
-    <div class="messages">
-      <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    </div>
+    <ul class="message-box">
+      {% for message in messages %}
+      <li class="field-row message">{{ message }}</li>
+      {% endfor %}
+    </ul>
     {% endif %}
     {% endwith %}
 
