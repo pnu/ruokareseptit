@@ -8,14 +8,22 @@
 
 <body>
 
-  <nav>
-    <h1><a href="{{ url_for('home.index') }}">Ruokareseptit</a></h1>
+  <nav class="navigation-bar">
     <ul>
-      <li><a href="{{ url_for('home.index') }}">Etusivu</a></li>
-      <li><a href="{{ url_for('auth.register') }}">Registeröidy</a></li>
+      <li><a href="{{ url_for('home.index') }}">Ruokareseptit</a></li>
+      <li><a href="{{ url_for('home.index') }}">Toiminto A</a></li>
+      <li class="current"><a href="{{ url_for('home.index') }}">Toiminto B</a></li>
+      <li><a href="{{ url_for('home.index') }}">Toiminto C</a></li>
+      <li><a href="{{ url_for('auth.register') }}">Rekisteröidy</a></li>
+      <li><a href="{{ url_for('home.index') }}">Kirjaudu</a></li>
+    </ul>
+    <ul class="secondary">
+      <li><a href="{{ url_for('home.index') }}">Alanavi 1</a></li>
+      <li class="current"><a href="{{ url_for('home.index') }}">Alanavi 2</a></li>
+      <li><a href="{{ url_for('home.index') }}">Alanavi 3</a></li>
     </ul>
   </nav>
-  <hr>
+
   <section class="content">
     {% with messages = get_flashed_messages(category_filter=["message"]) %}
     {% if messages %}

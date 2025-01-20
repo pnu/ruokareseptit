@@ -3,6 +3,49 @@ body {
   background-color: burlywood;
 }
 
+nav.navigation-bar {
+  display: flex;
+  background-color: lightcyan;
+  min-width: fit-content;
+  flex-direction: column;
+
+  a {
+    text-decoration: none;
+    color: blue;
+  }
+
+  ul {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    padding: 0.5em;
+    text-align: center;
+    min-width: max-content;
+  }
+
+  li.current {
+    background-color: lightblue;
+    font-weight: bold;
+  }
+
+  ul.secondary {
+    background-color: lightblue;
+  }
+
+  ul.secondary li.current {
+    font-weight: bold;
+  }
+}
+
 .registration-form {
   min-width: min-content;
   max-width: 30em;
@@ -29,6 +72,7 @@ ul.message-box {
   .warning {
     background-color: lightpink;
   }
+
   .message {
     background-color: lightgreen;
   }
