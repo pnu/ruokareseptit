@@ -16,19 +16,19 @@
     </ul>
   </nav>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  <section class="status">
-    <ul class=flashes>
-      {% for category, message in messages %}
-      <li class="{{ category }}">{{ message }}</li>
-      {% endfor %}
-    </ul>
-  </section>
-  {% endif %}
-  {% endwith %}
-
   <section class="content">
+    {% with messages = get_flashed_messages(category_filter=["message"]) %}
+    {% if messages %}
+    <div class="messages">
+      <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
+
     <header>{% block header %}{% endblock %}</header>
     {% block content %}{% endblock %}
   </section>

@@ -25,20 +25,24 @@ def register_submit():
     password2 = request.form["password2"]
 
     if not valid_username(username):
-        flash("Vähintään 4 merkkiä pitkä käyttäjätunnus on pakollinen.", "error")
+        flash_error("Vähintään 4 merkkiä pitkä käyttäjätunnus on pakollinen.")
     elif not strong_password(password1):
-        flash("Salasanan tulee olla vähintään 8 merkkiä pitkä.", "error")
+        flash_error("Salasanan tulee olla vähintään 8 merkkiä pitkä.")
     elif username == password1:
-        flash("Salasana ei voi olla sama kuin käyttätunnus.", "error")
+        flash_error("Salasana ei voi olla sama kuin käyttätunnus.")
     elif password1 != password2:
-        flash("Salasanat eivät täsmää.", "error")
+        flash_error("Salasanat eivät täsmää.")
     elif not insert_user(username, password1):
-        flash("Käyttäjätunnus on jo varattu tai muutoin epäkelvollinen.", "error")
+        flash_error("Käyttäjätunnus on jo varattu tai muutoin epäkelvollinen.")
     else:
         flash("Rekisteröityminen onnistui. Voit nyt kirjautua palveluun.")
         return redirect(url_for("home.index"))
 
     return render_template("auth/register.html")
+
+def flash_error(message: str):
+    """Flash form validation error"""
+    flash(message, "form_validation_error")
 
 def insert_user(username: str, password: str) -> bool:
     """Insert new user to database. Return True if successful, False otherwise."""
