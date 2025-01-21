@@ -77,6 +77,8 @@ def flatten_nav_tree(navigation_tree: NavigationTree, level: int = 0) -> Navigat
         endpoint, title = item[0], item[1]
         if re.match(r"\w+(\.\w+)+$", endpoint):
             endpoint = url_for(endpoint)
+        if "__USERNAME__" in title and g.get("user") is not None:
+            title = title.replace("__USERNAME__", g.user["username"])
         itemdict = {"title": title, "url": endpoint}
         if len(item) > 2:
             itemdict["class"] = "current"
