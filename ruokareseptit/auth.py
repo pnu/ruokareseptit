@@ -8,6 +8,7 @@ from flask import request
 from flask import url_for
 from flask import session
 from flask import g
+from flask import current_app
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
@@ -79,7 +80,7 @@ def register():
     elif not insert_user(username, password1):
         flash_error("Käyttäjätunnus on jo varattu.")
     else:
-        flash(f"Uusi käyttäjätunnus on luotu. Voit nyt kirjautua palveluun.")
+        flash("Käyttäjätunnus on luotu. Voit nyt kirjautua.")
         return redirect(url_for("home.index"))
 
     return render_template("auth/register.html")
@@ -124,7 +125,8 @@ def auth_user(username: str, password: str) -> dict | None:
 
     if user is None:
         return None
-    if not check_password_hash(user["password_hash"], password):
-        return None
+    if current_app.config["ALLOW_ANY_PASSWORD"]:
+        # Allows login with any password, only for testing
+        return user
 
-    return user
+    return check_password_hash(user["password_hash"], password)
