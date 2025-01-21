@@ -6,25 +6,39 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask import session
 from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 
 from .db import get_db
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
-@bp.route("/login")
+@bp.route("/login", methods=["GET","POST"])
 def login():
     """Login form"""
-    return render_template("auth/login.html")
+    if request.method == "GET":
+        return render_template("auth/login.html")
 
-@bp.route("/register")
+    username = request.form["username"]
+    password = request.form["password"]
+    user = auth_user(username, password)
+
+    if user is None:
+        flash_error("Väärä käyttäjätunnus tai salasana.")
+        return render_template("auth/login.html")
+
+    session.clear()
+    session["user_id"] = user["id"]
+    flash(f"Kirjautuminen onnistui. Tervetuloa, {user['username']}!")
+    return redirect(url_for("home.index"))
+
+@bp.route("/register", methods=["GET", "POST"])
 def register():
     """Registration form"""
-    return render_template("auth/register.html")
+    if request.method == "GET":
+        return render_template("auth/register.html")
 
-@bp.route("/register", methods=["POST"])
-def register_submit():
-    """Registration form submit"""
     username = request.form["username"]
     password1 = request.form["password1"]
     password2 = request.form["password2"]
@@ -45,9 +59,19 @@ def register_submit():
 
     return render_template("auth/register.html")
 
+## Utility functions
+
 def flash_error(message: str):
     """Flash form validation error"""
     flash(message, "form_validation_error")
+
+def strong_password(password: str) -> bool:
+    """Check if password is strong enough"""
+    return len(password) >= 8
+
+def valid_username(username: str) -> bool:
+    """Check if username is valid"""
+    return len(username) >= 4 and username.isalnum()
 
 def insert_user(username: str, password: str) -> bool:
     """Insert new user to database. Return True if successful, False otherwise."""
@@ -62,10 +86,13 @@ def insert_user(username: str, password: str) -> bool:
     except db.IntegrityError:
         return False
 
-def strong_password(password: str) -> bool:
-    """Check if password is strong enough"""
-    return len(password) >= 8
+def auth_user(username: str, password: str) -> dict | None:
+    """Authenticate user"""
+    user = get_db().execute("SELECT * FROM user WHERE username = ?", [username]).fetchone()
 
-def valid_username(username: str) -> bool:
-    """Check if username is valid"""
-    return len(username) >= 4 and username.isalnum()
+    if user is None:
+        return None
+    if not check_password_hash(user["password_hash"], password):
+        return None
+
+    return user
