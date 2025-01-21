@@ -4,9 +4,8 @@ body {
 }
 
 nav.navigation-bar {
-  display: flex;
   min-width: fit-content;
-  flex-direction: column;
+  margin-bottom: 1em;
 
   a {
     text-decoration: none;
@@ -65,10 +64,14 @@ nav.navigation-bar {
   max-width: 30em;
   outline-style: solid;
   padding: 1em;
+  margin: auto;
   background-color: antiquewhite;
 
   label {
     min-width: 8em;
+  }
+  h1 {
+    text-align: center;
   }
 }
 

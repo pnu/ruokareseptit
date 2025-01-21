@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
 
-{% block header %}
-<h1>{% block title %}Kirjautuminen{% endblock %}</h1>
-{% endblock %}
-
 {% block content %}
 <form class="login-form" method="post">
+  <h1>Kirjautuminen</h1>
+  <p>
+    Kirjaudu sisään omalla käyttäjä&shy;tunnuksella ja salasanalla.
+    Jos sinulla ei ole tunnusta, voit luoda sen
+    <a href="{{ url_for('.register') }}">Rekisteröidy</a> valikosta.
+  </p>
+
   {% with errors = get_flashed_messages(category_filter=["form_validation_error"]) %}
   {% if errors %}
   <ul class="message-box field-row">
@@ -14,12 +17,6 @@
     {% endfor -%}
   </ul>
   {% endif %} {% endwith %}
-
-  <p>
-    Kirjaudu sisään omalla käyttäjä&shy;tunnuksella ja salasanalla.
-    Jos sinulla ei ole tunnusta, voit luoda sen
-    <a href="{{ url_for('.register') }}">Rekisteröidy</a> valikosta.
-  </p>
 
   <div class="field-row">
     <label class="field-container min" for="username">Käyttäjätunnus</label>
