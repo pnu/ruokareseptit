@@ -15,13 +15,13 @@ NAVIGATION: NavigationTree = [
         ["about.index", "Palvelu"],
         ["about.instructions", "Ohjeet", [
             ["about.instructions_abc", "ABC"],
-            ["about.instructions_xyz", "XYZ"]
+            ["about.instructions_xyz", "XYZ"],
+            ["https://www.google.com/", "Google"]
         ]],
         ["about.contact", "Yhteystiedot"]
     ]],
     ["auth.register", "Rekisteröidy"],
-    ["auth.login", "Kirjaudu"],
-    ["https://www.google.com/", "Google"]
+    ["auth.login", "Kirjaudu"]
 ]
 
 NAVIGATION_LOGGED_IN: NavigationTree = [
@@ -30,7 +30,8 @@ NAVIGATION_LOGGED_IN: NavigationTree = [
         ["about.index", "Palvelu"],
         ["about.instructions", "Ohjeet", [
             ["about.instructions_abc", "ABC"],
-            ["about.instructions_xyz", "XYZ"]
+            ["about.instructions_xyz", "XYZ"],
+            ["https://www.google.com/", "Google"]
         ]],
         ["about.contact", "Yhteystiedot"]
     ]],
