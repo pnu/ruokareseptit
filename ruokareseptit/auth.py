@@ -15,7 +15,8 @@ from .db import get_db
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
-@bp.route("/login", methods=["GET","POST"])
+
+@bp.route("/login", methods=["GET", "POST"])
 def login():
     """Log in user"""
     if request.method == "GET":
@@ -34,16 +35,20 @@ def login():
     flash("Kirjautuminen onnistui. Tervetuloa!")
     return redirect(url_for("home.index"))
 
+
 @bp.before_app_request
 def g_user():
-    """Set g.user if logged in. Clear session if user has been deleted from db."""
+    """Set g.user if logged in. Clear session if user
+    has been deleted from db."""
     if session.get("uid") is not None:
+        query = "SELECT id, username FROM user WHERE id = ?"
         uid = session.get("uid")
-        user_cursor = get_db().execute("SELECT id, username FROM user WHERE id = ?", [uid])
+        user_cursor = get_db().execute(query, [uid])
         user_in_db = user_cursor.fetchone()
         if user_in_db is None:
             session.clear()
         g.user = user_in_db
+
 
 @bp.route("/logout")
 def logout():
@@ -51,6 +56,7 @@ def logout():
     session.clear()
     flash("Olet kirjautunut ulos.")
     return redirect(url_for("home.index"))
+
 
 @bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -73,41 +79,48 @@ def register():
     elif not insert_user(username, password1):
         flash_error("Käyttäjätunnus on jo varattu.")
     else:
-        flash(f"Uusi käyttäjätunnus '{username}' on luotu. Voit nyt kirjautua palveluun.")
+        flash(f"Uusi käyttäjätunnus on luotu. Voit nyt kirjautua palveluun.")
         return redirect(url_for("home.index"))
 
     return render_template("auth/register.html")
 
-## Utility functions
+
+# Utility functions
+
 
 def flash_error(message: str):
     """Flash form validation error"""
     flash(message, "form_validation_error")
 
+
 def strong_password(password: str) -> bool:
     """Check if password is strong enough"""
     return len(password) >= 8
+
 
 def valid_username(username: str) -> bool:
     """Check if username is valid"""
     return len(username) >= 4 and username.isalnum()
 
+
 def insert_user(username: str, password: str) -> bool:
-    """Insert new user to database. Return True if successful, False otherwise."""
+    """Insert new user to database. Return True if successful,
+    False otherwise."""
     try:
+        query = "INSERT INTO user (username, password_hash) VALUES (?, ?)"
+        params = (username, generate_password_hash(password))
         db = get_db()
-        db.execute(
-            "INSERT INTO user (username, password_hash) VALUES (?, ?)",
-            (username, generate_password_hash(password)),
-        )
+        db.execute(query, params)
         db.commit()
         return True
     except db.IntegrityError:
         return False
 
+
 def auth_user(username: str, password: str) -> dict | None:
     """Authenticate user"""
-    user = get_db().execute("SELECT * FROM user WHERE username = ?", [username]).fetchone()
+    query = "SELECT id, password_hash FROM user WHERE username = ?"
+    user = get_db().execute(query, [username]).fetchone()
 
     if user is None:
         return None

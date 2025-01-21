@@ -5,6 +5,7 @@ from flask import render_template
 
 bp = Blueprint("home", __name__)
 
+
 @bp.route("/")
 def index():
     """Homepage"""

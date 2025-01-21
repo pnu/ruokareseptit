@@ -6,11 +6,13 @@ from flask import g
 
 bp = Blueprint("profile", __name__, url_prefix="/profile")
 
+
 @bp.route("/")
 def index():
     """Profile page"""
     context = {"username": g.user["username"]}
     return render_template("profile/index.html", **context)
+
 
 @bp.route("/recipes")
 def recipes():
@@ -18,11 +20,13 @@ def recipes():
     context = {}
     return render_template("profile/recipes.html", **context)
 
+
 @bp.route("/friends")
 def friends():
     """Own friends"""
     context = {}
     return render_template("profile/friends.html", **context)
+
 
 @bp.route("/settings")
 def settings():

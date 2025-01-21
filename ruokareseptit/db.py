@@ -6,6 +6,7 @@ import click
 from flask import current_app
 from flask import g
 
+
 def get_db():
     """Connect to the application's configured database. The connection
     is unique for each request and will be reused if this is called
@@ -13,7 +14,8 @@ def get_db():
     """
     if "db" not in g:
         g.db = sqlite3.connect(
-            current_app.config["DATABASE"], detect_types=sqlite3.PARSE_DECLTYPES
+            current_app.config["DATABASE"],
+            detect_types=sqlite3.PARSE_DECLTYPES
         )
         g.db.execute("PRAGMA foreign_keys = ON")
         g.db.row_factory = sqlite3.Row
@@ -22,11 +24,9 @@ def get_db():
 
 
 def close_db(e=None):
-    """If this request connected to the database, close the
-    connection.
-    """
+    """Close the connection."""
     if e is not None:
-        print("Database teardown function was called because of an unhandled exception:", e)
+        print("Unhandled exception:", e)
     db = g.pop("db", None)
     if db is not None:
         db.close()
@@ -47,7 +47,10 @@ def init_db_command():
     click.echo("Initialized the database.")
 
 
-sqlite3.register_converter("timestamp", lambda v: datetime.fromisoformat(v.decode()))
+sqlite3.register_converter(
+    "timestamp",
+    lambda v: datetime.fromisoformat(v.decode())
+)
 
 
 def init_app(app):
