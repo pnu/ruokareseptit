@@ -1,5 +1,7 @@
 """User authentication"""
 
+import functools
+
 from flask import Blueprint
 from flask import flash
 from flask import redirect
@@ -33,22 +35,36 @@ def login():
 
     session.clear()
     session["uid"] = user_in_db["id"]
+    next_url = request.args.get("next", url_for("home.index"))
     flash("Kirjautuminen onnistui. Tervetuloa!")
-    return redirect(url_for("home.index"))
+    return redirect(next_url)
 
 
 @bp.before_app_request
 def g_user():
     """Set g.user if logged in. Clear session if user
     has been deleted from db."""
-    if session.get("uid") is not None:
-        query = "SELECT id, username FROM users WHERE id = ?"
-        uid = session.get("uid")
-        user_cursor = get_db().execute(query, [uid])
-        user_in_db = user_cursor.fetchone()
-        if user_in_db is None:
-            session.clear()
-        g.user = user_in_db
+    if session.get("uid") is None:
+        g.user = None
+        return
+    uid = session.get("uid")
+    query = "SELECT id, username FROM users WHERE id = ?"
+    user_cursor = get_db().execute(query, [uid])
+    user_in_db = user_cursor.fetchone()
+    if user_in_db is None:
+        session.clear()
+    g.user = user_in_db
+
+
+def login_required(view):
+    """View decorator to check if user is logged in.
+    Redirects to the login page if not."""
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for("auth.login", next=request.url))
+        return view(**kwargs)
+    return wrapped_view
 
 
 @bp.route("/logout")

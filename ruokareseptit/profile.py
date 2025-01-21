@@ -6,6 +6,7 @@ from flask import g
 from flask import url_for
 
 from .db import get_db
+from .auth import login_required
 
 bp = Blueprint("profile", __name__, url_prefix="/profile")
 
@@ -18,7 +19,8 @@ def index():
 
 
 @bp.route("/recipes/", defaults={'page': 0})
-@bp.route("/recipes/<page>")
+@bp.route("/recipes/<int:page>")
+@login_required
 def recipes(page):
     """Own recipes"""
     query = "SELECT * FROM recipes WHERE author_id = ? LIMIT 11 OFFSET ?"
@@ -31,6 +33,7 @@ def recipes(page):
     if page > 0:
         context["prev_page"] = url_for("profile.recipes", page=page - 1)
     return render_template("profile/recipes.html", **context)
+
 
 @bp.route("/friends")
 def friends():
