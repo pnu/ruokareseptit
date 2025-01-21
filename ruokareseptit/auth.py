@@ -16,7 +16,7 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 @bp.route("/login", methods=["GET","POST"])
 def login():
-    """Login form"""
+    """Log in user"""
     if request.method == "GET":
         return render_template("auth/login.html")
 
@@ -30,7 +30,14 @@ def login():
 
     session.clear()
     session["user_id"] = user["id"]
-    flash(f"Kirjautuminen onnistui. Tervetuloa, {user['username']}!")
+    flash("Kirjautuminen onnistui. Tervetuloa!")
+    return redirect(url_for("home.index"))
+
+@bp.route("/logout")
+def logout():
+    """Log out user"""
+    session.clear()
+    flash("Olet kirjautunut ulos.")
     return redirect(url_for("home.index"))
 
 @bp.route("/register", methods=["GET", "POST"])
