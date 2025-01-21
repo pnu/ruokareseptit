@@ -3,6 +3,8 @@
 import re
 from flask import request
 from flask import url_for
+from flask import session
+from flask import g
 
 type NavigationTree = list["NavigationTreeItem"]
 type NavigationTreeItem = list[str | NavigationTree | bool]
@@ -10,6 +12,7 @@ type NavigationTreeItem = list[str | NavigationTree | bool]
 NAVIGATION: NavigationTree = [
     ["home.index", "Ruokareseptit"],
     ["about.index", "Tietoa", [
+        ["about.index", "Palvelu"],
         ["about.instructions", "Ohjeet", [
             ["about.instructions_abc", "ABC"],
             ["about.instructions_xyz", "XYZ"]
@@ -21,6 +24,25 @@ NAVIGATION: NavigationTree = [
     ["https://www.google.com/", "Google"]
 ]
 
+NAVIGATION_LOGGED_IN: NavigationTree = [
+    ["home.index", "Ruokareseptit"],
+    ["about.index", "Tietoa", [
+        ["about.index", "Palvelu"],
+        ["about.instructions", "Ohjeet", [
+            ["about.instructions_abc", "ABC"],
+            ["about.instructions_xyz", "XYZ"]
+        ]],
+        ["about.contact", "Yhteystiedot"]
+    ]],
+    ["profile.index", "👤 Profiili", [
+        ["profile.index", "Omat tiedot"],
+        ["profile.recipes", "Omat reseptit"],
+        ["profile.friends", "Kaverit"],
+        ["profile.settings", "Asetukset"],
+        ["auth.logout", "Kirjaudu ulos"]
+    ]]
+]
+
 type NavigationItemDict = dict[str, str]
 type NavigationLayer = tuple[int, list[NavigationItemDict]]
 type Navigation = list[NavigationLayer]
@@ -28,9 +50,13 @@ type Navigation = list[NavigationLayer]
 def navigation_context():
     """Function to be register as context processor, used to inject
     `navigation` to the context."""
-    return {"navigation": get_navigation()}
+    if session.get("uid") is not None:
+        navigation = get_navigation(NAVIGATION_LOGGED_IN, request.endpoint)
+    else:
+        navigation = get_navigation(NAVIGATION, request.endpoint)
+    return {"navigation": navigation}
 
-def get_navigation():
+def get_navigation(tree: NavigationTree, endpoint: str):
     """Build a flattened and enumerated list of navigation levels for the `base.html`
     template. Every level is a list of dicts, defining the title and url for
     each navigation item at that level. If the current endpoint (eg. `home.index`)
@@ -40,7 +66,7 @@ def get_navigation():
     Eg. structure of the return value:
     `[ (0, [dict, dict, ...]), (1, [dict, dict, ...]) ]`
     """
-    pruned, _ = prune_nav_tree(NAVIGATION, request.endpoint)
+    pruned, _ = prune_nav_tree(tree, endpoint)
     return flatten_nav_tree(pruned)
 
 def flatten_nav_tree(navigation_tree: NavigationTree, level: int = 0) -> Navigation:
