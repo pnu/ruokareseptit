@@ -7,6 +7,7 @@ from flask import render_template
 from flask import request
 from flask import url_for
 from flask import session
+from flask import g
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
@@ -22,16 +23,27 @@ def login():
 
     username = request.form["username"]
     password = request.form["password"]
-    user = auth_user(username, password)
+    user_in_db = auth_user(username, password)
 
-    if user is None:
+    if user_in_db is None:
         flash_error("Väärä käyttäjätunnus tai salasana.")
         return render_template("auth/login.html")
 
     session.clear()
-    session["user_id"] = user["id"]
+    session["uid"] = user_in_db["id"]
     flash("Kirjautuminen onnistui. Tervetuloa!")
     return redirect(url_for("home.index"))
+
+@bp.before_app_request
+def g_user():
+    """Set g.user if logged in. Clear session if user has been deleted from db."""
+    if session.get("uid") is not None:
+        uid = session.get("uid")
+        user_cursor = get_db().execute("SELECT id, username FROM user WHERE id = ?", [uid])
+        user_in_db = user_cursor.fetchone()
+        if user_in_db is None:
+            session.clear()
+        g.user = user_in_db
 
 @bp.route("/logout")
 def logout():
