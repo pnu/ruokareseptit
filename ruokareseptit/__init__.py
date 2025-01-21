@@ -23,9 +23,11 @@ def create_app():
     from . import db
     db.init_app(app)
 
+    from . import navigation
     from . import home
     from . import about
     from . import auth
+    app.context_processor(navigation.navigation_context)
     app.register_blueprint(home.bp)
     app.register_blueprint(about.bp)
     app.register_blueprint(auth.bp)

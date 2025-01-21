@@ -8,21 +8,17 @@
 
 <body>
 
+  {% if navigation %}
   <nav class="navigation-bar">
-    <ul>
-      <li><a href="{{ url_for('home.index') }}">Ruokareseptit</a></li>
-      <li><a href="{{ url_for('home.index') }}">Toiminto A</a></li>
-      <li class="current"><a href="{{ url_for('home.index') }}">Toiminto B</a></li>
-      <li><a href="{{ url_for('home.index') }}">Toiminto C</a></li>
-      <li><a href="{{ url_for('auth.register') }}">Rekisteröidy</a></li>
-      <li><a href="{{ url_for('home.index') }}">Kirjaudu</a></li>
+    {% for (level, navigation) in navigation %}
+    <ul class="level-{{ level }}">
+      {% for item in navigation %}
+      <li class="{{ item.class }}"><a href="{{ item.url }}">{{ item.title }}</a></li>
+      {% endfor %}
     </ul>
-    <ul class="secondary">
-      <li><a href="{{ url_for('home.index') }}">Alanavi 1</a></li>
-      <li class="current"><a href="{{ url_for('home.index') }}">Alanavi 2</a></li>
-      <li><a href="{{ url_for('home.index') }}">Alanavi 3</a></li>
-    </ul>
+    {% endfor %}
   </nav>
+  {% endif %}
 
   <section class="content">
     {% with messages = get_flashed_messages(category_filter=["message"]) %}

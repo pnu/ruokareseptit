@@ -5,7 +5,6 @@ body {
 
 nav.navigation-bar {
   display: flex;
-  background-color: lightcyan;
   min-width: fit-content;
   flex-direction: column;
 
@@ -15,7 +14,7 @@ nav.navigation-bar {
   }
 
   ul {
-    width: 100%;
+    background-color: lightcyan;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -32,17 +31,31 @@ nav.navigation-bar {
     min-width: max-content;
   }
 
-  li.current {
-    background-color: lightblue;
+  li.current  {
     font-weight: bold;
   }
 
-  ul.secondary {
+  .level-0 li.current  {
     background-color: lightblue;
   }
 
-  ul.secondary li.current {
-    font-weight: bold;
+  ul.level-1 {
+    background-color: lightblue;
+  }
+
+  ul.level-2 {
+    background-color: initial;
+    width: min-content;
+    margin-top: 1em;
+    gap: 1em;
+  }
+
+  .level-2 li {
+    background-color: lightgray;
+  }
+
+  .level-2 li.current {
+    background-color: lightblue;
   }
 }
 
