@@ -42,7 +42,7 @@ def g_user():
     """Set g.user if logged in. Clear session if user
     has been deleted from db."""
     if session.get("uid") is not None:
-        query = "SELECT id, username FROM user WHERE id = ?"
+        query = "SELECT id, username FROM users WHERE id = ?"
         uid = session.get("uid")
         user_cursor = get_db().execute(query, [uid])
         user_in_db = user_cursor.fetchone()
@@ -120,7 +120,7 @@ def insert_user(username: str, password: str) -> bool:
 
 def auth_user(username: str, password: str) -> dict | None:
     """Authenticate user"""
-    query = "SELECT id, password_hash FROM user WHERE username = ?"
+    query = "SELECT id, password_hash FROM users WHERE username = ?"
     user = get_db().execute(query, [username]).fetchone()
 
     if user is None:
