@@ -31,11 +31,11 @@ nav.navigation-bar {
     min-width: max-content;
   }
 
-  li.current  {
+  li.current {
     font-weight: bold;
   }
 
-  .level-0 li.current  {
+  .level-0 li.current {
     background-color: lightblue;
   }
 
@@ -59,7 +59,8 @@ nav.navigation-bar {
   }
 }
 
-.registration-form {
+.registration-form,
+.login-form {
   min-width: min-content;
   max-width: 30em;
   outline-style: solid;

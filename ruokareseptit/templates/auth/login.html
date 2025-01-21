@@ -5,5 +5,34 @@
 {% endblock %}
 
 {% block content %}
-LOGIN FORM HERE
+<form class="login-form" method="post">
+  {% with errors = get_flashed_messages(category_filter=["form_validation_error"]) %}
+  {% if errors %}
+  <ul class="message-box field-row">
+    {%- for error in errors %}
+    <li class="field-container warning">{{ error }}</li>
+    {% endfor -%}
+  </ul>
+  {% endif %} {% endwith %}
+
+  <p>
+    Kirjaudu sisään omalla käyttäjä&shy;tunnuksella ja salasanalla.
+    Jos sinulla ei ole tunnusta, voit luoda sen
+    <a href="{{ url_for('.register') }}">Rekisteröidy</a> valikosta.
+  </p>
+
+  <div class="field-row">
+    <label class="field-container min" for="username">Käyttäjätunnus</label>
+    <input class="field-container" type="text" name="username" id="username" required />
+  </div>
+
+  <div class="field-row">
+    <label class="field-container min" for="password">Salasana</label>
+    <input class="field-container" type="password" name="password" id="password" required />
+  </div>
+
+  <div class="field-row">
+    <input class="field-container min" type="submit" value="Kirjaudu sisään" />
+  </div>
+</form>
 {% endblock %}

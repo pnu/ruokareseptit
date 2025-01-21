@@ -16,10 +16,14 @@
   {% endif %} {% endwith %}
 
   <p>
-    Valitse itsellesi uusi käyttäjätunnus ja salasana. Käyttäjätunnuksen
+    Valitse itsellesi uusi käyttäjä&shy;tunnus ja salasana. Käyttäjä&shy;tunnuksen
     on oltava vähintään 4 merkkiä pitkä ja se voi koostua vain kirjaimista
     ja numeroista. Salasanan on oltava vähintään 8 merkkiä pitkä. Salasana
     ei voi olla sama kuin käyttäjätunnus.
+  </p>
+  <p>
+    Jos sinulla on jo tunnus, voit kirjautua
+    <a href="{{ url_for('.login') }}">Kirjaudu</a> valikosta.
   </p>
 
   <div class="field-row">
