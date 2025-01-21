@@ -12,6 +12,11 @@ from .db import get_db
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
+@bp.route("/login")
+def login():
+    """Login form"""
+    return render_template("auth/login.html")
+
 @bp.route("/register")
 def register():
     """Registration form"""

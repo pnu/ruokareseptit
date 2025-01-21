@@ -24,8 +24,10 @@ def create_app():
     db.init_app(app)
 
     from . import home
+    from . import about
     from . import auth
     app.register_blueprint(home.bp)
+    app.register_blueprint(about.bp)
     app.register_blueprint(auth.bp)
 
     return app
