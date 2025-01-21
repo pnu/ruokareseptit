@@ -5,5 +5,12 @@
 {% endblock %}
 
 {% block content %}
-<p>SISÄLTÖ</p>
+
+{% for recipe in recipes %}
+<p>{{ recipe.id }} {{ recipe.title }} {{ recipe.published > 0 }}</p>
+{% endfor %}
+
+<p>previous page: {{ prev_page }}</p>
+<p>next page: {{ next_page }}</p>
+
 {% endblock %}
