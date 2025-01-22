@@ -1,4 +1,4 @@
-"""User profile pages and features"""
+"""User edit pages and features"""
 
 from flask import Blueprint
 from flask import render_template
@@ -8,14 +8,7 @@ from flask import url_for
 from .db import get_db
 from .auth import login_required
 
-bp = Blueprint("profile", __name__, url_prefix="/profile")
-
-
-@bp.route("/")
-def index():
-    """Profile page"""
-    context = {"username": g.user["username"]}
-    return render_template("profile/index.html", **context)
+bp = Blueprint("edit", __name__, url_prefix="/edit")
 
 
 @bp.route("/recipes/", defaults={'page': 0})
@@ -29,21 +22,22 @@ def recipes(page):
     context = {"recipes": rows}
     if len(rows) > 10:
         rows.pop()
-        context["next_page"] = url_for("profile.recipes", page=page + 1)
+        context["next_page"] = url_for("edit.recipes", page=page + 1)
     if page > 0:
-        context["prev_page"] = url_for("profile.recipes", page=page - 1)
-    return render_template("profile/recipes.html", **context)
+        context["prev_page"] = url_for("edit.recipes", page=page - 1)
+    return render_template("edit/recipes.html", **context)
 
 
-@bp.route("/friends")
-def friends():
-    """Own friends"""
+@bp.route("/create", methods=["GET", "POST"])
+@login_required
+def create():
+    """Create new recipe"""
     context = {}
-    return render_template("profile/friends.html", **context)
+    return render_template("edit/create.html", **context)
 
 
 @bp.route("/settings")
 def settings():
     """Own settings"""
     context = {}
-    return render_template("profile/settings.html", **context)
+    return render_template("edit/settings.html", **context)

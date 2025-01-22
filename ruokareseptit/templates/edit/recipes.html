@@ -5,12 +5,18 @@
 {% endblock %}
 
 {% block content %}
+<p>
+    Reseptin muokkausnäkymä jos polussa on reseptin id.
+    Muutoin listaus omista.
+</p>
 
+<hr/>
+
+<h2>Sivutettu listaus</h2>
 {% for recipe in recipes %}
 <p>{{ recipe.id }} {{ recipe.title }} {{ recipe.published > 0 }}</p>
 {% endfor %}
 
 <p>previous page: {{ prev_page }}</p>
 <p>next page: {{ next_page }}</p>
-
 {% endblock %}

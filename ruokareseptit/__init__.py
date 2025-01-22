@@ -27,12 +27,12 @@ def create_app():
     from . import navigation
     from . import home
     from . import recipes
-    from . import profile
+    from . import edit
     from . import auth
     app.context_processor(navigation.navigation_context)
     app.register_blueprint(home.bp)
     app.register_blueprint(recipes.bp)
-    app.register_blueprint(profile.bp)
+    app.register_blueprint(edit.bp)
     app.register_blueprint(auth.bp)
 
     return app

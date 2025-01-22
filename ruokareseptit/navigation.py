@@ -9,9 +9,9 @@ from flask import g
 type NavigationTree = list["NavigationTreeItem"]
 type NavigationTreeItem = list[str | NavigationTree | bool]
 
-NAVIGATION: NavigationTree = [
+NAVIGATION_COMMON_ITEMS = [
     ["home.index", "Ruokareseptit"],
-    ["recipes.index", "Reseptit", [
+    ["recipes.index", "Katsele", [
         ["recipes.index", "Parhaat"],
         ["recipes.browse", "Kategoriat", [
             ["recipes.browse", "Kaikki"],
@@ -21,27 +21,20 @@ NAVIGATION: NavigationTree = [
         ]],
         ["recipes.search", "Haku"]
     ]],
+]
+
+NAVIGATION: NavigationTree = [
+    *NAVIGATION_COMMON_ITEMS,
     ["auth.register", "Rekisteröidy"],
     ["auth.login", "Kirjaudu"]
 ]
 
 NAVIGATION_LOGGED_IN: NavigationTree = [
-    ["home.index", "Ruokareseptit"],
-    ["recipes.index", "Reseptit", [
-        ["recipes.index", "Parhaat"],
-        ["recipes.browse", "Kategoriat", [
-            ["recipes.browse", "Kaikki"],
-            ["recipes.browse_abc", "ABC"],
-            ["recipes.browse_xyz", "XYZ"],
-            ["https://www.google.com/", "Google"]
-        ]],
-        ["recipes.search", "Haku"]
-    ]],
-    ["profile.index", "👤 Profiili", [
-        ["profile.index", "Omat tiedot"],
-        ["profile.recipes", "Omat reseptit"],
-        ["profile.friends", "Kaverit"],
-        ["profile.settings", "Asetukset"],
+    *NAVIGATION_COMMON_ITEMS,
+    ["edit.recipes", "[👤 __USERNAME__] Muokkaa", [
+        ["edit.recipes", "Omat reseptit"],
+        ["edit.create", "Lisää uusi"],
+        ["edit.settings", "Omat tiedot"],
         ["auth.logout", "Kirjaudu ulos"]
     ]]
 ]
