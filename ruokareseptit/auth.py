@@ -124,7 +124,7 @@ def insert_user(username: str, password: str) -> bool:
     """Insert new user to database. Return True if successful,
     False otherwise."""
     try:
-        query = "INSERT INTO user (username, password_hash) VALUES (?, ?)"
+        query = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
         params = (username, generate_password_hash(password))
         db = get_db()
         db.execute(query, params)
