@@ -46,8 +46,8 @@ NAVIGATION_LOGGED_IN: NavigationTree = [
     ]]
 ]
 
-type NavigationItemDict = dict[str, str]
-type NavigationLayer = tuple[int, list[NavigationItemDict]]
+type NavigationItem = tuple[int, dict[str, str]]
+type NavigationLayer = tuple[int, list[NavigationItem]]
 type Navigation = list[NavigationLayer]
 
 
@@ -63,22 +63,22 @@ def navigation_context():
 
 def get_navigation(tree: NavigationTree, endpoint: str):
     """Build a flattened and enumerated list of navigation levels for the
-    `base.html` template. Every level is a list of dicts, defining the title
-    and url for each navigation item at that level. If the current endpoint
-    (eg. `home.index`) matches any of the items (or items below that in the
-    navigation tree), the dict has also attribute `class="current"` which
-    is used to select the CSS style.
+    `base.html` template. Every level is a list of `(index, dict)`, defining
+    the title and url for each navigation item at that level. If the current
+    endpoint (eg. `home.index`) matches any of the items (or items below that
+    in the navigation tree), the dict has also attribute `class="current"`
+    which is used to select the CSS style.
 
     Eg. structure of the return value:
-    `[ (0, [dict, dict, ...]), (1, [dict, dict, ...]) ]`
+    `[ (0, [(0, dict), (1, dict), ...]), (1, [(0, dict), (1, dict), ...]) ]`
     """
     pruned, _ = prune(tree, endpoint)
     return flatten(pruned)
 
 
 def flatten(tree: NavigationTree, level: int = 0) -> Navigation:
-    """Flatten navigation tree to a list of enumerated dicts. This is
-    passed to the base layout for rendering."""
+    """Flatten navigation tree to an enumerated list of enumerated
+    dicts. This is passed to the base layout for rendering."""
     this_level, next_level = [], None
     for item in tree:
         endpoint, title = item[0], item[1]
@@ -93,7 +93,7 @@ def flatten(tree: NavigationTree, level: int = 0) -> Navigation:
         this_level.append(itemdict)
     if len(this_level) == 0:
         return []
-    all_levels = [(level, this_level)]
+    all_levels = [(level, enumerate(this_level))]
     if next_level is not None:
         all_levels.extend(next_level)
     return all_levels
