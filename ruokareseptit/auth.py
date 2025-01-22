@@ -23,7 +23,8 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 def login():
     """Log in user"""
     if request.method == "GET":
-        return render_template("auth/login.html")
+        username = request.args.get("username")
+        return render_template("auth/login.html", username=username)
 
     username = request.form["username"]
     password = request.form["password"]
@@ -96,8 +97,9 @@ def register():
     elif not insert_user(username, password1):
         flash_error("Käyttäjätunnus on jo varattu.")
     else:
-        flash("Käyttäjätunnus on luotu. Voit nyt kirjautua.")
-        return redirect(url_for("home.index"))
+        flash("Käyttäjätunnus on luotu.")
+        next_url = request.args.get("next", url_for("home.index"))
+        return redirect(url_for("auth.login", next=next_url, username=username))
 
     return render_template("auth/register.html")
 

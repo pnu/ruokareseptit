@@ -80,8 +80,7 @@ def flatten(tree: NavigationTree, level: int = 0) -> Navigation:
     this_level, next_level = [], None
     for item in tree:
         endpoint, title = item[0], item[1]
-        if re.match(r"\w+(\.\w+)+$", endpoint):
-            endpoint = url_for(endpoint)
+        endpoint = url_for_endpoint(endpoint)
         if "__USERNAME__" in title and g.get("user") is not None:
             title = title.replace("__USERNAME__", g.user["username"])
         itemdict = {"title": title, "url": endpoint}
@@ -96,6 +95,21 @@ def flatten(tree: NavigationTree, level: int = 0) -> Navigation:
     if next_level is not None:
         all_levels.extend(next_level)
     return all_levels
+
+
+def url_for_endpoint(endpoint: str) -> str:
+    """URL for any given endpoint name. Contains logic for
+    passing current URL as parameter `next` etc."""
+    if re.match(r"\w+(\.\w+)+$", endpoint):
+        if endpoint in ("auth.login", "auth.register"):
+            if request.endpoint not in ("auth.login", "auth.register"):
+                next_url = request.url
+            else:
+                next_url = request.args.get("next")
+            endpoint = url_for(endpoint, next=next_url)
+        else:
+            endpoint = url_for(endpoint)
+    return endpoint
 
 
 def prune(tree: NavigationTree, current: str) -> tuple[NavigationTree, bool]:

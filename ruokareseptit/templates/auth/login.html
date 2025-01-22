@@ -20,12 +20,20 @@
 
   <div class="field-row">
     <label class="field-container min" for="username">Käyttäjätunnus</label>
-    <input class="field-container" type="text" name="username" id="username" required />
+    {% if username %}
+    <input class="field-container" type="text" name="username" id="username" value="{{ username }}" required />
+    {% else %}
+    <input class="field-container" type="text" name="username" id="username" autofocus required />
+    {% endif %}
   </div>
 
   <div class="field-row">
     <label class="field-container min" for="password">Salasana</label>
+    {% if username %}
+    <input class="field-container" type="password" name="password" id="password" autofocus required />
+    {% else %}
     <input class="field-container" type="password" name="password" id="password" required />
+    {% endif %}
   </div>
 
   <div class="field-row">
