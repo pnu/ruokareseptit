@@ -8,7 +8,7 @@ nav.navigation-bar {
   margin-bottom: 1em;
 
   a {
-    text-decoration: none;
+    display: contents;
     color: blue;
   }
 
@@ -17,6 +17,7 @@ nav.navigation-bar {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: stretch;
     padding: 0;
     margin: 0;
   }
@@ -27,7 +28,20 @@ nav.navigation-bar {
     flex-basis: 100%;
     padding: 0.5em;
     text-align: center;
+    justify-content: center;
     min-width: max-content;
+  }
+
+  li.logo-icon {
+    flex: 0;
+    padding: 0;
+    padding-inline: 0.2em;
+    font-size: 2em;
+  }
+
+  .level-0 li.item-0 {
+    flex: 0;
+    padding-right: 1em;
   }
 
   li.current {
@@ -84,6 +98,7 @@ ul.message-box {
     padding: 0.5em;
     text-align: center;
     font-weight: bold;
+    margin-bottom: 1em;
   }
 
   .warning {

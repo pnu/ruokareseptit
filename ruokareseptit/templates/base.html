@@ -12,8 +12,13 @@
   <nav class="navigation-bar">
     {% for (level, navigation) in navigation %}
     <ul class="level-{{ level }}">
-      {% for item in navigation %}
-      <li class="{{ item.class }}"><a href="{{ item.url }}">{{ item.title }}</a></li>
+      {% for (index, item) in navigation %}
+      <a href="{{ item.url }}">
+        {% if level == 0 and index == 0 %}
+        <li class="{{ item.class }} logo-icon">🍲</li>
+        {% endif %}
+        <li class="{{ item.class }} item-{{ index }}">{{ item.title }}</li>
+      </a>
       {% endfor %}
     </ul>
     {% endfor %}
