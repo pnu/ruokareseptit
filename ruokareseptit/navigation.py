@@ -11,14 +11,15 @@ type NavigationTreeItem = list[str | NavigationTree | bool]
 
 NAVIGATION: NavigationTree = [
     ["home.index", "Ruokareseptit"],
-    ["about.index", "Tietoa", [
-        ["about.index", "Palvelu"],
-        ["about.instructions", "Ohjeet", [
-            ["about.instructions_abc", "ABC"],
-            ["about.instructions_xyz", "XYZ"],
+    ["recipes.index", "Reseptit", [
+        ["recipes.index", "Parhaat"],
+        ["recipes.browse", "Kategoriat", [
+            ["recipes.browse", "Kaikki"],
+            ["recipes.browse_abc", "ABC"],
+            ["recipes.browse_xyz", "XYZ"],
             ["https://www.google.com/", "Google"]
         ]],
-        ["about.contact", "Yhteystiedot"]
+        ["recipes.search", "Haku"]
     ]],
     ["auth.register", "Rekisteröidy"],
     ["auth.login", "Kirjaudu"]
@@ -26,14 +27,15 @@ NAVIGATION: NavigationTree = [
 
 NAVIGATION_LOGGED_IN: NavigationTree = [
     ["home.index", "Ruokareseptit"],
-    ["about.index", "Tietoa", [
-        ["about.index", "Palvelu"],
-        ["about.instructions", "Ohjeet", [
-            ["about.instructions_abc", "ABC"],
-            ["about.instructions_xyz", "XYZ"],
+    ["recipes.index", "Reseptit", [
+        ["recipes.index", "Parhaat"],
+        ["recipes.browse", "Kategoriat", [
+            ["recipes.browse", "Kaikki"],
+            ["recipes.browse_abc", "ABC"],
+            ["recipes.browse_xyz", "XYZ"],
             ["https://www.google.com/", "Google"]
         ]],
-        ["about.contact", "Yhteystiedot"]
+        ["recipes.search", "Haku"]
     ]],
     ["profile.index", "👤 Profiili", [
         ["profile.index", "Omat tiedot"],
