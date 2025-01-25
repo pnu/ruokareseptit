@@ -99,7 +99,9 @@ def register():
     else:
         flash("Käyttäjätunnus on luotu.")
         next_url = request.args.get("next", url_for("home.index"))
-        return redirect(url_for("auth.login", next=next_url, username=username))
+        return redirect(url_for(
+            "auth.login", next=next_url, username=username
+        ))
 
     return render_template("auth/register.html")
 

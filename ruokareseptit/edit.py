@@ -33,13 +33,11 @@ def recipe(recipe_id: int):
             context["prev_page"] = url_for("edit.recipe", page=page - 1)
         return render_template("edit/recipes.html", **context)
 
-    query = "SELECT * FROM recipes WHERE id = ? and author_id = ?"
-    cursor = get_db().execute(query, [recipe_id, g.user["id"]])
-    recipe_row = cursor.fetchone()
-    if recipe_row is None:
+    recipe_context = fetch_recipe_context(recipe_id, g.user["id"])
+    if recipe_context is None:
         return redirect(url_for("edit.recipe"))
 
-    return render_template("edit/recipe.html", recipe=recipe_row)
+    return render_template("edit/recipe.html", **recipe_context)
 
 
 @bp.route("/recipe/create", methods=["GET", "POST"])
@@ -63,7 +61,7 @@ def create():
     else:
         recipe_id = insert_recipe(title, summary)
         if recipe_id is None:
-            flash_error("Palvelussa on jo samanniminen resepti. Valitse toinen nimi.")
+            flash_error("Nimi on jo varattu. Valitse toinen nimi.")
         else:
             flash("Uusi resepti on luotu.")
             session.pop("create_recipe_title", None)
@@ -100,19 +98,59 @@ def settings():
 
 # Utility functions
 
+
 def flash_error(message: str):
     """Flash form validation error"""
     flash(message, "form_validation_error")
+
 
 def insert_recipe(title: str, summary: str) -> int | None:
     """Insert new recipe to database. Return id if successful,
     None otherwise."""
     try:
-        query = "INSERT INTO recipes (title, summary, author_id) VALUES (?, ?, ?)"
-        params = (title, summary, session["uid"])
-        db = get_db()
-        res = db.execute(query, params)
-        db.commit()
+        res = get_db().execute("""
+            INSERT INTO recipes (title, summary, author_id) VALUES (?, ?, ?)
+            """, (title, summary, session["uid"])
+        )
+        get_db().commit()
         return res.lastrowid
-    except db.IntegrityError:
+    except:
         return None
+
+
+def fetch_recipe_context(recipe_id: int, author_id: int):
+    """Fetch a recipe from database. The recipe `author_id` in
+    databse must match the `author_id` passed. Returns a dict
+    to be used as a `render_template` context.
+    """
+    recipe_row = get_db().execute("""
+        SELECT * FROM recipes WHERE id = ? AND author_id = ?
+        """, [recipe_id, author_id]
+    ).fetchone()
+
+    if recipe_row is None:
+        return None
+
+    ingredients = get_db().execute("""
+        SELECT * FROM ingredients WHERE recipe_id = ? ORDER BY order_number
+        """, [recipe_id]
+    )
+    instructions = get_db().execute("""
+        SELECT * FROM instructions WHERE recipe_id = ? ORDER BY order_number
+        """, [recipe_id]
+    )
+    categories = get_db().execute("""
+        SELECT categories.title
+        FROM recipe_category
+        JOIN categories
+        ON recipe_category.category_id = categories.id
+        WHERE recipe_category.recipe_id = ?
+        """, [recipe_id]
+    )
+
+    return {
+        "recipe": recipe_row,
+        "ingredients": ingredients,
+        "instructions": instructions,
+        "categories": categories
+    }
