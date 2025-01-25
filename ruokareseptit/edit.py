@@ -39,7 +39,7 @@ def recipe(recipe_id: int):
     if recipe_row is None:
         return redirect(url_for("edit.recipe"))
 
-    return render_template("edit/recipe.html", recipe=dict(recipe_row))
+    return render_template("edit/recipe.html", recipe=recipe_row)
 
 
 @bp.route("/recipe/create", methods=["GET", "POST"])
