@@ -19,7 +19,7 @@ CREATE TABLE users (
 
 CREATE TABLE recipes (
     id INTEGER PRIMARY KEY,
-    title TEXT NOT NULL,
+    title TEXT UNIQUE NOT NULL,
     summary TEXT NOT NULL,
     preparation_time INTEGER,
     cooking_time INTEGER,
