@@ -6,17 +6,19 @@
 
 {% block content %}
 <p>
-    Reseptin muokkausnäkymä jos polussa on reseptin id.
-    Muutoin listaus omista.
+    Valitse resepti jota haluat muokata.
 </p>
-
-<hr/>
-
-<h2>Sivutettu listaus</h2>
+<hr>
 {% for recipe in recipes %}
-<p>{{ recipe.id }} {{ recipe.title }} {{ recipe.published > 0 }}</p>
+<p><a href="{{ url_for('edit.recipe', recipe_id=recipe.id) }}">{{ recipe.id }}</a> {{ recipe.title }} {{ recipe.published > 0 }}</p>
 {% endfor %}
+<hr>
 
-<p>previous page: {{ prev_page }}</p>
-<p>next page: {{ next_page }}</p>
+{% if prev_page %}
+<p><a href="{{ prev_page }}">&lt;&lt; edellinen sivu</a></p>
+{% endif %}
+{% if next_page %}
+<p><a href="{{ next_page }}">seuraava sivu &gt;&gt;</a></p>
+{% endif %}
+
 {% endblock %}

@@ -20,19 +20,29 @@ bp = Blueprint("edit", __name__, url_prefix="/edit")
 @login_required
 def recipe(recipe_id: int):
     """Own recipes"""
-    query = "SELECT * FROM recipes WHERE author_id = ? LIMIT 11 OFFSET ?"
-    cursor = get_db().execute(query, [g.user["id"], page * 10])
-    rows = cursor.fetchall()
-    context = {"recipes": rows}
-    if len(rows) > 10:
-        rows.pop()
-        context["next_page"] = url_for("edit.recipes", page=page + 1)
-    if page > 0:
-        context["prev_page"] = url_for("edit.recipes", page=page - 1)
-    return render_template("edit/recipes.html", **context)
+    if recipe_id is None:
+        page = int(request.args.get("page", 0))
+        query = "SELECT * FROM recipes WHERE author_id = ? LIMIT 11 OFFSET ?"
+        cursor = get_db().execute(query, [g.user["id"], page * 10])
+        rows = cursor.fetchall()
+        context = {"recipes": rows}
+        if len(rows) > 10:
+            rows.pop()
+            context["next_page"] = url_for("edit.recipe", page=page + 1)
+        if page > 0:
+            context["prev_page"] = url_for("edit.recipe", page=page - 1)
+        return render_template("edit/recipes.html", **context)
+
+    query = "SELECT * FROM recipes WHERE id = ? and author_id = ?"
+    cursor = get_db().execute(query, [recipe_id, g.user["id"]])
+    recipe_row = cursor.fetchone()
+    if recipe_row is None:
+        return redirect(url_for("edit.recipe"))
+
+    return render_template("edit/recipe.html", recipe=dict(recipe_row))
 
 
-@bp.route("/create", methods=["GET", "POST"])
+@bp.route("/recipe/create", methods=["GET", "POST"])
 @login_required
 def create():
     """Create new recipe"""
@@ -65,6 +75,20 @@ def create():
         "summary": session.pop("create_recipe_summary", "")
     }
     return render_template("edit/create.html", **context)
+
+
+@bp.route("/recipe/update/<int:recipe_id>")
+@login_required
+def recipe_update(recipe_id: int):
+    """Update recipe"""
+    return f"updated recipe {recipe_id}"
+
+
+@bp.route("/recipe/delete/<int:recipe_id>")
+@login_required
+def recipe_delete(recipe_id: int):
+    """Delete recipe"""
+    return f"deleted recipe {recipe_id}"
 
 
 @bp.route("/settings")
