@@ -11,10 +11,10 @@ from .auth import login_required
 bp = Blueprint("edit", __name__, url_prefix="/edit")
 
 
-@bp.route("/recipes/", defaults={'page': 0})
-@bp.route("/recipes/<int:page>")
+@bp.route("/recipe/", defaults={"recipe_id": None})
+@bp.route("/recipe/<int:recipe_id>")
 @login_required
-def recipes(page):
+def recipe(recipe_id: int):
     """Own recipes"""
     query = "SELECT * FROM recipes WHERE author_id = ? LIMIT 11 OFFSET ?"
     cursor = get_db().execute(query, [g.user["id"], page * 10])
