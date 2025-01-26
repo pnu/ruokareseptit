@@ -1,4 +1,5 @@
-"""Navigation definition and utilities"""
+"""Navigation definition and utilities
+"""
 
 import re
 from flask import request
@@ -46,7 +47,8 @@ type Navigation = list[NavigationLayer]
 
 def navigation_context():
     """Function to be register as context processor, used to inject
-    `navigation` to the context."""
+    `navigation` to the context.
+    """
     if session.get("uid") is not None:
         navigation = get_navigation(NAVIGATION_LOGGED_IN, request.endpoint)
     else:
@@ -71,7 +73,8 @@ def get_navigation(tree: NavigationTree, endpoint: str):
 
 def flatten(tree: NavigationTree, level: int = 0) -> Navigation:
     """Flatten navigation tree to an enumerated list of enumerated
-    dicts. This is passed to the base layout for rendering."""
+    dicts. This is passed to the base layout for rendering.
+    """
     this_level, next_level = [], None
     for item in tree:
         endpoint, title = item[0], item[1]
@@ -94,7 +97,8 @@ def flatten(tree: NavigationTree, level: int = 0) -> Navigation:
 
 def url_for_endpoint(endpoint: str) -> str:
     """URL for any given endpoint name. Contains logic for
-    passing current URL as parameter `next` etc."""
+    passing current URL as parameter `next` etc.
+    """
     if re.match(r"\w+(\.\w+)+$", endpoint):
         if endpoint in ("auth.login", "auth.register"):
             if request.endpoint not in ("auth.login", "auth.register"):
@@ -110,7 +114,8 @@ def url_for_endpoint(endpoint: str) -> str:
 def prune(tree: NavigationTree, current: str) -> tuple[NavigationTree, bool]:
     """Return pruned `navigation_tree` that contain only items relevant for
     the `current` endpoint. Returned bool indicates if any of the items in
-    this tree (or it's subtrees) is an exact match."""
+    this tree (or it's subtrees) is an exact match.
+    """
     pruned, any_match = [], False
     for item in tree:
         endpoint: str = item[0]

@@ -1,4 +1,5 @@
-"""User authentication"""
+"""User authentication
+"""
 
 import functools
 
@@ -21,7 +22,8 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
-    """Log in user"""
+    """Log in user
+    """
     if request.method == "GET":
         username = request.args.get("username")
         return render_template("auth/login.html", username=username)
@@ -44,14 +46,18 @@ def login():
 @bp.before_app_request
 def g_user():
     """Set g.user if logged in. Clear session if user
-    has been deleted from db."""
+    has been deleted from db.
+    """
     if session.get("uid") is None:
         g.user = None
         return
     uid = session.get("uid")
-    query = "SELECT id, username FROM users WHERE id = ?"
-    user_cursor = get_db().execute(query, [uid])
-    user_in_db = user_cursor.fetchone()
+    user_in_db = get_db().execute(
+        """
+        SELECT id, username
+        FROM users
+        WHERE id = ?
+        """, [uid]).fetchone()
     if user_in_db is None:
         session.clear()
     g.user = user_in_db
@@ -59,7 +65,8 @@ def g_user():
 
 def login_required(view):
     """View decorator to check if user is logged in.
-    Redirects to the login page if not."""
+    Redirects to the login page if not.
+    """
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
@@ -70,7 +77,8 @@ def login_required(view):
 
 @bp.route("/logout")
 def logout():
-    """Log out user"""
+    """Log out user
+    """
     session.clear()
     flash("Olet kirjautunut ulos.")
     return redirect(url_for("home.index"))
@@ -78,7 +86,8 @@ def logout():
 
 @bp.route("/register", methods=["GET", "POST"])
 def register():
-    """Registration form"""
+    """Registration form
+    """
     if request.method == "GET":
         return render_template("auth/register.html")
 
@@ -94,7 +103,7 @@ def register():
         flash_error("Salasana ei voi olla sama kuin käyttätunnus.")
     elif password1 != password2:
         flash_error("Salasanat eivät täsmää.")
-    elif not insert_user(username, password1):
+    elif insert_user(username, password1) is None:
         flash_error("Käyttäjätunnus on jo varattu.")
     else:
         flash("Käyttäjätunnus on luotu.")
@@ -110,38 +119,48 @@ def register():
 
 
 def flash_error(message: str):
-    """Flash form validation error"""
+    """Flash form validation error
+    """
     flash(message, "form_validation_error")
 
 
 def strong_password(password: str) -> bool:
-    """Check if password is strong enough"""
+    """Check if password is strong enough
+    """
     return len(password) >= 8
 
 
 def valid_username(username: str) -> bool:
-    """Check if username is valid"""
+    """Check if username is valid
+    """
     return len(username) >= 4 and username.isalnum()
 
 
-def insert_user(username: str, password: str) -> bool:
-    """Insert new user to database. Return True if successful,
-    False otherwise."""
+def insert_user(username: str, password: str) -> int:
+    """Insert new user to database. Return uid if successful,
+    None otherwise.
+    """
     try:
-        query = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
-        params = (username, generate_password_hash(password))
-        db = get_db()
-        db.execute(query, params)
-        db.commit()
-        return True
+        with get_db() as db:
+            res = db.execute(
+                """
+                INSERT INTO users (username, password_hash)
+                VALUES (?, ?)
+                """, [username, generate_password_hash(password)])
+            return res.lastrowid
     except db.IntegrityError:
-        return False
+        return None
 
 
 def auth_user(username: str, password: str) -> dict | None:
-    """Authenticate user"""
-    query = "SELECT id, password_hash FROM users WHERE username = ?"
-    user = get_db().execute(query, [username]).fetchone()
+    """Authenticate user
+    """
+    user = get_db().execute(
+        """
+        SELECT id, password_hash
+        FROM users
+        WHERE username = ?
+        """, [username]).fetchone()
 
     if user is None:
         return None

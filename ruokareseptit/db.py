@@ -1,4 +1,5 @@
-"""Database connection and utilities"""
+"""Database connection and utilities
+"""
 
 import sqlite3
 from datetime import datetime
@@ -24,7 +25,8 @@ def get_db():
 
 
 def close_db(e=None):
-    """Close the connection."""
+    """Close the connection.
+    """
     if e is not None:
         print("Unhandled exception:", e)
     db = g.pop("db", None)
@@ -33,7 +35,8 @@ def close_db(e=None):
 
 
 def init_db():
-    """Clear existing data and create new tables."""
+    """Clear existing data and create new tables.
+    """
     db = get_db()
 
     with current_app.open_resource("schema.sql") as f:
@@ -42,7 +45,8 @@ def init_db():
 
 @click.command("init-db")
 def init_db_command():
-    """Clear existing data and create new tables."""
+    """Clear existing data and create new tables.
+    """
     init_db()
     click.echo("Initialized the database.")
 

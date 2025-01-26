@@ -1,11 +1,13 @@
-"""Ruokareseptit application module"""
+"""Ruokareseptit application module
+"""
 
 import os
 from flask import Flask
 
 
 def create_app():
-    """Flask application factory."""
+    """Flask application factory.
+    """
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',  # used for signing the session cookie

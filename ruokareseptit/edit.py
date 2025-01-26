@@ -1,4 +1,5 @@
-"""User edit pages and features"""
+"""User edit pages and features
+"""
 
 from flask import Blueprint
 from flask import render_template
@@ -24,7 +25,8 @@ RECIPE_LIST_PAGE_SIZE = 5
 @bp.route("/recipe/<int:recipe_id>")
 @login_required
 def recipe(recipe_id: int):
-    """Own recipes"""
+    """Own recipes
+    """
     if recipe_id is None:
         page = int(request.args.get("page", 0))
         user_recipes, count = list_user_recipes(
@@ -47,7 +49,8 @@ def recipe(recipe_id: int):
 @bp.route("/recipe/create", methods=["GET", "POST"])
 @login_required
 def create():
-    """Create new recipe"""
+    """Create new recipe
+    """
     if request.method == "GET":
         session.pop("create_recipe_title", None)
         session.pop("create_recipe_summary", None)
@@ -82,20 +85,23 @@ def create():
 @bp.route("/recipe/update/<int:recipe_id>")
 @login_required
 def recipe_update(recipe_id: int):
-    """Update recipe"""
+    """Update recipe
+    """
     return f"updated recipe {recipe_id}"
 
 
 @bp.route("/recipe/delete/<int:recipe_id>")
 @login_required
 def recipe_delete(recipe_id: int):
-    """Delete recipe"""
+    """Delete recipe
+    """
     return f"deleted recipe {recipe_id}"
 
 
 @bp.route("/settings")
 def settings():
-    """Own settings"""
+    """Own settings
+    """
     context = {}
     return render_template("edit/settings.html", **context)
 
@@ -104,18 +110,22 @@ def settings():
 
 
 def flash_error(message: str):
-    """Flash form validation error"""
+    """Flash form validation error
+    """
     flash(message, "form_validation_error")
 
 
 def insert_recipe(title: str, summary: str) -> int | None:
     """Insert new recipe to database. Return id if successful,
-    None otherwise."""
+    None otherwise.
+    """
     try:
         with get_db() as db:
-            res = db.execute("""
-            INSERT INTO recipes (title, summary, author_id) VALUES (?, ?, ?)
-            """, (title, summary, session["uid"]))
+            res = db.execute(
+                """
+                INSERT INTO recipes (title, summary, author_id)
+                VALUES (?, ?, ?)
+                """, [title, summary, session["uid"]])
             return res.lastrowid
     except db.IntegrityError:
         return None
@@ -124,13 +134,19 @@ def insert_recipe(title: str, summary: str) -> int | None:
 def list_user_recipes(author_id: int, page_size: int, page: int):
     """Query recipes of user `author_id`
     """
-    user_recipes_total_count = get_db().execute("""
-    SELECT count(*) FROM recipes WHERE author_id = ?
-    """, [author_id]).fetchone()[0]
+    user_recipes_total_count = get_db().execute(
+        """
+        SELECT count(*)
+        FROM recipes
+        WHERE author_id = ?
+        """, [author_id]).fetchone()[0]
 
-    user_recipes = get_db().execute("""
-    SELECT * FROM recipes WHERE author_id = ? LIMIT ? OFFSET ?
-    """, [author_id, page_size, page * page_size]
+    user_recipes = get_db().execute(
+        """
+        SELECT *
+        FROM recipes
+        WHERE author_id = ? LIMIT ? OFFSET ?
+        """, [author_id, page_size, page * page_size]
     )
     return user_recipes, user_recipes_total_count
 
@@ -140,31 +156,37 @@ def fetch_recipe_context(recipe_id: int, author_id: int):
     databse must match the `author_id` passed. Returns a dict
     to be used as a `render_template` context.
     """
-    recipe_row = get_db().execute("""
-    SELECT * FROM recipes WHERE id = ? AND author_id = ?
-    """, [recipe_id, author_id]).fetchone()
+    recipe_row = get_db().execute(
+        """
+        SELECT *
+        FROM recipes
+        WHERE id = ? AND author_id = ?
+        """, [recipe_id, author_id]).fetchone()
 
     if recipe_row is None:
         return None
 
-    ingredients = get_db().execute("""
-    SELECT * FROM ingredients WHERE recipe_id = ?
-    ORDER BY order_number LIMIT ?
-    """, [recipe_id, RECIPE_INGREDIENTS_MAX])
+    ingredients = get_db().execute(
+        """
+        SELECT * FROM ingredients WHERE recipe_id = ?
+        ORDER BY order_number LIMIT ?
+        """, [recipe_id, RECIPE_INGREDIENTS_MAX])
 
-    instructions = get_db().execute("""
-    SELECT * FROM instructions WHERE recipe_id = ?
-    ORDER BY order_number LIMIT ?
-    """, [recipe_id, RECIPE_INSTRUCTIONS_MAX])
+    instructions = get_db().execute(
+        """
+        SELECT * FROM instructions WHERE recipe_id = ?
+        ORDER BY order_number LIMIT ?
+        """, [recipe_id, RECIPE_INSTRUCTIONS_MAX])
 
-    categories = get_db().execute("""
-    SELECT categories.title
-    FROM recipe_category
-    JOIN categories
-    ON recipe_category.category_id = categories.id
-    WHERE recipe_category.recipe_id = ?
-    LIMIT ?
-    """, [recipe_id, RECIPE_CATEGORIES_MAX])
+    categories = get_db().execute(
+        """
+        SELECT categories.title
+        FROM recipe_category
+        JOIN categories
+        ON recipe_category.category_id = categories.id
+        WHERE recipe_category.recipe_id = ?
+        LIMIT ?
+        """, [recipe_id, RECIPE_CATEGORIES_MAX])
 
     return {
         "recipe": recipe_row,
