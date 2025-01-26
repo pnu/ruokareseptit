@@ -9,16 +9,12 @@ from flask import request
 from flask import session
 from flask import flash
 from flask import redirect
+from flask import current_app
 
 from .db import get_db
 from .auth import login_required
 
 bp = Blueprint("edit", __name__, url_prefix="/edit")
-
-RECIPE_INGREDIENTS_MAX = 20
-RECIPE_INSTRUCTIONS_MAX = 20
-RECIPE_CATEGORIES_MAX = 20
-RECIPE_LIST_PAGE_SIZE = 5
 
 
 @bp.route("/recipe/", defaults={"recipe_id": None})
@@ -29,11 +25,9 @@ def recipe(recipe_id: int):
     """
     if recipe_id is None:
         page = int(request.args.get("page", 0))
-        user_recipes, count = list_user_recipes(
-            g.user["id"], RECIPE_LIST_PAGE_SIZE, page
-        )
+        user_recipes, remaining = list_user_recipes(g.user["id"], page)
         context = {"recipes": user_recipes}
-        if count - page * RECIPE_LIST_PAGE_SIZE > RECIPE_LIST_PAGE_SIZE:
+        if remaining > 0:
             context["next_page"] = url_for("edit.recipe", page=page + 1)
         if page > 0:
             context["prev_page"] = url_for("edit.recipe", page=page - 1)
@@ -131,24 +125,26 @@ def insert_recipe(title: str, summary: str) -> int | None:
         return None
 
 
-def list_user_recipes(author_id: int, page_size: int, page: int):
+def list_user_recipes(author_id: int, page: int):
     """Query recipes of user `author_id`
     """
-    user_recipes_total_count = get_db().execute(
+    total_rows = get_db().execute(
         """
         SELECT count(*)
         FROM recipes
         WHERE author_id = ?
         """, [author_id]).fetchone()[0]
-
+    page_size = current_app.config["RECIPE_LIST_PAGE_SIZE"]
+    offset = page * page_size
     user_recipes = get_db().execute(
         """
         SELECT *
         FROM recipes
         WHERE author_id = ? LIMIT ? OFFSET ?
-        """, [author_id, page_size, page * page_size]
+        """, [author_id, page_size, offset]
     )
-    return user_recipes, user_recipes_total_count
+    recipes_remaining = total_rows - offset - page_size
+    return user_recipes, recipes_remaining
 
 
 def fetch_recipe_context(recipe_id: int, author_id: int):
@@ -166,18 +162,21 @@ def fetch_recipe_context(recipe_id: int, author_id: int):
     if recipe_row is None:
         return None
 
+    ingredients_limit = current_app.config["RECIPE_INGREDIENTS_MAX"]
     ingredients = get_db().execute(
         """
         SELECT * FROM ingredients WHERE recipe_id = ?
         ORDER BY order_number LIMIT ?
-        """, [recipe_id, RECIPE_INGREDIENTS_MAX])
+        """, [recipe_id, ingredients_limit])
 
+    instructions_limit = current_app.config["RECIPE_INSTRUCTIONS_MAX"]
     instructions = get_db().execute(
         """
         SELECT * FROM instructions WHERE recipe_id = ?
         ORDER BY order_number LIMIT ?
-        """, [recipe_id, RECIPE_INSTRUCTIONS_MAX])
+        """, [recipe_id, instructions_limit])
 
+    categories_limit = current_app.config["RECIPE_CATEGORIES_MAX"]
     categories = get_db().execute(
         """
         SELECT categories.title
@@ -186,7 +185,7 @@ def fetch_recipe_context(recipe_id: int, author_id: int):
         ON recipe_category.category_id = categories.id
         WHERE recipe_category.recipe_id = ?
         LIMIT ?
-        """, [recipe_id, RECIPE_CATEGORIES_MAX])
+        """, [recipe_id, categories_limit])
 
     return {
         "recipe": recipe_row,
