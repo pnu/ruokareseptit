@@ -14,6 +14,11 @@ from .auth import login_required
 
 bp = Blueprint("edit", __name__, url_prefix="/edit")
 
+RECIPE_INGREDIENTS_MAX = 20
+RECIPE_INSTRUCTIONS_MAX = 20
+RECIPE_CATEGORIES_MAX = 20
+RECIPE_LIST_PAGE_SIZE = 5
+
 
 @bp.route("/recipe/", defaults={"recipe_id": None})
 @bp.route("/recipe/<int:recipe_id>")
@@ -22,12 +27,11 @@ def recipe(recipe_id: int):
     """Own recipes"""
     if recipe_id is None:
         page = int(request.args.get("page", 0))
-        query = "SELECT * FROM recipes WHERE author_id = ? LIMIT 11 OFFSET ?"
-        cursor = get_db().execute(query, [g.user["id"], page * 10])
-        rows = cursor.fetchall()
-        context = {"recipes": rows}
-        if len(rows) > 10:
-            rows.pop()
+        user_recipes, count = list_user_recipes(
+            g.user["id"], RECIPE_LIST_PAGE_SIZE, page
+        )
+        context = {"recipes": user_recipes}
+        if count - page * RECIPE_LIST_PAGE_SIZE > RECIPE_LIST_PAGE_SIZE:
             context["next_page"] = url_for("edit.recipe", page=page + 1)
         if page > 0:
             context["prev_page"] = url_for("edit.recipe", page=page - 1)
@@ -108,14 +112,27 @@ def insert_recipe(title: str, summary: str) -> int | None:
     """Insert new recipe to database. Return id if successful,
     None otherwise."""
     try:
-        res = get_db().execute("""
+        with get_db() as db:
+            res = db.execute("""
             INSERT INTO recipes (title, summary, author_id) VALUES (?, ?, ?)
-            """, (title, summary, session["uid"])
-        )
-        get_db().commit()
-        return res.lastrowid
-    except:
+            """, (title, summary, session["uid"]))
+            return res.lastrowid
+    except db.IntegrityError:
         return None
+
+
+def list_user_recipes(author_id: int, page_size: int, page: int):
+    """Query recipes of user `author_id`
+    """
+    user_recipes_total_count = get_db().execute("""
+    SELECT count(*) FROM recipes WHERE author_id = ?
+    """, [author_id]).fetchone()[0]
+
+    user_recipes = get_db().execute("""
+    SELECT * FROM recipes WHERE author_id = ? LIMIT ? OFFSET ?
+    """, [author_id, page_size, page * page_size]
+    )
+    return user_recipes, user_recipes_total_count
 
 
 def fetch_recipe_context(recipe_id: int, author_id: int):
@@ -124,29 +141,30 @@ def fetch_recipe_context(recipe_id: int, author_id: int):
     to be used as a `render_template` context.
     """
     recipe_row = get_db().execute("""
-        SELECT * FROM recipes WHERE id = ? AND author_id = ?
-        """, [recipe_id, author_id]
-    ).fetchone()
+    SELECT * FROM recipes WHERE id = ? AND author_id = ?
+    """, [recipe_id, author_id]).fetchone()
 
     if recipe_row is None:
         return None
 
     ingredients = get_db().execute("""
-        SELECT * FROM ingredients WHERE recipe_id = ? ORDER BY order_number
-        """, [recipe_id]
-    )
+    SELECT * FROM ingredients WHERE recipe_id = ?
+    ORDER BY order_number LIMIT ?
+    """, [recipe_id, RECIPE_INGREDIENTS_MAX])
+
     instructions = get_db().execute("""
-        SELECT * FROM instructions WHERE recipe_id = ? ORDER BY order_number
-        """, [recipe_id]
-    )
+    SELECT * FROM instructions WHERE recipe_id = ?
+    ORDER BY order_number LIMIT ?
+    """, [recipe_id, RECIPE_INSTRUCTIONS_MAX])
+
     categories = get_db().execute("""
-        SELECT categories.title
-        FROM recipe_category
-        JOIN categories
-        ON recipe_category.category_id = categories.id
-        WHERE recipe_category.recipe_id = ?
-        """, [recipe_id]
-    )
+    SELECT categories.title
+    FROM recipe_category
+    JOIN categories
+    ON recipe_category.category_id = categories.id
+    WHERE recipe_category.recipe_id = ?
+    LIMIT ?
+    """, [recipe_id, RECIPE_CATEGORIES_MAX])
 
     return {
         "recipe": recipe_row,
