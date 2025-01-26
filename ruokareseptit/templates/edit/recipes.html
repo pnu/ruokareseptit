@@ -10,7 +10,7 @@
 </p>
 <hr>
 {% for recipe in recipes %}
-<p><a href="{{ url_for('edit.recipe', recipe_id=recipe.id) }}">{{ recipe.id }}</a> {{ recipe.title }} {{ recipe.published > 0 }}</p>
+<p><a href="{{ url_for('edit.recipe', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a> {{ recipe.title }} {{ recipe.published > 0 }}</p>
 {% endfor %}
 <hr>
 
