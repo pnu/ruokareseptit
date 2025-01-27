@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-<form class="registration-form" method="post">
+<form class="new-recipe-form" method="post">
     <h1>Uusi resepti</h1>
     <p>
         Valitse ensin resptille nimi ja lyhyt kuvaus.
@@ -16,27 +16,20 @@
 
     {% with errors = get_flashed_messages(category_filter=["form_validation_error"]) %}
     {% if errors %}
-    <ul class="message-box field-row">
+    <ul class="message-box">
         {%- for error in errors %}
-        <li class="field-container warning">{{ error }}</li>
+        <li class="warning">{{ error }}</li>
         {% endfor -%}
     </ul>
     {% endif %} {% endwith %}
 
-    <div class="field-row">
-        <label class="field-container min" for="title">Reseptin nimi</label>
-        <input class="field-container" type="text" name="title" id="title" placeholder="Pizza" value="{{ title }}"
-            autofocus />
-    </div>
+    <label for="title">Reseptin nimi</label>
+    <input type="text" name="title" id="title" placeholder="Pizza" value="{{ title }}" autofocus />
 
-    <div class="field-row">
-        <label class="field-container min" for="summary">Kuvaus</label>
-        <textarea class="field-container" name="summary" id="summary" rows="5"
-            placeholder="Hyvä perusresepti pizzapohjalle, kestää jonkin aikaa tehdä mutta niin sen arvoista!">{{ summary }}</textarea>
-    </div>
+    <label for="summary">Kuvaus</label>
+    <textarea name="summary" id="summary" rows="5"
+        placeholder="Hyvä perusresepti pizzapohjalle, kestää jonkin aikaa tehdä mutta niin sen arvoista!">{{ summary }}</textarea>
 
-    <div class="field-row">
-        <input class="field-container min" type="submit" value="Luo resepti" />
-    </div>
+    <input type="submit" value="Luo resepti" />
 </form>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form class="login-form" method="post">
+<form class="dialog-form" method="post">
   <h1>Kirjautuminen</h1>
   <p>
     Kirjaudu sisään omalla käyttäjä&shy;tunnuksella ja salasanalla.
@@ -11,33 +11,27 @@
 
   {% with errors = get_flashed_messages(category_filter=["form_validation_error"]) %}
   {% if errors %}
-  <ul class="message-box field-row">
+  <ul class="message-box">
     {%- for error in errors %}
-    <li class="field-container warning">{{ error }}</li>
+    <li class="warning">{{ error }}</li>
     {% endfor -%}
   </ul>
   {% endif %} {% endwith %}
 
-  <div class="field-row">
-    <label class="field-container min" for="username">Käyttäjätunnus</label>
-    {% if username %}
-    <input class="field-container" type="text" name="username" id="username" value="{{ username }}" required />
-    {% else %}
-    <input class="field-container" type="text" name="username" id="username" autofocus required />
-    {% endif %}
-  </div>
+  <label for="username">Käyttäjätunnus</label>
+  {% if username %}
+  <input type="text" name="username" id="username" value="{{ username }}" required />
+  {% else %}
+  <input type="text" name="username" id="username" autofocus required />
+  {% endif %}
 
-  <div class="field-row">
-    <label class="field-container min" for="password">Salasana</label>
-    {% if username %}
-    <input class="field-container" type="password" name="password" id="password" autofocus required />
-    {% else %}
-    <input class="field-container" type="password" name="password" id="password" required />
-    {% endif %}
-  </div>
+  <label class="field-container min" for="password">Salasana</label>
+  {% if username %}
+  <input type="password" name="password" id="password" autofocus required />
+  {% else %}
+  <input type="password" name="password" id="password" required />
+  {% endif %}
 
-  <div class="field-row">
-    <input class="field-container min" type="submit" value="Kirjaudu sisään" />
-  </div>
+  <input type="submit" value="Kirjaudu sisään" />
 </form>
 {% endblock %}

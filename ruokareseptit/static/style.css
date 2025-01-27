@@ -3,15 +3,18 @@ body {
   background-color: burlywood;
 }
 
+/* Main navigation bar at the top of page */
 nav.navigation-bar {
   min-width: fit-content;
   margin-bottom: 1em;
 
+  /* <a> fully covers all child elements */
   a {
     display: contents;
     color: blue;
   }
 
+  /* Nav levels are flex rows */
   ul {
     background-color: lightcyan;
     display: flex;
@@ -20,75 +23,102 @@ nav.navigation-bar {
     align-items: stretch;
     padding: 0;
     margin: 0;
+
+    /* Base style for nav items in a row,
+    all flex equally to fill the available width */
+    li {
+      display: flex;
+      flex-direction: column;
+      flex-basis: 100%;
+      padding: 0.5em;
+      text-align: center;
+      justify-content: center;
+      min-width: max-content;
+    }
+
+    /* Current selection is highlighted */
+    li.current {
+      font-weight: bold;
+      background-color: lightblue;
+    }
   }
 
-  li {
-    display: flex;
-    flex-direction: column;
-    flex-basis: 100%;
-    padding: 0.5em;
-    text-align: center;
-    justify-content: center;
-    min-width: max-content;
+  /* Specific exception: first level first two items don't flex */
+  ul.level-0 {
+    li.logo-icon {
+      flex: 0;
+      padding: 0;
+      padding-inline: 0.2em;
+      font-size: 2em;
+    }
+
+    li.item-0 {
+      flex: 0;
+      padding-right: 1em;
+    }
   }
 
-  li.logo-icon {
-    flex: 0;
-    padding: 0;
-    padding-inline: 0.2em;
-    font-size: 2em;
-  }
-
-  .level-0 li.item-0 {
-    flex: 0;
-    padding-right: 1em;
-  }
-
-  li.current {
-    font-weight: bold;
-  }
-
-  .level-0 li.current {
-    background-color: lightblue;
-  }
-
+  /* Second level navi row; all items have "selected" color */
   ul.level-1 {
     background-color: lightblue;
   }
 
+  /* Third level navigation row; looks like "buttons" */
   ul.level-2 {
     background-color: initial;
     width: min-content;
     margin-top: 1em;
     gap: 1em;
-  }
 
-  .level-2 li {
-    background-color: lightgray;
-  }
+    li {
+      background-color: lightgray;
+    }
 
-  .level-2 li.current {
-    background-color: lightblue;
+    li.current {
+      background-color: lightblue;
+    }
   }
 }
 
-.registration-form,
-.login-form {
+/* Centered dialog form (login and register) is a grid */
+.dialog-form {
+  display: grid;
+  grid-template-columns: [labels] auto [controls] 1fr;
+  grid-gap: 1em;
+  align-items: center;
+  background-color: antiquewhite;
+  padding: 1.5em;
+  outline-style: solid;
   min-width: min-content;
   max-width: 30em;
-  outline-style: solid;
-  padding: 1em;
   margin: auto;
-  background-color: antiquewhite;
 
-  label {
-    min-width: 8em;
+  /* Header, text area and flash messages span 2 columns */
+  h1,
+  p,
+  ul.message-box {
+    grid-column: span 2;
+    margin: 0;
   }
+
   h1 {
     text-align: center;
   }
+
+  /* Form labels are in the first column */
+  label {
+    grid-column: labels;
+  }
+
+  /* Form controls are in the second column */
+  input,
+  button {
+    grid-column: controls;
+    padding: 0.5em;
+  }
 }
 
+/* Message box is a list of flash messages */
 ul.message-box {
   list-style: none;
   padding: 0;
@@ -98,31 +128,15 @@ ul.message-box {
     padding: 0.5em;
     text-align: center;
     font-weight: bold;
-    margin-bottom: 1em;
+    margin-block: 1em;
   }
 
-  .warning {
+  /* Colors for different flash categories */
+  li.warning {
     background-color: lightpink;
   }
 
-  .message {
+  li.message {
     background-color: lightgreen;
-  }
-}
-
-.field-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-
-  .field-container {
-    display: flex;
-    flex-direction: column;
-    flex-basis: 100%;
-    margin: 0.5em;
-  }
-
-  .min {
-    flex-basis: min-content;
   }
 }
