@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Reseptin muokkaus{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<a href="{{ request.args.get('back', url_for('recipes.index')) }}"><< Takaisin reseptilistaukseen</a>
+
+<h2>{{ recipe.title }}</h2>
+
+<p>
+    {{ recipe.summary }}
+</p>
+
+<ul>
+    {% if recipe.preparation_time and recipe.cooking_time %}
+    <li>Valmisteluaika, aktiivinen: {{ recipe.preparation_time }} min</li>
+    <li>Valmistusaika, yhteensä {{ recipe.preparation_time + recipe.cooking_time }} min</li>
+    {% endif %}
+    {% if recipe.skill_level %}
+    <li>Vaikeustaso: {{ recipe.skill_level }}</li>
+    {% endif %}
+</ul>
+
+<h3>
+    Ainekset
+    {% if recipe.portions == 1 %}
+    ({{ recipe.portions }} annos)
+    {% elif recipe.portions %}
+    ({{ recipe.portions }} annosta)
+    {% endif %}
+</h3>
+<ul>
+{% for ingredient in ingredients %}
+<li>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.title }}</li>
+{% endfor %}
+</ul>
+
+<h3>Valmistusohjeet</h3>
+<ul>
+{% for step in instructions %}
+<li>{{ step.order_number }}: {{ step.instructions }}</li>
+{% endfor %}
+</ul>
+
+
+{% endblock %}
