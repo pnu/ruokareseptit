@@ -1,14 +1,10 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}Reseptin muokkaus{% endblock %}</h1>
+<h1>{% block title %}{{ recipe.title }}{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-<a href="{{ request.args.get('back', url_for('recipes.index')) }}"><< Takaisin reseptilistaukseen</a>
-
-<h2>{{ recipe.title }}</h2>
-
 <p>
     {{ recipe.summary }}
 </p>
@@ -16,14 +12,26 @@
 <ul>
     <li>Reseptin laatija: {{ recipe.username }}</li>
     {% if recipe.preparation_time and recipe.cooking_time %}
-    <li>Valmisteluaika, aktiivinen: {{ recipe.preparation_time }} min</li>
+    <li>Valmistusaika, aktiivinen: {{ recipe.preparation_time }} min</li>
     <li>Valmistusaika, yhteensä {{ recipe.preparation_time + recipe.cooking_time }} min</li>
     {% endif %}
     {% if recipe.skill_level %}
     <li>Vaikeustaso: {{ recipe.skill_level }}</li>
     {% endif %}
+    {% for category in categories %}
+    {% if loop.first %}
+    <li>Kategoriat:
+        {% endif %}
+        {{ category.title }}
+        {%- if not loop.last %}, {% else %}
+    </li>
+    {% endif %}
+    {% endfor %}
+    </li>
 </ul>
 
+{% for ingredient in ingredients %}
+{% if loop.first %}
 <h3>
     Ainekset
     {% if recipe.portions == 1 %}
@@ -33,17 +41,23 @@
     {% endif %}
 </h3>
 <ul>
-{% for ingredient in ingredients %}
-<li>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.title }}</li>
-{% endfor %}
+    {% endif %}
+    <li>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.title }}</li>
+    {% if loop.last %}
 </ul>
+{% endif %}
+{% endfor %}
 
+{% for step in instructions %}
+{% if loop.first %}
 <h3>Valmistusohjeet</h3>
 <ul>
-{% for step in instructions %}
-<li>{{ step.order_number }}: {{ step.instructions }}</li>
-{% endfor %}
+    {% endif %}
+    <li>{{ step.order_number }}: {{ step.instructions }}</li>
+    {% if loop.last %}
 </ul>
+{% endif %}
+{% endfor %}
 
 {% if g.user.id == recipe.author_id %}
 <a href="{{ url_for('edit.recipe', recipe_id=recipe.id, back=request.url) }}">Muokkaa reseptiä</a>

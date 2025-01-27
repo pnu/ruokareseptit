@@ -13,7 +13,7 @@ type NavigationTreeItem = list[str | NavigationTree | bool]
 NAVIGATION_COMMON_ITEMS = [
     ["home.index", "Ruokareseptit"],
     ["recipes.index", "Katsele", [
-        ["recipes.index", "Parhaat"],
+        ["recipes.index", "Reseptit"],
         ["recipes.browse", "Kategoriat", [
             ["recipes.browse", "Kaikki"],
             ["recipes.browse_abc", "ABC"],
