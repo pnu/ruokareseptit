@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form class="dialog-form" method="post">
+<form class="grid dialog" method="post">
   <h1>Rekisteröityminen</h1>
   <p>
     Valitse itsellesi uusi käyttäjä&shy;tunnus ja salasana. Käyttäjä&shy;tunnuksen
@@ -39,6 +39,6 @@
   <label for="password2">Toista salasana</label>
   <input type="password" name="password2" id="password2" required />
 
-  <input type="submit" value="Luo uusi tunnus" />
+  <button type="submit">Luo uusi tunnus</button>
 </form>
 {% endblock %}

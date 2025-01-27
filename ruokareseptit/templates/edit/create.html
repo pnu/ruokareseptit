@@ -5,8 +5,7 @@
 {% endblock %}
 
 {% block content %}
-<form class="new-recipe-form" method="post">
-    <h1>Uusi resepti</h1>
+<form class="grid" method="post">
     <p>
         Valitse ensin resptille nimi ja lyhyt kuvaus.
         Seuraavassa vaiheessa lisäät reseptiin ainesosat, varsinaiset valmistusohjeet yms. tiedot.
@@ -30,6 +29,6 @@
     <textarea name="summary" id="summary" rows="5"
         placeholder="Hyvä perusresepti pizzapohjalle, kestää jonkin aikaa tehdä mutta niin sen arvoista!">{{ summary }}</textarea>
 
-    <input type="submit" value="Luo resepti" />
+    <button type="submit">Luo resepti</button>
 </form>
 {% endblock %}

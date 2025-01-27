@@ -7,7 +7,6 @@
 </head>
 
 <body>
-
   {% if navigation %}
   <nav class="navigation-bar">
     {% for (level, navigation) in navigation %}
@@ -24,18 +23,16 @@
     {% endfor %}
   </nav>
   {% endif %}
-
+  {% with messages = get_flashed_messages(category_filter=["message"]) %}
+  {% if messages %}
+  <ul class="message-box">
+    {% for message in messages %}
+    <li class="message">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endwith %}
   <section class="content">
-    {% with messages = get_flashed_messages(category_filter=["message"]) %}
-    {% if messages %}
-    <ul class="message-box">
-      {% for message in messages %}
-      <li class="message">{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-
     <header>{% block header %}{% endblock %}</header>
     {% block content %}{% endblock %}
   </section>

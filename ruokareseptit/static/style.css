@@ -3,6 +3,10 @@ body {
   background-color: burlywood;
 }
 
+section.content {
+  padding-inline: 1em;
+}
+
 /* Main navigation bar at the top of page */
 nav.navigation-bar {
   min-width: fit-content;
@@ -81,17 +85,11 @@ nav.navigation-bar {
 }
 
 /* Centered dialog form (login and register) is a grid */
-.dialog-form {
+form.grid {
   display: grid;
   grid-template-columns: [labels] auto [controls] 1fr;
   grid-gap: 1em;
-  align-items: center;
-  background-color: antiquewhite;
-  padding: 1.5em;
-  outline-style: solid;
   min-width: min-content;
-  max-width: 30em;
-  margin: auto;
 
   /* Header, text area and flash messages span 2 columns */
   h1,
@@ -101,10 +99,6 @@ nav.navigation-bar {
     margin: 0;
   }
 
-  h1 {
-    text-align: center;
-  }
-
   /* Form labels are in the first column */
   label {
     grid-column: labels;
@@ -112,11 +106,31 @@ nav.navigation-bar {
 
   /* Form controls are in the second column */
   input,
-  button {
+  textarea {
     grid-column: controls;
     padding: 0.5em;
   }
+  button {
+    grid-column: span 2;
+    padding: 0.5em;
+    margin: auto;
+  }
 }
+
+/* Centered dialog form (login and register) */
+form.dialog {
+  align-items: center;
+  background-color: antiquewhite;
+  padding: 1.5em;
+  outline-style: solid;
+  max-width: 30em;
+  margin: auto;
+
+  h1 {
+    text-align: center;
+  }
+}
+
 
 /* Message box is a list of flash messages */
 ul.message-box {

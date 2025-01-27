@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form class="dialog-form" method="post">
+<form class="grid dialog" method="post">
   <h1>Kirjautuminen</h1>
   <p>
     Kirjaudu sisään omalla käyttäjä&shy;tunnuksella ja salasanalla.
@@ -32,6 +32,6 @@
   <input type="password" name="password" id="password" required />
   {% endif %}
 
-  <input type="submit" value="Kirjaudu sisään" />
+  <button type="submit">Kirjaudu sisään</button>
 </form>
 {% endblock %}
