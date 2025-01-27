@@ -89,14 +89,16 @@ def register():
     """Registration form
     """
     if request.method == "GET":
-        return render_template("auth/register.html")
+        username = request.args.get("username")
+        return render_template("auth/register.html", username=username)
 
     username = request.form["username"]
     password1 = request.form["password1"]
     password2 = request.form["password2"]
 
     if not valid_username(username):
-        flash_error("Käyttäjätunnus ei ole vaatimusten mukainen.")
+        flash_error("Käyttäjätunnus " + username + " ei ole vaatimusten mukainen.")
+        username = None
     elif not strong_password(password1):
         flash_error("Salasana ei ole vaatimusten mukainen.")
     elif username == password1:
@@ -104,16 +106,16 @@ def register():
     elif password1 != password2:
         flash_error("Salasanat eivät täsmää.")
     elif insert_user(username, password1) is None:
-        flash_error("Käyttäjätunnus on jo varattu.")
+        flash_error("Käyttäjätunnus " + username + " on jo varattu.")
+        username = None
     else:
-        flash("Käyttäjätunnus on luotu.")
+        flash("Käyttäjätunnus " + username + " on luotu.")
         next_url = request.args.get("next", url_for("home.index"))
         return redirect(url_for(
             "auth.login", next=next_url, username=username
         ))
 
-    return render_template("auth/register.html")
-
+    return render_template("auth/register.html", username=username)
 
 # Utility functions
 
