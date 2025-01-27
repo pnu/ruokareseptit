@@ -102,9 +102,11 @@ def fetch_recipe_context(recipe_id: int):
     """
     recipe_row = get_db().execute(
         """
-        SELECT *
+        SELECT recipes.*, users.username
         FROM recipes
-        WHERE id = ?
+        JOIN users
+        ON recipes.author_id = users.id
+        WHERE recipes.id = ?
         """, [recipe_id]).fetchone()
 
     if recipe_row is None:

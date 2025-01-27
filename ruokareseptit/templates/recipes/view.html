@@ -14,6 +14,7 @@
 </p>
 
 <ul>
+    <li>Reseptin laatija: {{ recipe.username }}</li>
     {% if recipe.preparation_time and recipe.cooking_time %}
     <li>Valmisteluaika, aktiivinen: {{ recipe.preparation_time }} min</li>
     <li>Valmistusaika, yhteensä {{ recipe.preparation_time + recipe.cooking_time }} min</li>
@@ -44,5 +45,9 @@
 {% endfor %}
 </ul>
 
-
+{% if g.user.id == recipe.author_id %}
+<a href="{{ url_for('edit.recipe', recipe_id=recipe.id, back=request.url) }}">Muokkaa reseptiä</a>
+{% endif %}
+<hr />
+<a href="{{ request.args.get('back', url_for('recipes.index')) }}">&lt;&lt; Takaisin reseptilistaukseen </a>
 {% endblock %}
