@@ -83,8 +83,12 @@ def list_published_recipes(page: int):
     offset = page * page_size
     pub_recipes = get_db().execute(
         """
-        SELECT *
-        FROM recipes
+        SELECT recipes.*, AVG(user_review.rating) AS rating
+        FROM recipes LEFT JOIN user_review
+        ON recipes.id = user_review.recipe_id
+        WHERE published = 1
+        GROUP BY recipes.id
+        ORDER BY rating DESC
         LIMIT ? OFFSET ?
         """, [page_size, offset]
     )
