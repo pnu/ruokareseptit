@@ -289,7 +289,7 @@ def delete_ingredients_row(recipe_id: int, ingredient_id: int) -> bool:
             db.execute(
                 """
                 DELETE FROM ingredients
-                    WHERE recipe_id = ? AND id = ?
+                WHERE recipe_id = ? AND id = ?
                 """, [recipe_id, ingredient_id])
             return True
     except db.IntegrityError:
@@ -325,30 +325,17 @@ def move_ingredients_row_up(recipe_id: int, ingredient_id: int) -> bool:
         with get_db() as db:
             db.execute(
                 """
-                WITH prev AS (
-                    SELECT id, MAX(order_number) AS order_number
-                    FROM ingredients
-                    WHERE order_number < (
-                        SELECT order_number FROM ingredients
-                        WHERE id = :ingredient_id
-                    ) AND recipe_id = :recipe_id
-                ), this AS (
-                    SELECT id, order_number
-                    FROM ingredients
-                    WHERE id = :ingredient_id
-                    AND recipe_id = :recipe_id
-                )
                 UPDATE ingredients SET order_number = CASE
-                    WHEN ingredients.id = prev.id THEN this.order_number
-                    WHEN ingredients.id = this.id THEN prev.order_number
-                    END
-                FROM prev, this
-                WHERE recipe_id = :recipe_id
-                AND ingredients.id in (prev.id, this.id)
-                """, {
-                    "recipe_id": recipe_id,
-                    "ingredient_id": ingredient_id
-                })
+                WHEN ingredients.id = prev_id THEN this.order_number
+                WHEN ingredients.id = this.id THEN prev_order_number
+                END FROM ingredients AS this, (SELECT id,
+                    lag(id) OVER (ORDER BY order_number) AS prev_id,
+                    lag(order_number) OVER (ORDER BY order_number) AS prev_order_number
+                    FROM ingredients WHERE recipe_id = ?) AS prev
+                WHERE this.id = prev.id
+                AND this.id = ?
+                AND ingredients.id IN (this.id, prev_id);
+                """, [recipe_id, ingredient_id])
             return True
     except db.IntegrityError:
         return False
@@ -361,30 +348,17 @@ def move_ingredients_row_down(recipe_id: int, ingredient_id: int) -> bool:
         with get_db() as db:
             db.execute(
                 """
-                WITH next AS (
-                    SELECT id, MIN(order_number) AS order_number
-                    FROM ingredients
-                    WHERE order_number > (
-                        SELECT order_number FROM ingredients
-                        WHERE id = :ingredient_id
-                    ) AND recipe_id = :recipe_id
-                ), this AS (
-                    SELECT id, order_number
-                    FROM ingredients
-                    WHERE id = :ingredient_id
-                    AND recipe_id = :recipe_id
-                )
                 UPDATE ingredients SET order_number = CASE
-                    WHEN ingredients.id = next.id THEN this.order_number
-                    WHEN ingredients.id = this.id THEN next.order_number
-                    END
-                FROM next, this
-                WHERE recipe_id = :recipe_id
-                AND ingredients.id in (next.id, this.id)
-                """, {
-                    "recipe_id": recipe_id,
-                    "ingredient_id": ingredient_id
-                })
+                WHEN ingredients.id = next_id THEN this.order_number
+                WHEN ingredients.id = this.id THEN next_order_number
+                END FROM ingredients AS this, (SELECT id,
+                    lead(id) OVER (ORDER BY order_number) AS next_id,
+                    lead(order_number) OVER (ORDER BY order_number) AS next_order_number
+                    FROM ingredients WHERE recipe_id = ?) AS next
+                WHERE this.id = next.id
+                AND this.id = ?
+                AND ingredients.id IN (this.id, next_id);
+                """, [recipe_id, ingredient_id])
             return True
     except db.IntegrityError:
         return False
