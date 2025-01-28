@@ -33,9 +33,9 @@ CREATE TABLE ingredients (
     id INTEGER PRIMARY KEY,
     recipe_id INTEGER REFERENCES recipes ON DELETE CASCADE,
     order_number INTEGER NOT NULL,
-    amount INTEGER NOT NULL,
+    amount INTEGER,
     unit TEXT,
-    title TEXT NOT NULL
+    title TEXT
 );
 
 CREATE TABLE instructions (
