@@ -35,7 +35,7 @@ def recipe(recipe_id: int, tab: int):
             context["prev_page"] = url_for("edit.recipe", page=page - 1)
         return render_template("edit/recipes.html", **context)
 
-    recipe_context = fetch_recipe_context(recipe_id, g.user["id"])
+    recipe_context = fetch_author_recipe_context(recipe_id, g.user["id"])
     if recipe_context is None:
         return redirect(url_for("edit.recipe"))
 
@@ -156,7 +156,7 @@ def list_user_recipes(author_id: int, page: int):
     return user_recipes, recipes_remaining
 
 
-def fetch_recipe_context(recipe_id: int, author_id: int):
+def fetch_author_recipe_context(recipe_id: int, author_id: int):
     """Fetch a recipe from database. The recipe `author_id` in
     databse must match the `author_id` passed. Returns a dict
     to be used as a `render_template` context.

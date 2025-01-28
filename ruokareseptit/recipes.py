@@ -28,7 +28,7 @@ def index(recipe_id: int):
             context["prev_page"] = url_for("recipes.index", page=page - 1)
         return render_template("recipes/list.html", **context)
 
-    recipe_context = fetch_recipe_context(recipe_id)
+    recipe_context = fetch_published_recipe_context(recipe_id)
     if recipe_context is None:
         return redirect(url_for("recipes.list"))
 
@@ -70,10 +70,6 @@ def search():
 # Utility functions
 
 
-# TODO ; this is public listing
-# Check that the recipes are published
-# Order by best ratings average
-
 def list_published_recipes(page: int):
     """Query all published recipes
     """
@@ -81,6 +77,7 @@ def list_published_recipes(page: int):
         """
         SELECT count(*)
         FROM recipes
+        WHERE published = 1
         """).fetchone()[0]
     page_size = current_app.config["RECIPE_LIST_PAGE_SIZE"]
     offset = page * page_size
@@ -95,10 +92,10 @@ def list_published_recipes(page: int):
     return pub_recipes, recipes_remaining
 
 
-def fetch_recipe_context(recipe_id: int):
-    """Fetch a recipe from database. The recipe `author_id` in
-    databse must match the `author_id` passed. Returns a dict
-    to be used as a `render_template` context.
+def fetch_published_recipe_context(recipe_id: int):
+    """Fetch a recipe from database. The recipe must be
+    published. Returns a dict to be used as a `render_template`
+    context.
     """
     recipe_row = get_db().execute(
         """
@@ -106,7 +103,7 @@ def fetch_recipe_context(recipe_id: int):
         FROM recipes
         JOIN users
         ON recipes.author_id = users.id
-        WHERE recipes.id = ?
+        WHERE recipes.id = ? AND published = 1
         """, [recipe_id]).fetchone()
 
     if recipe_row is None:
