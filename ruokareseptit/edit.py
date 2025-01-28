@@ -1,6 +1,8 @@
 """User edit pages and features
 """
 
+import re
+
 from flask import Blueprint
 from flask import render_template
 from flask import g
@@ -86,12 +88,46 @@ def create():
     return render_template("edit/create.html", **context)
 
 
-@bp.route("/recipe/update/<int:recipe_id>")
+@bp.route("/recipe/update/<int:recipe_id>", methods=["POST"])
 @login_required
 def recipe_update(recipe_id: int):
     """Update recipe
     """
-    return f"updated recipe {recipe_id}"
+    update_author_recipe(recipe_id, g.user["id"], request.form)
+    ingredient_data = {}
+    for key in request.form:
+        field = re.match(r"^ingredients_(\d+)_(\w+)$", key)
+        if field is not None:
+            i_id = field.group(1)
+            column = field.group(2)
+            value = request.form[key]
+            if column == "up":
+                move_ingredients_row_up(recipe_id, i_id)
+            elif column == "down":
+                move_ingredients_row_down(recipe_id, i_id)
+            elif column == "delete":
+                delete_ingredients_row(recipe_id, i_id)
+            else:
+                if i_id not in ingredient_data:
+                    ingredient_data[i_id] = {}
+                ingredient_data[i_id][column] = value
+
+    for i_id, values in ingredient_data.items():
+        update_ingredients_row(recipe_id, i_id, values)
+
+    if request.form.get("ingredients_add_row", False):
+        add_ingredients_row(recipe_id)
+
+    if request.form.get("return", False):
+        return redirect(request.args.get("back", url_for("edit.recipe")))
+
+    tab = int(request.args.get("tab", 1))
+    param = {
+        "recipe_id": recipe_id,
+        "tab": int(request.form.get("tab", tab)),
+        "back": request.args.get("back", "")
+    }
+    return redirect(url_for("edit.recipe", **param))
 
 
 @bp.route("/recipe/delete/<int:recipe_id>")
@@ -180,3 +216,168 @@ def fetch_author_recipe_context(recipe_id: int, author_id: int):
         "instructions": instructions,
         "categories": categories
     }
+
+
+def update_author_recipe(recipe_id: int, author_id: int, fields: dict) -> bool:
+    """Update recipe to database. Recipe author_id must match.
+    """
+    try:
+        # Special case for checkbox: the "not checked" value
+        # is in hidden input. This is needed to handle the
+        # case where the checkbox is not in the form vs.
+        # where it is unchecked.
+        is_pub_default = fields.get("published.default")
+        is_pub = fields.get("published", is_pub_default)
+        with get_db() as db:
+            db.execute(
+                """
+                UPDATE recipes
+                SET title = IFNULL(?, title),
+                summary = IFNULL(?, summary),
+                preparation_time = IFNULL(?, preparation_time),
+                cooking_time = IFNULL(? ,cooking_time),
+                skill_level = IFNULL(?, skill_level),
+                portions = IFNULL(?, portions),
+                published = IFNULL(?, published)
+                WHERE id = ? AND author_id = ?
+                """, [
+                    fields.get("title"),
+                    fields.get("summary"),
+                    fields.get("preparation_time"),
+                    fields.get("cooking_time"),
+                    fields.get("skill_level"),
+                    fields.get("portions"),
+                    is_pub,
+                    recipe_id,
+                    author_id
+                ])
+            return True
+    except db.IntegrityError:
+        print("HUI")
+        return False
+
+
+def add_ingredients_row(recipe_id: int) -> bool:
+    """Add ingredients row to recipe
+    """
+    try:
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT INTO ingredients (recipe_id, order_number)
+                SELECT ?, IFNULL(MAX(order_number), 0) + 1
+                FROM ingredients
+                WHERE recipe_id = ?
+                """, [recipe_id, recipe_id])
+            return True
+    except db.IntegrityError:
+        return False
+
+
+def delete_ingredients_row(recipe_id: int, ingredient_id: int) -> bool:
+    """Delete s ingredients row from a recipe
+    """
+    try:
+        with get_db() as db:
+            db.execute(
+                """
+                DELETE FROM ingredients
+                    WHERE recipe_id = ? AND id = ?
+                """, [recipe_id, ingredient_id])
+            return True
+    except db.IntegrityError:
+        return False
+
+
+def update_ingredients_row(recipe_id: int, i_id: int, values: dict) -> bool:
+    """Update ingredients
+    """
+    print(i_id, values)
+    try:
+        with get_db() as db:
+            db.execute(
+                """
+                UPDATE ingredients
+                SET (amount, unit, title) = (?, ?, ?)
+                WHERE recipe_id = ? AND id = ?
+                """, [
+                    values["amount"],
+                    values["unit"],
+                    values["title"],
+                    recipe_id, i_id]
+                )
+            return True
+    except db.IntegrityError:
+        return False
+
+
+def move_ingredients_row_up(recipe_id: int, ingredient_id: int) -> bool:
+    """Move up
+    """
+    try:
+        with get_db() as db:
+            db.execute(
+                """
+                WITH prev AS (
+                    SELECT id, MAX(order_number) AS order_number
+                    FROM ingredients
+                    WHERE order_number < (
+                        SELECT order_number FROM ingredients
+                        WHERE id = :ingredient_id
+                    ) AND recipe_id = :recipe_id
+                ), this AS (
+                    SELECT id, order_number
+                    FROM ingredients
+                    WHERE id = :ingredient_id
+                    AND recipe_id = :recipe_id
+                )
+                UPDATE ingredients SET order_number = CASE
+                    WHEN ingredients.id = prev.id THEN this.order_number
+                    WHEN ingredients.id = this.id THEN prev.order_number
+                    END
+                FROM prev, this
+                WHERE recipe_id = :recipe_id
+                AND ingredients.id in (prev.id, this.id)
+                """, {
+                    "recipe_id": recipe_id,
+                    "ingredient_id": ingredient_id
+                })
+            return True
+    except db.IntegrityError:
+        return False
+
+
+def move_ingredients_row_down(recipe_id: int, ingredient_id: int) -> bool:
+    """Move down
+    """
+    try:
+        with get_db() as db:
+            db.execute(
+                """
+                WITH next AS (
+                    SELECT id, MIN(order_number) AS order_number
+                    FROM ingredients
+                    WHERE order_number > (
+                        SELECT order_number FROM ingredients
+                        WHERE id = :ingredient_id
+                    ) AND recipe_id = :recipe_id
+                ), this AS (
+                    SELECT id, order_number
+                    FROM ingredients
+                    WHERE id = :ingredient_id
+                    AND recipe_id = :recipe_id
+                )
+                UPDATE ingredients SET order_number = CASE
+                    WHEN ingredients.id = next.id THEN this.order_number
+                    WHEN ingredients.id = this.id THEN next.order_number
+                    END
+                FROM next, this
+                WHERE recipe_id = :recipe_id
+                AND ingredients.id in (next.id, this.id)
+                """, {
+                    "recipe_id": recipe_id,
+                    "ingredient_id": ingredient_id
+                })
+            return True
+    except db.IntegrityError:
+        return False
