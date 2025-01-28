@@ -13,6 +13,7 @@ from flask import current_app
 
 from .db import get_db
 from .auth import login_required
+from .recipes import fetch_recipe_related
 
 bp = Blueprint("edit", __name__, url_prefix="/edit")
 
@@ -171,30 +172,7 @@ def fetch_author_recipe_context(recipe_id: int, author_id: int):
     if recipe_row is None:
         return None
 
-    ingredients_limit = current_app.config["RECIPE_INGREDIENTS_MAX"]
-    ingredients = get_db().execute(
-        """
-        SELECT * FROM ingredients WHERE recipe_id = ?
-        ORDER BY order_number LIMIT ?
-        """, [recipe_id, ingredients_limit])
-
-    instructions_limit = current_app.config["RECIPE_INSTRUCTIONS_MAX"]
-    instructions = get_db().execute(
-        """
-        SELECT * FROM instructions WHERE recipe_id = ?
-        ORDER BY order_number LIMIT ?
-        """, [recipe_id, instructions_limit])
-
-    categories_limit = current_app.config["RECIPE_CATEGORIES_MAX"]
-    categories = get_db().execute(
-        """
-        SELECT categories.title
-        FROM recipe_category
-        JOIN categories
-        ON recipe_category.category_id = categories.id
-        WHERE recipe_category.recipe_id = ?
-        LIMIT ?
-        """, [recipe_id, categories_limit])
+    ingredients, instructions, categories = fetch_recipe_related(recipe_id)
 
     return {
         "recipe": recipe_row,

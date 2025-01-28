@@ -109,6 +109,19 @@ def fetch_published_recipe_context(recipe_id: int):
     if recipe_row is None:
         return None
 
+    ingredients, instructions, categories = fetch_recipe_related(recipe_id)
+
+    return {
+        "recipe": recipe_row,
+        "ingredients": ingredients,
+        "instructions": instructions,
+        "categories": categories
+    }
+
+
+def fetch_recipe_related(recipe_id):
+    """Fetch content from tables related to recipe
+    """
     ingredients_limit = current_app.config["RECIPE_INGREDIENTS_MAX"]
     ingredients = get_db().execute(
         """
@@ -134,9 +147,4 @@ def fetch_published_recipe_context(recipe_id: int):
         LIMIT ?
         """, [recipe_id, categories_limit])
 
-    return {
-        "recipe": recipe_row,
-        "ingredients": ingredients,
-        "instructions": instructions,
-        "categories": categories
-    }
+    return ingredients, instructions, categories
