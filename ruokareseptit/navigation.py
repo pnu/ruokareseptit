@@ -12,8 +12,8 @@ type NavigationTreeItem = list[str | NavigationTree | bool]
 
 NAVIGATION_COMMON_ITEMS = [
     ["home.index", "Ruokareseptit"],
-    ["recipes.index", "Katsele", [
-        ["recipes.index", "Reseptit"],
+    ["recipes.index", "Reseptit", [
+        ["recipes.index", "Parhaat"],
         ["recipes.browse", "Kategoriat", [
             ["recipes.browse", "Kaikki"],
             ["recipes.browse_abc", "ABC"],
@@ -32,10 +32,10 @@ NAVIGATION: NavigationTree = [
 
 NAVIGATION_LOGGED_IN: NavigationTree = [
     *NAVIGATION_COMMON_ITEMS,
-    ["edit.recipe", "[👤 __USERNAME__] Muokkaa", [
+    ["edit.recipe", "[👤 __USERNAME__] Omat", [
         ["edit.recipe", "Reseptit"],
         ["edit.create", "Lisää uusi"],
-        ["edit.settings", "Omat tiedot"],
+        ["edit.settings", "Asetukset"],
         ["auth.logout", "Kirjaudu ulos"]
     ]]
 ]

@@ -97,7 +97,7 @@ def register():
     password2 = request.form["password2"]
 
     if not valid_username(username):
-        flash_error("Käyttäjätunnus " + username + " ei ole vaatimusten mukainen.")
+        flash_error("Käyttäjätunnus ei ole vaatimusten mukainen.")
         username = None
     elif not strong_password(password1):
         flash_error("Salasana ei ole vaatimusten mukainen.")
