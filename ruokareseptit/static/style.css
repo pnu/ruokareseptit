@@ -155,6 +155,7 @@ form.recipe {
 
     button {
       cursor: pointer;
+      width: 100%;
       font-size: medium;
       font-weight: bold;
       padding: 0.5em;
@@ -207,13 +208,6 @@ form.recipe {
     resize: vertical;
   }
 
-  button {
-    background-color: lightpink;
-    border: 1px solid black;
-    grid-column: span 3;
-    width: 100%;
-  }
-
   .flex {
     display: flex;
     padding-inline: 2em;
@@ -250,9 +244,23 @@ form.recipe {
       text-align: left;
     }
 
+    button.up,
+    button.down,
+    button.delete,
+    button.actions {
+      cursor: pointer;
+      background-color: lightgray;
+      border: 0;
+      border-radius: 10px;
+    }
+
+    button:hover {
+      background-color: lightblue;
+    }
+
     .actions {
       grid-column: up / span 3;
-      text-align: center;
+      width: 100%;
     }
 
     .up {
