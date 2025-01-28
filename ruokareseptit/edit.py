@@ -94,29 +94,7 @@ def recipe_update(recipe_id: int):
     """Update recipe
     """
     update_author_recipe(recipe_id, g.user["id"], request.form)
-    ingredient_data = {}
-    for key in request.form:
-        field = re.match(r"^ingredients_(\d+)_(\w+)$", key)
-        if field is not None:
-            i_id = field.group(1)
-            column = field.group(2)
-            value = request.form[key]
-            if column == "up":
-                move_ingredients_row_up(recipe_id, i_id)
-            elif column == "down":
-                move_ingredients_row_down(recipe_id, i_id)
-            elif column == "delete":
-                delete_ingredients_row(recipe_id, i_id)
-            else:
-                if i_id not in ingredient_data:
-                    ingredient_data[i_id] = {}
-                ingredient_data[i_id][column] = value
-
-    for i_id, values in ingredient_data.items():
-        update_ingredients_row(recipe_id, i_id, values)
-
-    if request.form.get("ingredients_add_row", False):
-        add_ingredients_row(recipe_id)
+    update_recipe_ingredients(recipe_id, request.form)
 
     if request.form.get("return", False):
         return redirect(request.args.get("back", url_for("edit.recipe")))
@@ -222,10 +200,9 @@ def update_author_recipe(recipe_id: int, author_id: int, fields: dict) -> bool:
     """Update recipe to database. Recipe author_id must match.
     """
     try:
-        # Special case for checkbox: the "not checked" value
-        # is in hidden input. This is needed to handle the
-        # case where the checkbox is not in the form vs.
-        # where it is unchecked.
+        # For checkbox `published` we need to distinguish between
+        # cases when checkbox is not checked vs. it's not part
+        # of the form.
         is_pub_default = fields.get("published.default")
         is_pub = fields.get("published", is_pub_default)
         with get_db() as db:
@@ -255,6 +232,36 @@ def update_author_recipe(recipe_id: int, author_id: int, fields: dict) -> bool:
     except db.IntegrityError:
         print("HUI")
         return False
+
+
+def update_recipe_ingredients(recipe_id: int, fields: dict):
+    """Update all ingredients values from form keys eg.
+    `ingredients_ID_amount` and `ingredients_ID_title`.
+    Triggers also move, delete and add row actions.
+    """
+    ingredient_data = {}
+    for key in fields:
+        field = re.match(r"^ingredients_(\d+)_(\w+)$", key)
+        if field is not None:
+            i_id = field.group(1)
+            column = field.group(2)
+            value = fields[key]
+            if column == "up":
+                move_ingredients_row_up(recipe_id, i_id)
+            elif column == "down":
+                move_ingredients_row_down(recipe_id, i_id)
+            elif column == "delete":
+                delete_ingredients_row(recipe_id, i_id)
+            else:
+                if i_id not in ingredient_data:
+                    ingredient_data[i_id] = {}
+                ingredient_data[i_id][column] = value
+
+    for i_id, values in ingredient_data.items():
+        update_ingredients_row(recipe_id, i_id, values)
+
+    if fields.get("ingredients_add_row", False):
+        add_ingredients_row(recipe_id)
 
 
 def add_ingredients_row(recipe_id: int) -> bool:
