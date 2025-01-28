@@ -93,19 +93,24 @@ def create():
 def recipe_update(recipe_id: int):
     """Update recipe
     """
-    update_author_recipe(recipe_id, g.user["id"], request.form)
+    edit_params = {
+        "recipe_id": recipe_id,
+        "tab": int(request.args.get("tab", 1)),
+        "back": request.args.get("back", "")
+    }
+
+    updated = update_author_recipe(recipe_id, g.user["id"], request.form)
+    if updated is False:
+        flash("Reseptin päivittäminen epäonnistui.")
+        return redirect(url_for("edit.recipe", **edit_params))
+
     update_recipe_ingredients(recipe_id, request.form)
 
     if request.form.get("return", False):
         return redirect(request.args.get("back", url_for("edit.recipe")))
 
-    tab = int(request.args.get("tab", 1))
-    param = {
-        "recipe_id": recipe_id,
-        "tab": int(request.form.get("tab", tab)),
-        "back": request.args.get("back", "")
-    }
-    return redirect(url_for("edit.recipe", **param))
+    edit_params["tab"] = int(request.form.get("tab", edit_params["tab"]))
+    return redirect(url_for("edit.recipe", **edit_params))
 
 
 @bp.route("/recipe/delete/<int:recipe_id>")
@@ -230,7 +235,6 @@ def update_author_recipe(recipe_id: int, author_id: int, fields: dict) -> bool:
                 ])
             return True
     except db.IntegrityError:
-        print("HUI")
         return False
 
 
