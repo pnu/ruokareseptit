@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>{% block title %}{% endblock %} - Ruokareseptit</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body class="dialog">
+  {% with messages = get_flashed_messages(category_filter=["message"]) %}
+  {% if messages %}
+  <ul class="message-box">
+    {% for message in messages %}
+    <li class="message">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endwith %}
+  <section>
+    {% block content %}{% endblock %}
+  </section>
+</body>
+
+</html>

@@ -1,48 +1,45 @@
-{% extends 'base.html' %}
-
-{% block header %}
-<h1>{% block title %}Reseptin muokkaus{% endblock %}</h1>
-{% endblock %}
-
+{% extends 'base_dialog.html' %}
+{% block title %}{{ recipe.title }}{% endblock %}
 {% block content %}
-<a href="{{ request.args.get('back', url_for('edit.recipe')) }}"><< Takaisin reseptilistaukseen</a>
+<form class="dialog grid recipe" action="{{ submit_url }}" method="post">
+    <h1>{{ recipe.title }}</h1>
 
-<h2>{{ recipe.title }}</h2>
+    <nav>
+        <button class="current" type="button">①&nbsp;Perustiedot</button>
+        <button name="tab" value="2">②&nbsp;Ainesosat</button>
+        <button name="tab" value="3">③&nbsp;Valmistusohjeet</button>
+    </nav>
 
-<p>
-    {{ recipe.summary }}
-</p>
+    <label for="title">Reseptin nimi</label>
+    <input class="control" type="text" name="title" id="title" value="{{ recipe.title }}" autofocus />
 
-<ul>
-    {% if recipe.preparation_time and recipe.cooking_time %}
-    <li>Valmisteluaika, aktiivinen: {{ recipe.preparation_time }} min</li>
-    <li>Valmistusaika, yhteensä {{ recipe.preparation_time + recipe.cooking_time }} min</li>
-    {% endif %}
-    {% if recipe.skill_level %}
-    <li>Vaikeustaso: {{ recipe.skill_level }}</li>
-    {% endif %}
-</ul>
+    <label for="summary">Kuvaus</label>
+    <textarea class="control" name="summary" id="summary" rows="5">{{ recipe.summary }}</textarea>
 
-<h3>
-    Ainekset
-    {% if recipe.portions == 1 %}
-    ({{ recipe.portions }} annos)
-    {% elif recipe.portions %}
-    ({{ recipe.portions }} annosta)
-    {% endif %}
-</h3>
-<ul>
-{% for ingredient in ingredients %}
-<li>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.title }}</li>
-{% endfor %}
-</ul>
+    <label for="preparation_time">Valmisteluaika (aktiivinen)</label>
+    <input class="control with-unit" type="number" name="preparation_time" value="{{ recipe.preparation_time }}" />
+    <span class="unit">minuuttia</span>
 
-<h3>Valmistusohjeet</h3>
-<ul>
-{% for step in instructions %}
-<li>{{ step.order_number }}: {{ step.instructions }}</li>
-{% endfor %}
-</ul>
+    <label for="cooking_time">Valmistusaika (passiivinen)</label>
+    <input class="control with-unit" type="number" name="cooking_time" value="{{ recipe.cooking_time }}" />
+    <span class="unit">minuuttia</span>
 
+    <fieldset class="control full-width flex">
+        <legend>Vaikeustaso</legend>
+        <label><input type="radio" name="skill_level" value="1" {{ 'checked' if recipe.skill_level == 1 }}>Helppo</label>
+        <label><input type="radio" name="skill_level" value="2" {{ 'checked' if recipe.skill_level == 2 }}>Normaali</label>
+        <label><input type="radio" name="skill_level" value="3" {{ 'checked' if recipe.skill_level == 3 }}>Vaikea </label>
+        <label><input type="radio" name="skill_level" value="4" {{ 'checked' if recipe.skill_level == 4 }}>Erittäin vaativa </label>
+    </fieldset>
 
+    <fieldset class="control full-width flex">
+        <legend>Julkaise resepti</legend>
+        <input type="hidden" name="published.default" value="0"/>
+        <label><input type="checkbox" name="published" value="1" {{ 'checked' if recipe.published == 1 }}>Julkinen</label>
+    </fieldset>
+
+    <nav>
+        <button type="submit" name="return" value="1">④ Tallenna ja palaa reseptilistaukseen</button>
+    </nav>
+</form>
 {% endblock %}

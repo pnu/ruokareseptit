@@ -1,0 +1,42 @@
+{% extends 'base_dialog.html' %}
+{% block title %}Ainesosat - {{ recipe.title }}{% endblock %}
+{% block content %}
+<form class="dialog grid recipe" action="{{ submit_url }}" method="post">
+    <h1>{{ recipe.title }}</h1>
+
+    <nav>
+        <button name="tab" value="1">①&nbsp;Perustiedot</button>
+        <button class="current" type="button">②&nbsp;Ainesosat</button>
+        <button name="tab" value="3">③&nbsp;Valmistusohjeet</button>
+    </nav>
+
+    <label for="portions">Annosten määrä ohjeessa:</label>
+    <input class="control" type="number" name="portions" value="{{ recipe.portions }}" />
+
+    <fieldset class="control full-width grid">
+        <legend>Ainesosat</legend>
+        <label class="amount" for="amount">Määrä</label>
+        <label class="unit" for="unit">Yksikkö</label>
+        <label class="title" for="title">Nimi</label>
+        <label class="actions">Siirrä / Poista</label>
+        {% for ingredient in ingredients %}
+        <input class="amount" type="number" name="ingredients_{{ ingredient.id }}_amount"
+            value="{{ ingredient.amount }}" />
+        <input class="unit" type="text" name="ingredients_{{ ingredient.id }}_unit" value="{{ ingredient.unit }}" />
+        <input class="title" type="text" name="ingredients_{{ ingredient.id }}_title" value="{{ ingredient.title }}" />
+        {% if not loop.first %}
+        <button class="up" name="ingredients_{{ ingredient.id }}_up" value="1">↑</button>
+        {% endif %}
+        {% if not loop.last %}
+        <button class="down" name="ingredients_{{ ingredient.id }}_down" value="1">↓</button>
+        {% endif %}
+        <button class="delete" name="ingredients_{{ ingredient.id }}_delete" value="1">X</button>
+        {% endfor %}
+        <button class="control actions" name="ingredients_add_row" value="1">Lisää rivi</button>
+    </fieldset>
+
+    <nav>
+        <button type="submit" name="return" value="1">④ Tallenna ja palaa reseptilistaukseen</button>
+    </nav>
+</form>
+{% endblock %}

@@ -17,10 +17,12 @@ from .auth import login_required
 bp = Blueprint("edit", __name__, url_prefix="/edit")
 
 
-@bp.route("/recipe/", defaults={"recipe_id": None})
-@bp.route("/recipe/<int:recipe_id>")
+@bp.route("/recipe/", defaults={"recipe_id": None, "tab": None})
+@bp.route("/recipe/<int:recipe_id>", defaults={"tab": 1})
+@bp.route("/recipe/<int:recipe_id>/", defaults={"tab": 1})
+@bp.route("/recipe/<int:recipe_id>/<int:tab>")
 @login_required
-def recipe(recipe_id: int):
+def recipe(recipe_id: int, tab: int):
     """Own recipes
     """
     if recipe_id is None:
@@ -37,7 +39,14 @@ def recipe(recipe_id: int):
     if recipe_context is None:
         return redirect(url_for("edit.recipe"))
 
-    return render_template("edit/recipe.html", **recipe_context)
+    back = request.args.get("back", url_for("edit.recipe"))
+    submit_url = url_for("edit.recipe_update",
+                         recipe_id=recipe_id,
+                         tab=tab,
+                         back=back)
+    recipe_context["submit_url"] = submit_url
+    tmpl = ["", "_ingredients", "_instructions"][tab - 1]
+    return render_template("edit/recipe" + tmpl + ".html", **recipe_context)
 
 
 @bp.route("/recipe/create", methods=["GET", "POST"])
