@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form class="grid dialog" method="post">
+<form class="dialog login grid" method="post">
   <h1>Kirjautuminen</h1>
   <p>
     Kirjaudu sisään omalla käyttäjä&shy;tunnuksella ja salasanalla.
@@ -20,18 +20,18 @@
 
   <label for="username">Käyttäjätunnus</label>
   {% if username %}
-  <input type="text" name="username" id="username" value="{{ username }}" required />
+  <input class="control" type="text" name="username" id="username" value="{{ username }}" required />
   {% else %}
-  <input type="text" name="username" id="username" autofocus required />
+  <input class="control" type="text" name="username" id="username" autofocus required />
   {% endif %}
 
-  <label class="field-container min" for="password">Salasana</label>
+  <label for="password">Salasana</label>
   {% if username %}
-  <input type="password" name="password" id="password" autofocus required />
+  <input class="control" type="password" name="password" id="password" autofocus required />
   {% else %}
-  <input type="password" name="password" id="password" required />
+  <input class="control" type="password" name="password" id="password" required />
   {% endif %}
 
-  <button type="submit">Kirjaudu sisään</button>
+  <button class="control" type="submit">Kirjaudu sisään</button>
 </form>
 {% endblock %}

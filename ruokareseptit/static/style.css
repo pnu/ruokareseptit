@@ -3,6 +3,11 @@ body {
   background-color: burlywood;
 }
 
+body.dialog {
+  background-color: gray;
+  margin: 0;
+}
+
 section.content {
   padding-inline: 1em;
 }
@@ -84,53 +89,185 @@ nav.navigation-bar {
   }
 }
 
-/* Centered dialog form (login and register) is a grid */
+/* Grid form */
 form.grid {
   display: grid;
   grid-template-columns: [labels] auto [controls] 1fr;
   grid-gap: 1em;
   min-width: min-content;
+  align-items: center;
 
-  /* Header, text area and flash messages span 2 columns */
+  /* Header, text area and flash messages span all columns */
   h1,
   p,
+  nav,
   ul.message-box {
-    grid-column: span 2;
+    grid-column: 1 / -1;
     margin: 0;
   }
 
   /* Form labels are in the first column */
   label {
     grid-column: labels;
+    width: fit-content;
+    padding-block: 0.5em;
   }
 
   /* Form controls are in the second column */
-  input,
-  textarea {
-    grid-column: controls;
+  .control {
+    grid-column: controls / -1;
     padding: 0.5em;
   }
-  button {
-    grid-column: span 2;
+
+  button.control {
+    cursor: pointer;
+    grid-column: 1 / -1;
     padding: 0.5em;
     margin: auto;
   }
 }
 
-/* Centered dialog form (login and register) */
+/* Centered dialog form */
 form.dialog {
-  align-items: center;
   background-color: antiquewhite;
   padding: 1.5em;
   outline-style: solid;
-  max-width: 30em;
-  margin: auto;
+  margin: 3em;
 
   h1 {
     text-align: center;
   }
 }
 
+/* Centered narrow form */
+form.login {
+  max-width: 30em;
+  margin-inline: auto;
+}
+
+/* Additional fetures for recipe edit form */
+form.recipe {
+  grid-template-columns: [labels] auto [controls] 1fr [units] auto;
+
+  nav {
+    display: flex;
+    gap: 2em;
+
+    button {
+      cursor: pointer;
+      font-size: medium;
+      font-weight: bold;
+      padding: 0.5em;
+      border: 0;
+      background-color: lightgray;
+
+      ::hover {
+        background-color: white;
+      }
+    }
+
+    button.current {
+      background-color: lightblue;
+      cursor: default;
+    }
+
+    button:hover {
+      background-color: lightblue;
+    }
+  }
+
+  fieldset label {
+    cursor: pointer;
+
+    input {
+      cursor: pointer;
+    }
+  }
+
+  label {
+    text-align: right;
+    width: initial;
+    min-width: max-content;
+  }
+
+  .control.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .control.with-unit {
+    grid-column: controls / span 1;
+  }
+
+  .unit {
+    grid-column: units;
+    min-width: max-content;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  button {
+    background-color: lightpink;
+    border: 1px solid black;
+    grid-column: span 3;
+    width: 100%;
+  }
+
+  .flex {
+    display: flex;
+    padding-inline: 2em;
+    justify-content: space-between;
+
+    label {
+      text-wrap-mode: nowrap;
+    }
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: [amount] auto [unit] auto [title] 1fr [up] auto [down] auto [delete] auto;
+    gap: 1em;
+    padding-inline: 2em;
+
+    input {
+      padding: 0.5em;
+    }
+
+    .amount {
+      grid-column: amount;
+      text-align: right;
+      width: 3em;
+    }
+
+    .unit {
+      grid-column: unit;
+      width: 3em;
+    }
+
+    .title {
+      grid-column: title;
+      text-align: left;
+    }
+
+    .actions {
+      grid-column: up / span 3;
+      text-align: center;
+    }
+
+    .up {
+      grid-column: up;
+    }
+
+    .down {
+      grid-column: down;
+    }
+
+    .delete {
+      grid-column: delete;
+    }
+  }
+}
 
 /* Message box is a list of flash messages */
 ul.message-box {
