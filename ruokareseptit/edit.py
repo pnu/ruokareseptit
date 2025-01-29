@@ -31,9 +31,9 @@ def recipe(recipe_id: int, tab: int):
     if recipe_id is None:
         with get_db() as db:
             page = int(request.args.get("page", 0))
-            user_recipes, remaining = list_user_recipes(db, g.user["id"], page)
-            context = {"recipes": user_recipes}
-            if remaining > 0:
+            u_recipes, count, more = list_user_recipes(db, g.user["id"], page)
+            context = {"recipes": u_recipes, "count": count}
+            if more > 0:
                 context["next_page"] = url_for("edit.recipe", page=page + 1)
             if page > 0:
                 context["prev_page"] = url_for("edit.recipe", page=page - 1)
@@ -193,7 +193,7 @@ def list_user_recipes(db: Connection, author_id: int, page: int):
         """, [author_id, page_size, offset]
     )
     recipes_remaining = total_rows - offset - page_size
-    return user_recipes, recipes_remaining
+    return user_recipes, total_rows, recipes_remaining
 
 
 def fetch_author_recipe_context(db: Connection, recipe_id: int, author_id: int):
