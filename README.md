@@ -2,14 +2,14 @@
 
 ## Sovelluksen toiminnot
 
-* Sovelluksessa käyttäjät pystyvät jakamaan ruokareseptejään. Reseptissä lukee tarvittavat ainekset ja valmistusohje.
-* Käyttäjä pystyy luomaan tunnuksen ja kirjautumaan sisään sovellukseen.
-* Käyttäjä pystyy lisäämään reseptejä ja muokkaamaan ja poistamaan niitä.
-* Käyttäjä näkee sovellukseen lisätyt reseptit.
-* Käyttäjä pystyy etsimään reseptejä hakusanalla.
-* Käyttäjäsivu näyttää, montako reseptiä käyttäjä on lisännyt ja listan käyttäjän lisäämistä resepteistä.
-* Käyttäjä pystyy valitsemaan reseptille yhden tai useamman luokittelun (esim. alkuruoka, intialainen, vegaaninen).
-* Käyttäjä pystyy antamaan reseptille kommentin ja arvosanan. Reseptistä näytetään kommentit ja keskimääräinen arvosana.
+Sovelluksessa käyttäjät pystyvät jakamaan ruokareseptejään. Reseptissä lukee tarvittavat ainekset ja valmistusohje.
+* -[x] Käyttäjä pystyy luomaan tunnuksen ja kirjautumaan sisään sovellukseen.
+* -[x] Käyttäjä pystyy lisäämään reseptejä ja muokkaamaan ja poistamaan niitä.
+* -[x] Käyttäjä näkee sovellukseen lisätyt reseptit.
+* -[ ] Käyttäjä pystyy etsimään reseptejä hakusanalla.
+* -[x] Käyttäjäsivu näyttää, montako reseptiä käyttäjä on lisännyt ja listan käyttäjän lisäämistä resepteistä.
+* -[ ] Käyttäjä pystyy valitsemaan reseptille yhden tai useamman luokittelun (esim. alkuruoka, intialainen, vegaaninen).
+* -[ ] Käyttäjä pystyy antamaan reseptille kommentin ja arvosanan. Reseptistä näytetään kommentit ja keskimääräinen arvosana.
 
 ## Sovelluksen asennus
 
@@ -31,7 +31,8 @@ tietokanta on jo olemassa.
 flask --app ruokareseptit init-db
 ```
 
-Käynnistä sovellus `flask run` komennolla.
+Käynnistä sovellus `flask run` komennolla. Debug-tilassa
+kirjautuminen ei tarkista salasanan oikeellisuutta.
 
 ```
 flask --app ruokareseptit --debug run
