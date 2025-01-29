@@ -120,7 +120,15 @@ def recipe_update(recipe_id: int):
 def recipe_delete(recipe_id: int):
     """Delete recipe
     """
-    return f"deleted recipe {recipe_id}"
+    try:
+        with get_db() as db:
+            c = delete_author_recipe(db, recipe_id, g.user["id"])
+            if c.rowcount > 0:
+                flash("Resepti on poistettu.")
+    except db.IntegrityError:
+        flash("Reseptin poistaminen epäonnistui.", "error")
+
+    return redirect(request.args.get("next", url_for("edit.recipe")))
 
 
 @bp.route("/settings")
@@ -263,6 +271,17 @@ def update_author_recipe(
         """, (title, summary, preparation_time,
         cooking_time, skill_level, portions, published,
         recipe_id, author_id))
+    return cursor
+
+
+def delete_author_recipe(db: Connection, recipe_id: int, author_id: int):
+    """Delete recipe from database. Recipe author_id must match.
+    """
+    cursor = db.execute(
+        """
+        DELETE FROM recipes
+        WHERE id = ? and author_id = ?
+        """, [recipe_id, author_id])
     return cursor
 
 
