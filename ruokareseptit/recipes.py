@@ -1,6 +1,8 @@
 """Published recipe listings
 """
 
+from sqlite3 import Cursor
+
 from flask import Blueprint
 from flask import render_template
 from flask import redirect
@@ -19,20 +21,21 @@ def index(recipe_id: int):
     """View published recipes
     """
     if recipe_id is None:
-        page = int(request.args.get("page", 0))
-        pub_recipes, remaining = list_published_recipes(page)
-        context = {"recipes": pub_recipes}
-        if remaining > 0:
-            context["next_page"] = url_for("recipes.index", page=page + 1)
-        if page > 0:
-            context["prev_page"] = url_for("recipes.index", page=page - 1)
-        return render_template("recipes/list.html", **context)
+        with get_db() as db:
+            page = int(request.args.get("page", 0))
+            pub_recipes, remaining = list_published_recipes(db, page)
+            context = {"recipes": pub_recipes}
+            if remaining > 0:
+                context["next_page"] = url_for("recipes.index", page=page + 1)
+            if page > 0:
+                context["prev_page"] = url_for("recipes.index", page=page - 1)
+            return render_template("recipes/list.html", **context)
 
-    recipe_context = fetch_published_recipe_context(recipe_id)
-    if recipe_context is None:
-        return redirect(url_for("recipes.list"))
-
-    return render_template("recipes/view.html", **recipe_context)
+    with get_db() as db:
+        recipe_context = fetch_published_recipe_context(db, recipe_id)
+        if recipe_context is None:
+            return redirect(url_for("recipes.index"))
+        return render_template("recipes/view.html", **recipe_context)
 
 
 @bp.route("/browse")
@@ -67,13 +70,14 @@ def search():
     return render_template("recipes/search.html", **context)
 
 
-# Utility functions
+# SQL queries for READ operations ########################################
 
 
-def list_published_recipes(page: int):
-    """Query all published recipes
+def list_published_recipes(db: Cursor, page: int):
+    """Query all published recipes, paginated. Returns a tuple of
+    Cursor and number of remaining recipes after this page.
     """
-    total_rows = get_db().execute(
+    total_rows = db.execute(
         """
         SELECT count(*)
         FROM recipes
@@ -81,7 +85,7 @@ def list_published_recipes(page: int):
         """).fetchone()[0]
     page_size = current_app.config["RECIPE_LIST_PAGE_SIZE"]
     offset = page * page_size
-    pub_recipes = get_db().execute(
+    pub_recipes = db.execute(
         """
         SELECT recipes.*, AVG(user_review.rating) AS rating
         FROM recipes LEFT JOIN user_review
@@ -92,16 +96,16 @@ def list_published_recipes(page: int):
         LIMIT ? OFFSET ?
         """, [page_size, offset]
     )
-    recipes_remaining = total_rows - offset - page_size
+    recipes_remaining = max(total_rows - offset - page_size, 0)
     return pub_recipes, recipes_remaining
 
 
-def fetch_published_recipe_context(recipe_id: int):
+def fetch_published_recipe_context(db: Cursor, recipe_id: int):
     """Fetch a recipe from database. The recipe must be
     published. Returns a dict to be used as a `render_template`
     context.
     """
-    recipe_row = get_db().execute(
+    recipe_row = db.execute(
         """
         SELECT recipes.*, users.username
         FROM recipes
@@ -109,39 +113,33 @@ def fetch_published_recipe_context(recipe_id: int):
         ON recipes.author_id = users.id
         WHERE recipes.id = ? AND published = 1
         """, [recipe_id]).fetchone()
-
     if recipe_row is None:
         return None
 
-    ingredients, instructions, categories = fetch_recipe_related(recipe_id)
-
-    return {
-        "recipe": recipe_row,
-        "ingredients": ingredients,
-        "instructions": instructions,
-        "categories": categories
-    }
+    related = fetch_recipe_related(db, recipe_id)
+    return {"recipe": recipe_row, **related}
 
 
-def fetch_recipe_related(recipe_id):
-    """Fetch content from tables related to recipe
+def fetch_recipe_related(db: Cursor, recipe_id):
+    """Fetch content from related tables. Returns a dict of each
+    key `ingredients`, `instructions`, `categories` and `user_reviews`.
     """
     ingredients_limit = current_app.config["RECIPE_INGREDIENTS_MAX"]
-    ingredients = get_db().execute(
+    ingredients = db.execute(
         """
         SELECT * FROM ingredients WHERE recipe_id = ?
         ORDER BY order_number LIMIT ?
         """, [recipe_id, ingredients_limit])
 
     instructions_limit = current_app.config["RECIPE_INSTRUCTIONS_MAX"]
-    instructions = get_db().execute(
+    instructions = db.execute(
         """
         SELECT * FROM instructions WHERE recipe_id = ?
         ORDER BY order_number LIMIT ?
         """, [recipe_id, instructions_limit])
 
     categories_limit = current_app.config["RECIPE_CATEGORIES_MAX"]
-    categories = get_db().execute(
+    categories = db.execute(
         """
         SELECT categories.title
         FROM recipe_category
@@ -151,4 +149,18 @@ def fetch_recipe_related(recipe_id):
         LIMIT ?
         """, [recipe_id, categories_limit])
 
-    return ingredients, instructions, categories
+    user_reviews_limit = current_app.config["RECIPE_USER_REVIEWS_MAX"]
+    user_reviews = db.execute(
+        """
+        SELECT user_review.*, users.username
+        FROM user_review JOIN users ON user_review.user_id = users.id
+        WHERE user_review.recipe_id = ?
+        LIMIT ?
+        """, [recipe_id, user_reviews_limit])
+
+    return {
+        "ingredients": ingredients,
+        "instructions": instructions,
+        "categories": categories,
+        "user_reviews": user_reviews
+    }
