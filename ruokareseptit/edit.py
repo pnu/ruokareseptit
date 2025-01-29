@@ -2,6 +2,7 @@
 """
 
 import re
+from sqlite3 import Connection
 
 from flask import Blueprint
 from flask import render_template
@@ -98,15 +99,15 @@ def recipe_update(recipe_id: int):
         "tab": int(request.args.get("tab", 1)),
         "back": request.args.get("back", "")
     }
-
-    updated = update_author_recipe(recipe_id, g.user["id"], request.form)
-    if updated is False:
+    try:
+        with get_db() as db:
+            update_author_recipe(db, recipe_id, g.user["id"], request.form)
+            update_recipe_ingredients(db, recipe_id, request.form)
+    except db.IntegrityError:
         flash("Reseptin päivittäminen epäonnistui.")
         return redirect(url_for("edit.recipe", **edit_params))
 
-    update_recipe_ingredients(recipe_id, request.form)
-
-    if request.form.get("return", False):
+    if request.form.get("return"):
         return redirect(request.args.get("back", url_for("edit.recipe")))
 
     edit_params["tab"] = int(request.form.get("tab", edit_params["tab"]))
@@ -201,44 +202,40 @@ def fetch_author_recipe_context(recipe_id: int, author_id: int):
     }
 
 
-def update_author_recipe(recipe_id: int, author_id: int, fields: dict) -> bool:
+def update_author_recipe(db: Connection, recipe_id: int, author_id: int, fields: dict):
     """Update recipe to database. Recipe author_id must match.
     """
-    try:
-        # For checkbox `published` we need to distinguish between
-        # cases when checkbox is not checked vs. it's not part
-        # of the form.
-        is_pub_default = fields.get("published.default")
-        is_pub = fields.get("published", is_pub_default)
-        with get_db() as db:
-            db.execute(
-                """
-                UPDATE recipes
-                SET title = IFNULL(?, title),
-                summary = IFNULL(?, summary),
-                preparation_time = IFNULL(?, preparation_time),
-                cooking_time = IFNULL(? ,cooking_time),
-                skill_level = IFNULL(?, skill_level),
-                portions = IFNULL(?, portions),
-                published = IFNULL(?, published)
-                WHERE id = ? AND author_id = ?
-                """, [
-                    fields.get("title"),
-                    fields.get("summary"),
-                    fields.get("preparation_time"),
-                    fields.get("cooking_time"),
-                    fields.get("skill_level"),
-                    fields.get("portions"),
-                    is_pub,
-                    recipe_id,
-                    author_id
-                ])
-            return True
-    except db.IntegrityError:
-        return False
+    # For checkbox `published` we need to distinguish between
+    # cases when checkbox is not checked vs. it's not part
+    # of the form.
+    is_pub_default = fields.get("published.default")
+    is_pub = fields.get("published", is_pub_default)
+    cursor = db.execute(
+        """
+        UPDATE recipes
+        SET title = IFNULL(?, title),
+        summary = IFNULL(?, summary),
+        preparation_time = IFNULL(?, preparation_time),
+        cooking_time = IFNULL(? ,cooking_time),
+        skill_level = IFNULL(?, skill_level),
+        portions = IFNULL(?, portions),
+        published = IFNULL(?, published)
+        WHERE id = ? AND author_id = ?
+        """, [
+            fields.get("title"),
+            fields.get("summary"),
+            fields.get("preparation_time"),
+            fields.get("cooking_time"),
+            fields.get("skill_level"),
+            fields.get("portions"),
+            is_pub,
+            recipe_id,
+            author_id
+        ])
+    return cursor
 
 
-def update_recipe_ingredients(recipe_id: int, fields: dict):
+def update_recipe_ingredients(db: Connection, recipe_id: int, fields: dict):
     """Update all ingredients values from form keys eg.
     `ingredients_ID_amount` and `ingredients_ID_title`.
     Triggers also move, delete and add row actions.
@@ -251,118 +248,97 @@ def update_recipe_ingredients(recipe_id: int, fields: dict):
             column = field.group(2)
             value = fields[key]
             if column == "up":
-                move_ingredients_row_up(recipe_id, i_id)
+                move_ingredients_row_up(db, recipe_id, i_id)
             elif column == "down":
-                move_ingredients_row_down(recipe_id, i_id)
+                move_ingredients_row_down(db, recipe_id, i_id)
             elif column == "delete":
-                delete_ingredients_row(recipe_id, i_id)
+                delete_ingredients_row(db, recipe_id, i_id)
             else:
                 if i_id not in ingredient_data:
                     ingredient_data[i_id] = {}
                 ingredient_data[i_id][column] = value
 
     for i_id, values in ingredient_data.items():
-        update_ingredients_row(recipe_id, i_id, values)
+        update_ingredients_row(db, recipe_id, i_id, values)
 
     if fields.get("ingredients_add_row", False):
-        add_ingredients_row(recipe_id)
+        add_ingredients_row(db, recipe_id)
 
 
-def add_ingredients_row(recipe_id: int) -> bool:
+def add_ingredients_row(db: Connection, recipe_id: int):
     """Add ingredients row to recipe
     """
-    try:
-        with get_db() as db:
-            db.execute(
-                """
-                INSERT INTO ingredients (recipe_id, order_number)
-                SELECT ?, IFNULL(MAX(order_number), 0) + 1
-                FROM ingredients
-                WHERE recipe_id = ?
-                """, [recipe_id, recipe_id])
-            return True
-    except db.IntegrityError:
-        return False
+    cursor = db.execute(
+        """
+        INSERT INTO ingredients (recipe_id, order_number)
+        SELECT ?, IFNULL(MAX(order_number), 0) + 1
+        FROM ingredients
+        WHERE recipe_id = ?
+        """, [recipe_id, recipe_id])
+    return cursor
 
 
-def delete_ingredients_row(recipe_id: int, ingredient_id: int) -> bool:
+def delete_ingredients_row(db: Connection, recipe_id: int, ingredient_id: int) -> bool:
     """Delete s ingredients row from a recipe
     """
-    try:
-        with get_db() as db:
-            db.execute(
-                """
-                DELETE FROM ingredients
-                WHERE recipe_id = ? AND id = ?
-                """, [recipe_id, ingredient_id])
-            return True
-    except db.IntegrityError:
-        return False
+    cursor = db.execute(
+        """
+        DELETE FROM ingredients
+        WHERE recipe_id = ? AND id = ?
+        """, [recipe_id, ingredient_id])
+    return cursor
 
 
-def update_ingredients_row(recipe_id: int, i_id: int, values: dict) -> bool:
+def update_ingredients_row(db: Connection, recipe_id: int, i_id: int, values: dict) -> bool:
     """Update ingredients
     """
-    print(i_id, values)
-    try:
-        with get_db() as db:
-            db.execute(
-                """
-                UPDATE ingredients
-                SET (amount, unit, title) = (?, ?, ?)
-                WHERE recipe_id = ? AND id = ?
-                """, [
-                    values["amount"],
-                    values["unit"],
-                    values["title"],
-                    recipe_id, i_id]
-                )
-            return True
-    except db.IntegrityError:
-        return False
+    cursor = db.execute(
+        """
+        UPDATE ingredients
+        SET (amount, unit, title) = (?, ?, ?)
+        WHERE recipe_id = ? AND id = ?
+        """, [
+            values["amount"],
+            values["unit"],
+            values["title"],
+            recipe_id, i_id]
+        )
+    return cursor
 
 
-def move_ingredients_row_up(recipe_id: int, ingredient_id: int) -> bool:
+def move_ingredients_row_up(db: Connection, recipe_id: int, ingredient_id: int) -> bool:
     """Move up
     """
-    try:
-        with get_db() as db:
-            db.execute(
-                """
-                UPDATE ingredients SET order_number = CASE
-                WHEN ingredients.id = prev_id THEN this.order_number
-                WHEN ingredients.id = this.id THEN prev_order_number
-                END FROM ingredients AS this, (SELECT id,
-                    lag(id) OVER (ORDER BY order_number) AS prev_id,
-                    lag(order_number) OVER (ORDER BY order_number) AS prev_order_number
-                    FROM ingredients WHERE recipe_id = ?) AS prev
-                WHERE this.id = prev.id
-                AND this.id = ?
-                AND ingredients.id IN (this.id, prev_id);
-                """, [recipe_id, ingredient_id])
-            return True
-    except db.IntegrityError:
-        return False
+    cursor = db.execute(
+        """
+        UPDATE ingredients SET order_number = CASE
+        WHEN ingredients.id = prev_id THEN this.order_number
+        WHEN ingredients.id = this.id THEN prev_order_number
+        END FROM ingredients AS this, (SELECT id,
+            lag(id) OVER (ORDER BY order_number) AS prev_id,
+            lag(order_number) OVER (ORDER BY order_number) AS prev_order_number
+            FROM ingredients WHERE recipe_id = ?) AS prev
+        WHERE this.id = prev.id
+        AND this.id = ?
+        AND ingredients.id IN (this.id, prev_id);
+        """, [recipe_id, ingredient_id])
+    return cursor
 
 
-def move_ingredients_row_down(recipe_id: int, ingredient_id: int) -> bool:
+def move_ingredients_row_down(db: Connection, recipe_id: int, ingredient_id: int) -> bool:
     """Move down
     """
-    try:
-        with get_db() as db:
-            db.execute(
-                """
-                UPDATE ingredients SET order_number = CASE
-                WHEN ingredients.id = next_id THEN this.order_number
-                WHEN ingredients.id = this.id THEN next_order_number
-                END FROM ingredients AS this, (SELECT id,
-                    lead(id) OVER (ORDER BY order_number) AS next_id,
-                    lead(order_number) OVER (ORDER BY order_number) AS next_order_number
-                    FROM ingredients WHERE recipe_id = ?) AS next
-                WHERE this.id = next.id
-                AND this.id = ?
-                AND ingredients.id IN (this.id, next_id);
-                """, [recipe_id, ingredient_id])
-            return True
-    except db.IntegrityError:
-        return False
+    cursor = db.execute(
+        """
+        UPDATE ingredients SET order_number = CASE
+        WHEN ingredients.id = next_id THEN this.order_number
+        WHEN ingredients.id = this.id THEN next_order_number
+        END FROM ingredients AS this, (SELECT id,
+            lead(id) OVER (ORDER BY order_number) AS next_id,
+            lead(order_number) OVER (ORDER BY order_number) AS next_order_number
+            FROM ingredients WHERE recipe_id = ?) AS next
+        WHERE this.id = next.id
+        AND this.id = ?
+        AND ingredients.id IN (this.id, next_id);
+        """, [recipe_id, ingredient_id])
+    return cursor
