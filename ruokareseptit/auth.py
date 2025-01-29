@@ -2,6 +2,7 @@
 """
 
 import functools
+from sqlite3 import Connection
 
 from flask import Blueprint
 from flask import flash
@@ -28,19 +29,79 @@ def login():
         username = request.args.get("username")
         return render_template("auth/login.html", username=username)
 
-    username = request.form["username"]
-    password = request.form["password"]
-    user_in_db = auth_user(username, password)
+    next_url = request.args.get("next", url_for("home.index"))
+    redir_params = {"next": next_url}
+    with get_db() as db:
+        username = request.form["username"]
+        password = request.form["password"]
+        user_id = auth_user_id(db, username, password)
 
-    if user_in_db is None:
+    if user_id is None:
         flash_error("Väärä käyttäjätunnus tai salasana.")
-        return render_template("auth/login.html")
+        return redirect(url_for("auth.login", **redir_params))
 
     session.clear()
-    session["uid"] = user_in_db["id"]
-    next_url = request.args.get("next", url_for("home.index"))
+    session["uid"] = user_id
     flash("Kirjautuminen onnistui. Tervetuloa!")
     return redirect(next_url)
+
+
+@bp.route("/logout")
+def logout():
+    """Log out user
+    """
+    session.clear()
+    flash("Olet kirjautunut ulos.")
+    return redirect(url_for("home.index"))
+
+
+@bp.route("/register", methods=["GET", "POST"])
+def register():
+    """Registration form
+    """
+    if request.method == "GET":
+        username = request.args.get("username")
+        return render_template("auth/register.html", username=username)
+
+    username = request.form["username"]
+    next_url = request.args.get("next", url_for("home.index"))
+    redir_params = {"next": next_url}
+    if validate_register_form(request.form) is False:
+        return redirect(url_for("auth.register", **redir_params))
+
+    try:
+        with get_db() as db:
+            password = request.form["password1"]
+            insert_user(db, username, password)
+    except db.IntegrityError:
+        flash_error("Käyttäjätunnus " + username + " on jo varattu.")
+        return redirect(url_for("auth.register", **redir_params))
+
+    flash("Käyttäjätunnus " + username + " on luotu.")
+    redir_params["username"] = username
+    return redirect(url_for("auth.login", **redir_params))
+
+
+def validate_register_form(fields: dict[str, str]) -> bool:
+    """Validate register form fields
+    """
+    username = fields.get("username")
+    password1 = fields.get("password1")
+    password2 = fields.get("password2")
+    if len(username) < 4 or username.isalnum() is False:
+        flash_error("Käyttäjätunnus ei ole vaatimusten mukainen.")
+    elif len(password1) < 8:
+        flash_error("Salasana ei ole vaatimusten mukainen.")
+    elif username == password1:
+        flash_error("Salasana ei voi olla sama kuin käyttätunnus.")
+    elif password1 != password2:
+        flash_error("Salasanat eivät täsmää.")
+    else:
+        return True
+    return False
+
+
+# Flask request handling, context processors and decorators
 
 
 @bp.before_app_request
@@ -75,48 +136,6 @@ def login_required(view):
     return wrapped_view
 
 
-@bp.route("/logout")
-def logout():
-    """Log out user
-    """
-    session.clear()
-    flash("Olet kirjautunut ulos.")
-    return redirect(url_for("home.index"))
-
-
-@bp.route("/register", methods=["GET", "POST"])
-def register():
-    """Registration form
-    """
-    if request.method == "GET":
-        username = request.args.get("username")
-        return render_template("auth/register.html", username=username)
-
-    username = request.form["username"]
-    password1 = request.form["password1"]
-    password2 = request.form["password2"]
-
-    if not valid_username(username):
-        flash_error("Käyttäjätunnus ei ole vaatimusten mukainen.")
-        username = None
-    elif not strong_password(password1):
-        flash_error("Salasana ei ole vaatimusten mukainen.")
-    elif username == password1:
-        flash_error("Salasana ei voi olla sama kuin käyttätunnus.")
-    elif password1 != password2:
-        flash_error("Salasanat eivät täsmää.")
-    elif insert_user(username, password1) is None:
-        flash_error("Käyttäjätunnus " + username + " on jo varattu.")
-        username = None
-    else:
-        flash("Käyttäjätunnus " + username + " on luotu.")
-        next_url = request.args.get("next", url_for("home.index"))
-        return redirect(url_for(
-            "auth.login", next=next_url, username=username
-        ))
-
-    return render_template("auth/register.html", username=username)
-
 # Utility functions
 
 
@@ -126,48 +145,37 @@ def flash_error(message: str):
     flash(message, "form_validation_error")
 
 
-def strong_password(password: str) -> bool:
-    """Check if password is strong enough
+# SQL queries for CREATE / UPDATE operations #############################
+
+
+def insert_user(db: Connection, username: str, password: str):
+    """Insert new user to database.
     """
-    return len(password) >= 8
-
-
-def valid_username(username: str) -> bool:
-    """Check if username is valid
-    """
-    return len(username) >= 4 and username.isalnum()
-
-
-def insert_user(username: str, password: str) -> int:
-    """Insert new user to database. Return uid if successful,
-    None otherwise.
-    """
-    try:
-        with get_db() as db:
-            res = db.execute(
-                """
-                INSERT INTO users (username, password_hash)
-                VALUES (?, ?)
-                """, [username, generate_password_hash(password)])
-            return res.lastrowid
-    except db.IntegrityError:
-        return None
-
-
-def auth_user(username: str, password: str) -> dict | None:
-    """Authenticate user
-    """
-    user = get_db().execute(
+    cursor = db.execute(
         """
-        SELECT id, password_hash
+        INSERT INTO users (username, password_hash)
+        VALUES (?, ?)
+        """, [username, generate_password_hash(password)])
+    return cursor
+
+
+# SQL queries for READ operations ########################################
+
+
+def auth_user_id(db: Connection, username: str, password: str) -> int | None:
+    """Return user id for username if password is correct.
+    """
+    user: dict[str, any] = db.execute(
+        """
+        SELECT id, username, password_hash
         FROM users
         WHERE username = ?
         """, [username]).fetchone()
-
     if user is None:
         return None
-    if current_app.config["ALLOW_ANY_PASSWORD"]:
-        # Allows login with any password, only for testing
-        return user
-
-    return check_password_hash(user["password_hash"], password)
+    if current_app.debug:
+        # In debug mode accept any password
+        return user["id"]
+    if check_password_hash(user["password_hash"], password) is False:
+        return None
+    return user["id"]
