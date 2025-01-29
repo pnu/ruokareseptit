@@ -18,6 +18,8 @@ def get_db():
             current_app.config["DATABASE"],
             detect_types=sqlite3.PARSE_DECLTYPES
         )
+        if current_app.debug:
+            g.db.set_trace_callback(print)
         g.db.execute("PRAGMA foreign_keys = ON")
         g.db.row_factory = sqlite3.Row
 
