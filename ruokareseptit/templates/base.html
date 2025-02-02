@@ -14,9 +14,10 @@
       {% for (index, item) in navigation %}
       <a href="{{ item.url }}">
         {% if level == 0 and index == 0 %}
-        <li class="{{ item.class }} logo-icon">🍲</li>
-        {% endif %}
+        <li class="{{ item.class }} item-{{ index }}"><span class="logo-icon">🍲</span>{{ item.title }}</li>
+        {% else %}
         <li class="{{ item.class }} item-{{ index }}">{{ item.title }}</li>
+        {% endif %}
       </a>
       {% endfor %}
     </ul>

@@ -32,7 +32,7 @@ NAVIGATION: NavigationTree = [
 
 NAVIGATION_LOGGED_IN: NavigationTree = [
     *NAVIGATION_COMMON_ITEMS,
-    ["edit.recipe", "Omat  (👤 __USERNAME__)", [
+    ["edit.recipe", "Omat  ( 👤 __USERNAME__ )", [
         ["edit.recipe", "Reseptit"],
         ["edit.create", "Lisää uusi"],
         ["edit.settings", "Asetukset"],

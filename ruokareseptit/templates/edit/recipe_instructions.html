@@ -10,10 +10,30 @@
         <button class="current" type="button">③&nbsp;Valmistusohjeet</button>
     </nav>
 
-    <fieldset class="control full-width grid">
-        <legend>Ohjeet</legend>
-        <p>Tämä ominaisuus on toteuttamatta.</p>
-    </fieldset>
+    <div class="full-width instructions">
+        <span class="controls">Ohje</span>
+        <span class="actions">Siirrä / Poista</span>
+        {% for instruction in instructions %}
+        <label class="step" for="summary">{{ loop.index }}</label>
+        <textarea class="controls" name="summary" id="summary" rows="5">{{ instruction.instructions }}</textarea>
+        <div class="actions">
+            {% if not loop.first %}
+            <button class="up" name="instructions_{{ instruction.id }}_up" value="1">↑</button>
+            {% else %}
+            <span></span>
+            {% endif %}
+            {% if not loop.last %}
+            <button class="down" name="instructions_{{ instruction.id }}_down" value="1">↓</button>
+            {% else %}
+            <span></span>
+            {% endif %}
+            <button class="delete danger" name="instructions_{{ instruction.id }}_delete" value="1">✗</button>
+        </div>
+        {% endfor %}
+        <div class="actions">
+            <button class="actions" name="instructions_add_row" value="1">Lisää rivi</button>
+        </div>
+    </div>
 
     <nav>
         <button type="submit" name="return" value="1">④ Tallenna ja palaa reseptilistaukseen</button>

@@ -52,18 +52,18 @@ nav.navigation-bar {
     }
   }
 
-  /* Specific exception: first level first two items don't flex */
+  /* Specific exception: first level first element does not flex */
   ul.level-0 {
-    li.logo-icon {
-      flex: 0;
-      padding: 0;
-      padding-inline: 0.2em;
-      font-size: 2em;
-    }
-
     li.item-0 {
       flex: 0;
       padding-right: 1em;
+      flex-direction: row;
+      align-items: center;
+
+      span.logo-icon {
+        font-size: 2em;
+        padding-right: 0.2em;
+      }
     }
   }
 
@@ -89,8 +89,31 @@ nav.navigation-bar {
   }
 }
 
-/* Grid form */
-form.grid {
+/* Message box is a list of flash messages */
+ul.message-box {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    padding: 0.5em;
+    text-align: center;
+    font-weight: bold;
+    margin-block: 1em;
+  }
+
+  /* Colors for different flash categories */
+  li.warning {
+    background-color: lightpink;
+  }
+
+  li.message {
+    background-color: lightgreen;
+  }
+}
+
+/* All forms use grid layout */
+form {
   display: grid;
   grid-template-columns: [labels] auto [controls] 1fr;
   grid-gap: 1em;
@@ -106,24 +129,44 @@ form.grid {
     margin: 0;
   }
 
+  input,
+  textarea {
+    padding: 0.7em;
+  }
+
   /* Form labels are in the first column */
   label {
     grid-column: labels;
-    width: fit-content;
     padding-block: 0.5em;
   }
 
   /* Form controls are in the second column */
   .control {
     grid-column: controls / -1;
-    padding: 0.5em;
+    min-width: min-content;
   }
 
-  button.control {
+  button {
     cursor: pointer;
-    grid-column: 1 / -1;
+    font-size: medium;
+    font-weight: bold;
+    border: 0;
     padding: 0.5em;
-    margin: auto;
+    width: 100%;
+    min-width: fit-content;
+    background-color: lightgray;
+  }
+
+  button:hover {
+    background-color: lightblue;
+  }
+
+  button.danger {
+    background-color: pink;
+  }
+
+  button.danger:hover {
+    background-color: hotpink;
   }
 }
 
@@ -153,30 +196,9 @@ form.recipe {
     display: flex;
     gap: 2em;
 
-    button {
-      cursor: pointer;
-      width: 100%;
-      font-size: medium;
-      font-weight: bold;
-      padding: 0.5em;
-      border: 0;
-      background-color: lightgray;
-    }
-
     button.current {
       background-color: lightblue;
       cursor: default;
-    }
-
-    button.danger {
-      background-color: pink;
-    }
-
-    button:hover {
-      background-color: lightblue;
-    }
-    button.danger:hover {
-      background-color: hotpink;
     }
   }
 
@@ -190,11 +212,9 @@ form.recipe {
 
   label {
     text-align: right;
-    width: initial;
-    min-width: max-content;
   }
 
-  .control.full-width {
+  .full-width {
     grid-column: 1 / -1;
   }
 
@@ -204,7 +224,7 @@ form.recipe {
 
   .unit {
     grid-column: units;
-    min-width: max-content;
+    text-align: left;
   }
 
   textarea {
@@ -221,25 +241,39 @@ form.recipe {
     }
   }
 
-  .grid {
+  /* Action buttons (up, down, del) */
+  div.actions {
     display: grid;
-    grid-template-columns: [amount] auto [unit] auto [title] 1fr [up] auto [down] auto [delete] auto;
-    gap: 1em;
-    padding-inline: 2em;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 0.5em;
+    align-items: center;
 
-    input {
-      padding: 0.5em;
+    button {
+      width: min-content;
+      height: min-content;
+      border-radius: 1em;
     }
+
+    /* add row button */
+    button.actions {
+      grid-column: 1 / -1;
+      width: 100%;
+    }
+  }
+
+  .ingredients {
+    display: grid;
+    grid-template-columns: [amount] auto [unit] auto [title] 1fr [actions] auto;
+    gap: 1em;
 
     .amount {
       grid-column: amount;
       text-align: right;
-      width: 3em;
     }
 
     .unit {
       grid-column: unit;
-      width: 3em;
     }
 
     .title {
@@ -247,66 +281,32 @@ form.recipe {
       text-align: left;
     }
 
-    button.up,
-    button.down,
-    button.delete,
-    button.actions {
-      cursor: pointer;
-      background-color: lightgray;
-      border: 0;
-      border-radius: 10px;
+    .actions {
+      grid-column: actions;
+    }
+  }
+
+  .instructions {
+    display: grid;
+    grid-template-columns: [step] auto [controls] 1fr [actions] auto;
+    gap: 1em;
+
+    .step {
+      grid-column: step;
     }
 
-    button:hover {
-      background-color: lightblue;
+    label.step {
+      font-size: x-large;
+      font-weight: bold;
+      padding: 0;
     }
 
-    button.danger {
-      background-color: pink;
-    }
-
-    button.danger:hover {
-      background-color: hotpink;
+    .controls {
+      grid-column: controls;
     }
 
     .actions {
-      grid-column: up / span 3;
-      width: 100%;
+      grid-column: actions;
     }
-
-    .up {
-      grid-column: up;
-    }
-
-    .down {
-      grid-column: down;
-    }
-
-    .delete {
-      grid-column: delete;
-    }
-  }
-}
-
-/* Message box is a list of flash messages */
-ul.message-box {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  li {
-    padding: 0.5em;
-    text-align: center;
-    font-weight: bold;
-    margin-block: 1em;
-  }
-
-  /* Colors for different flash categories */
-  li.warning {
-    background-color: lightpink;
-  }
-
-  li.message {
-    background-color: lightgreen;
   }
 }

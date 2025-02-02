@@ -26,16 +26,18 @@
 
     <fieldset class="control full-width flex">
         <legend>Vaikeustaso</legend>
-        <label><input type="radio" name="skill_level" value="1" {{ 'checked' if recipe.skill_level == 1 }}>Helppo</label>
-        <label><input type="radio" name="skill_level" value="2" {{ 'checked' if recipe.skill_level == 2 }}>Normaali</label>
-        <label><input type="radio" name="skill_level" value="3" {{ 'checked' if recipe.skill_level == 3 }}>Vaikea </label>
-        <label><input type="radio" name="skill_level" value="4" {{ 'checked' if recipe.skill_level == 4 }}>Erittäin vaativa </label>
+        <label><input type="radio" name="skill_level" value="1" {{ 'checked' if recipe.skill_level==1 }}>Helppo</label>
+        <label><input type="radio" name="skill_level" value="2" {{ 'checked' if recipe.skill_level==2
+                }}>Normaali</label>
+        <label><input type="radio" name="skill_level" value="3" {{ 'checked' if recipe.skill_level==3 }}>Vaikea </label>
+        <label><input type="radio" name="skill_level" value="4" {{ 'checked' if recipe.skill_level==4 }}>Erittäin
+            vaativa </label>
     </fieldset>
 
     <fieldset class="control full-width flex">
         <legend>Julkaise resepti</legend>
-        <input type="hidden" name="published.default" value="0"/>
-        <label><input type="checkbox" name="published" value="1" {{ 'checked' if recipe.published == 1 }}>Julkinen</label>
+        <input type="hidden" name="published.default" value="0" />
+        <label><input type="checkbox" name="published" value="1" {{ 'checked' if recipe.published==1 }}>Julkinen</label>
     </fieldset>
 
     <nav>
