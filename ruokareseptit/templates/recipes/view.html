@@ -53,18 +53,20 @@
 <h3>Valmistusohjeet</h3>
 <ul>
     {% endif %}
-    <li>{{ step.order_number }}: {{ step.instructions }}</li>
+    <li>{{ loop.index }}: {{ step.instructions }}</li>
     {% if loop.last %}
 </ul>
 {% endif %}
 {% endfor %}
 
+<hr />
 {% if g.user.id == recipe.author_id %}
+<p>
 <em>Tämä on sinun laatima resepti;
 <a href="{{ url_for('edit.recipe', recipe_id=recipe.id, back=request.url) }}">muokkaa reseptiä.</a><br/>
 Löydät sen myös omista resepteistäsi.
 </em>
+</p>
 {% endif %}
-<hr />
 <a href="{{ request.args.get('back', url_for('recipes.index')) }}">&lt;&lt; Takaisin reseptilistaukseen </a>
 {% endblock %}

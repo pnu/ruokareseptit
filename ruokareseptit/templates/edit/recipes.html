@@ -5,20 +5,48 @@
 {% endblock %}
 
 {% block content %}
+{% if count == 0 %}
+<p>
+    Sinulla ei ole yhtään omaa reseptiä.
+</p>
+<p>
+    <a href="{{ url_for('edit.create') }}">Lisää uusi</a>
+</p>
+{% else %}
 <p>
     Valitse resepti jota haluat muokata tai poistaa.
 </p>
 <p>
-    Sinulla on {{ count }} reseptiä.
+    Sinulla on {{ count }} resepti{{ "ä" if count > 1 else "" }}.
 </p>
-<hr>
-{% for recipe in recipes %}
-<p>
-    <a href="{{ url_for('edit.recipe', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a>
-    {{ recipe.title }} {{ recipe.published > 0 }}
-</p>
-{% endfor %}
-<hr>
+<table>
+    <tr>
+        <th>Nro</th>
+        <th>Reseptin nimi</th>
+        <th></th>
+    </tr>
+    {% for recipe in recipes %}
+    <tr>
+        <td>
+            {{ recipe.id }}
+        </td>
+        <td>
+            <a href="{{ url_for('edit.recipe', recipe_id=recipe.id, back=request.url) }}">
+                {{ recipe.title }}
+            </a>
+        </td>
+        <td>
+            {% if recipe.published > 0 %}
+            {% else %}
+            <em>Ei julkaistu</em>
+            {% endif %}
+        </td>
+        <td>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
 
 {% if prev_page %}
 <p><a href="{{ prev_page }}">&lt;&lt; edellinen sivu</a></p>
