@@ -161,10 +161,6 @@ form.recipe {
       padding: 0.5em;
       border: 0;
       background-color: lightgray;
-
-      ::hover {
-        background-color: white;
-      }
     }
 
     button.current {
