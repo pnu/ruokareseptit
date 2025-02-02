@@ -104,6 +104,7 @@ def recipe_update(recipe_id: int):
         with get_db() as db:
             update_author_recipe(db, recipe_id, g.user["id"], request.form)
             update_recipe_ingredients(db, recipe_id, request.form)
+            update_recipe_instructions(db, recipe_id, request.form)
     except db.IntegrityError:
         flash("Reseptin päivittäminen epäonnistui.")
         return redirect(url_for("edit.recipe", **edit_params))
@@ -182,6 +183,37 @@ def update_recipe_ingredients(
 
     if fields.get("ingredients_add_row", False):
         add_ingredients_row(db, recipe_id)
+
+
+def update_recipe_instructions(
+        db: Connection, recipe_id: int, fields: dict[str, str]):
+    """Update all instructions text from form keys eg.
+    `instructions_ID_instruction`. Triggers also move,
+    delete and add row actions.
+    """
+    instruction_data = {}
+    for key in fields:
+        field = re.match(r"^instructions_(\d+)_(\w+)$", key)
+        if field is not None:
+            i_id = field.group(1)
+            column = field.group(2)
+            value = fields[key]
+            if column == "up":
+                move_instructions_row_up(db, recipe_id, i_id)
+            elif column == "down":
+                move_instructions_row_down(db, recipe_id, i_id)
+            elif column == "delete":
+                delete_instructions_row(db, recipe_id, i_id)
+            else:
+                if i_id not in instruction_data:
+                    instruction_data[i_id] = {}
+                instruction_data[i_id][column] = value
+
+    for i_id, i_fields in instruction_data.items():
+        update_instructions_row(db, recipe_id, i_id, i_fields)
+
+    if fields.get("instructions_add_row", False):
+        add_instructions_row(db, recipe_id)
 
 
 # SQL queries for READ operations ########################################
@@ -367,4 +399,84 @@ def move_ingredients_row_down(db: Connection, recipe_id: int, ingredient_id: int
         AND this.id = ?
         AND ingredients.id IN (this.id, next_id);
         """, [recipe_id, ingredient_id])
+    return cursor
+
+
+def add_instructions_row(db: Connection, recipe_id: int):
+    """Add instructions row to recipe
+    """
+    cursor = db.execute(
+        """
+        INSERT INTO instructions (recipe_id, order_number)
+        SELECT ?, IFNULL(MAX(order_number), 0) + 1
+        FROM instructions
+        WHERE recipe_id = ?
+        """, [recipe_id, recipe_id])
+    return cursor
+
+
+def delete_instructions_row(db: Connection, recipe_id: int, instruction_id: int) -> bool:
+    """Delete s instructions row from a recipe
+    """
+    cursor = db.execute(
+        """
+        DELETE FROM instructions
+        WHERE recipe_id = ? AND id = ?
+        """, [recipe_id, instruction_id])
+    return cursor
+
+
+def update_instructions_row(
+        db: Connection, recipe_id: int, i_id: int, fields: dict[str, str]) -> bool:
+    """Update specific instructions row. Fields must contain key
+    `instructions`.
+    """
+    fields = {**fields, "recipe_id": recipe_id, "i_id": i_id}
+    cursor = db.execute(
+        """
+        UPDATE instructions
+        SET (instructions)
+         = (:instructions)
+        WHERE recipe_id = :recipe_id AND id = :i_id
+        """, fields)
+    return cursor
+
+
+def move_instructions_row_up(db: Connection, recipe_id: int, instruction_id: int) -> bool:
+    """Move instruction up by swapping order_number values
+    with the previous instruction (in order of appearance).
+    """
+    cursor = db.execute(
+        """
+        UPDATE instructions SET order_number = CASE
+        WHEN instructions.id = prev_id THEN this.order_number
+        WHEN instructions.id = this.id THEN prev_order_number
+        END FROM instructions AS this, (SELECT id,
+            lag(id) OVER (ORDER BY order_number) AS prev_id,
+            lag(order_number) OVER (ORDER BY order_number) AS prev_order_number
+            FROM instructions WHERE recipe_id = ?) AS prev
+        WHERE this.id = prev.id
+        AND this.id = ?
+        AND instructions.id IN (this.id, prev_id);
+        """, [recipe_id, instruction_id])
+    return cursor
+
+
+def move_instructions_row_down(db: Connection, recipe_id: int, instruction_id: int) -> bool:
+    """Move instruction down by swapping order_number values
+    with the next instruction (in order of appearance).
+    """
+    cursor = db.execute(
+        """
+        UPDATE instructions SET order_number = CASE
+        WHEN instructions.id = next_id THEN this.order_number
+        WHEN instructions.id = this.id THEN next_order_number
+        END FROM instructions AS this, (SELECT id,
+            lead(id) OVER (ORDER BY order_number) AS next_id,
+            lead(order_number) OVER (ORDER BY order_number) AS next_order_number
+            FROM instructions WHERE recipe_id = ?) AS next
+        WHERE this.id = next.id
+        AND this.id = ?
+        AND instructions.id IN (this.id, next_id);
+        """, [recipe_id, instruction_id])
     return cursor

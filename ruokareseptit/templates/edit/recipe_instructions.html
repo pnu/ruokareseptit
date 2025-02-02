@@ -15,7 +15,7 @@
         <span class="actions">Siirrä / Poista</span>
         {% for instruction in instructions %}
         <label class="step" for="summary">{{ loop.index }}</label>
-        <textarea class="controls" name="summary" id="summary" rows="5">{{ instruction.instructions }}</textarea>
+        <textarea class="controls" name="instructions_{{ instruction.id }}_instructions" rows="5">{{ instruction.instructions |default('', True)}}</textarea>
         <div class="actions">
             {% if not loop.first %}
             <button class="up" name="instructions_{{ instruction.id }}_up" value="1">↑</button>

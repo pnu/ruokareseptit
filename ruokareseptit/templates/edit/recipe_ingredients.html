@@ -20,11 +20,11 @@
         <label class="actions">Siirrä / Poista</label>
         {% for ingredient in ingredients %}
         <input class="amount" type="number" name="ingredients_{{ ingredient.id }}_amount" min="0" max="100"
-            value="{{ ingredient.amount |default('',True)}}" />
+            value="{{ ingredient.amount |default('', True)}}" />
         <input class="unit" type="text" name="ingredients_{{ ingredient.id }}_unit" size="8"
-            value="{{ ingredient.unit |default('',True)}}" />
+            value="{{ ingredient.unit |default('', True)}}" />
         <input class="title" type="text" name="ingredients_{{ ingredient.id }}_title"
-            value="{{ ingredient.title |default('',True)}}" />
+            value="{{ ingredient.title |default('', True)}}" />
         <div class="actions">
             {% if not loop.first %}
             <button class="up" name="ingredients_{{ ingredient.id }}_up" value="1">↑</button>
