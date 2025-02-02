@@ -6,7 +6,7 @@
 
 {% block content %}
 <p>
-    Valitse resepti jota haluat muokata.
+    Valitse resepti jota haluat muokata tai poistaa.
 </p>
 <p>
     Sinulla on {{ count }} reseptiä.
@@ -16,7 +16,6 @@
 <p>
     <a href="{{ url_for('edit.recipe', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a>
     {{ recipe.title }} {{ recipe.published > 0 }}
-    <a href="{{ url_for('edit.recipe_delete', recipe_id=recipe.id, back=request.url) }}">poista</a>
 </p>
 {% endfor %}
 <hr>

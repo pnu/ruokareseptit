@@ -168,8 +168,15 @@ form.recipe {
       cursor: default;
     }
 
+    button.danger {
+      background-color: pink;
+    }
+
     button:hover {
       background-color: lightblue;
+    }
+    button.danger:hover {
+      background-color: hotpink;
     }
   }
 
@@ -252,6 +259,14 @@ form.recipe {
 
     button:hover {
       background-color: lightblue;
+    }
+
+    button.danger {
+      background-color: pink;
+    }
+
+    button.danger:hover {
+      background-color: hotpink;
     }
 
     .actions {

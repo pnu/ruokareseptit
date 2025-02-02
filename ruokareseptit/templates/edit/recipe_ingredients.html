@@ -30,13 +30,14 @@
         {% if not loop.last %}
         <button class="down" name="ingredients_{{ ingredient.id }}_down" value="1">↓</button>
         {% endif %}
-        <button class="delete" name="ingredients_{{ ingredient.id }}_delete" value="1">✗</button>
+        <button class="delete danger" name="ingredients_{{ ingredient.id }}_delete" value="1">✗</button>
         {% endfor %}
         <button class="control actions" name="ingredients_add_row" value="1">Lisää rivi</button>
     </fieldset>
 
     <nav>
         <button type="submit" name="return" value="1">④ Tallenna ja palaa reseptilistaukseen</button>
+        <button class="danger" type="submit" name="delete" value="1">ⓧ Poista resepti</button>
     </nav>
 </form>
 {% endblock %}

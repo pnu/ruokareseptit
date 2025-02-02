@@ -111,6 +111,11 @@ def recipe_update(recipe_id: int):
     if request.form.get("return"):
         return redirect(request.args.get("back", url_for("edit.recipe")))
 
+    if request.form.get("delete"):
+        back = request.args.get("back", url_for("edit.recipe"))
+        return redirect(url_for(
+            "edit.recipe_delete", recipe_id=recipe_id, next=back))
+
     edit_params["tab"] = int(request.form.get("tab", edit_params["tab"]))
     return redirect(url_for("edit.recipe", **edit_params))
 
