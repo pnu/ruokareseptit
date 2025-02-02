@@ -58,7 +58,7 @@ def create():
     """Create new recipe
     """
     if request.method == "GET":
-        return render_template("edit/create.html")
+        return render_template("edit/create.html", **request.args)
 
     recipe_id = None
     if validate_create_form(request.form) is False:

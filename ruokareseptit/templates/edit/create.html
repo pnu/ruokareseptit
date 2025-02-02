@@ -1,16 +1,13 @@
 {% extends 'base.html' %}
-
-{% block header %}
-<h1>{% block title %}Luo uusi resepti{% endblock %}</h1>
-{% endblock %}
-
+{% block title %}Uusi resepti{% endblock %}
 {% block content %}
-<form class="grid" method="post">
+<form class="dialog grid recipe" action="{{ submit_url }}" method="post">
+    <h1>Luo uusi resepti</h1>
     <p>
         Valitse ensin resptille nimi ja lyhyt kuvaus.
         Seuraavassa vaiheessa lisäät reseptiin ainesosat, varsinaiset valmistusohjeet yms. tiedot.
-        Tämän jälkeen voit vielä valita haluatko julkaista reseptin, vai jätätkö sen
-        luonnokseksi. Voit muokata omia reseptejäsi myös myöhemmin tämän jälkeen.
+        Voit vielä myöhemmin muokata nimeä ja kuvausta sekä valita haluatko julkaista reseptin,
+        vai jättää sen luonnokseksi.
     </p>
 
     {% with errors = get_flashed_messages(category_filter=["form_validation_error"]) %}
@@ -23,12 +20,13 @@
     {% endif %} {% endwith %}
 
     <label for="title">Reseptin nimi</label>
-    <input type="text" name="title" id="title" placeholder="Pizza" value="{{ title }}" autofocus />
+    <input class="control" type="text" name="title" id="title" placeholder="Pizza" value="{{ title }}" autofocus />
 
     <label for="summary">Kuvaus</label>
-    <textarea name="summary" id="summary" rows="5"
-        placeholder="Hyvä perusresepti pizzapohjalle, kestää jonkin aikaa tehdä mutta niin sen arvoista!">{{ summary }}</textarea>
+    <textarea class="control" name="summary" id="summary" rows="5" placeholder="Hyvä perusresepti pizzapohjalle, kestää jonkin aikaa tehdä mutta niin sen arvoista!">{{ summary }}</textarea>
 
-    <button type="submit">Luo resepti</button>
+    <nav>
+        <button type="submit">Luo resepti</button>
+    </nav>
 </form>
 {% endblock %}
