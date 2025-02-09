@@ -23,6 +23,11 @@ nav.navigation-bar {
     color: blue;
   }
 
+  /* Text navigation */
+  .hidden {
+    display: none;
+  }
+
   /* Nav levels are flex rows */
   ul {
     background-color: lightcyan;

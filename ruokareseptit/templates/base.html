@@ -18,6 +18,7 @@
         {% else %}
         <li class="{{ item.class }} item-{{ index }}">{{ item.title }}</li>
         {% endif %}
+        <a href="{{ item.url }}" alt="{{ item.title }}" class="hidden">{{ item.title }}</a>
       </a>
       {% endfor %}
     </ul>
