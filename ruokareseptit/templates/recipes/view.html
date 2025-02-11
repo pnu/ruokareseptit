@@ -5,9 +5,11 @@
 {% endblock %}
 
 {% block content %}
-<p>
-    {{ recipe.summary }}
-</p>
+
+{% set summary_paragraphs = recipe.summary.splitlines() %}
+{% for p in summary_paragraphs %}
+    <p>{{ p }}</p>
+{% endfor %}
 
 <ul>
     <li>Reseptin laatija: {{ recipe.username }}</li>
@@ -53,7 +55,12 @@
 <h3>Valmistusohjeet</h3>
 <ul>
     {% endif %}
-    <li>{{ loop.index }}: {{ step.instructions }}</li>
+    <li>{{ loop.index }}:
+        {% set instruction_paragraphs = step.instructions.splitlines() %}
+        {% for p in instruction_paragraphs %}
+            <p>{{ p }}</p>
+        {% endfor %}
+    </li>
     {% if loop.last %}
 </ul>
 {% endif %}
