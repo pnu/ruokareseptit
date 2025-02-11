@@ -69,7 +69,7 @@ def create():
             cursor = insert_recipe(db, g.user["id"], request.form)
             recipe_id = cursor.lastrowid
     except db.IntegrityError:
-        flash_error("Nimi on jo varattu. Valitse toinen nimi.")
+        flash("Reseptin päivittäminen epäonnistui.")
         return redirect(url_for("edit.create", **request.form))
 
     flash("Uusi resepti on luotu.")

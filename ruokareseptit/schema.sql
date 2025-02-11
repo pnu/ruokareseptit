@@ -1,5 +1,5 @@
 -- Initialize the database.
--- Drop any existing data and create empty tables.
+-- Use `flask --app ruokareseptit init-db` to execute this script.
 
 PRAGMA foreign_keys = OFF;
 DROP TABLE IF EXISTS recipes;
@@ -19,7 +19,7 @@ CREATE TABLE users (
 
 CREATE TABLE recipes (
     id INTEGER PRIMARY KEY,
-    title TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
     summary TEXT NOT NULL,
     preparation_time INTEGER,
     cooking_time INTEGER,
@@ -101,3 +101,5 @@ INSERT INTO user_review (user_id, recipe_id, rating, review) VALUES
 (1, 1, 5, 'Erinomainen suolajauho!'),
 (1, 1, 2, 'En pitänyt.'),
 (1, 2, 4, 'Maistui voin kanssa todella hyvälle.');
+
+VACUUM;
