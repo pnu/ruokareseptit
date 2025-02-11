@@ -63,6 +63,17 @@ CREATE TABLE user_review (
   review TEXT
 );
 
+-- Specific indexes used in the app
+CREATE INDEX idx_published_recipes ON recipes(published);
+CREATE INDEX idx_author_recipes ON recipes(author_id);
+CREATE INDEX idx_recipe_ratings ON user_review(recipe_id, rating DESC);
+CREATE INDEX idx_recipe_ingredients_order ON ingredients(recipe_id, order_number);
+CREATE INDEX idx_recipe_instructions_order ON instructions(recipe_id, order_number);
+CREATE INDEX idx_recipe_category ON recipe_category(recipe_id);
+-- For case insensitive LIKE prefix search '...%'
+CREATE INDEX idx_recipe_title ON recipes(title COLLATE NOCASE);
+CREATE INDEX idx_ingredient_title ON ingredients(title COLLATE NOCASE);
+
 -- Initial content
 
 INSERT INTO users (id, username, password_hash) VALUES
