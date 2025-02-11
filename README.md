@@ -40,6 +40,20 @@ flask --app ruokareseptit --debug run
 
 Sovellus on tämän jälkeen käytettävissä osoitteessa `http://localhost:5000/`
 
+## Testaaminen suurella tietomäärällä
+
+Sovellukseen voi syöttää suuren määärän satunnaisia käyttäjiä, reseptejä
+ja arvosteluita komennolla `python3 seed.py` projektin juurihakemistossa.
+Tietokanta on alustettava `init-db` komennolla ennen tätä (kts. edellä).
+Testidatalla tietokannan tiedostokoko kasvaa ~500 MiB kokoluokkaan.
+
+Testikäyttäjien nimet on `test_N`, missä N on 1 ja 10000 väliltä.
+Kun sovellusta ajetaan `--debug` tilassa, näillä käyttäjillä voi helposti
+kirjautua tietämättä salasanaa (kts. edellä). Scripti luo lisäksi miljoona
+`nobody_N` käyttäjää, joilla ei ole omia reseptejä mutta ovat antaneet
+arvosteluita eri resepteille. Testidatassa on kaikkiaan ~ 2.5 miljoonaa
+arvostelua.
+
 ## Asetukset ja tuotantoon vieminen
 
 Sovelluksen oletusasetukset on määritelty tiedostossa
