@@ -7,9 +7,6 @@ import urllib.request
 import os
 
 db = sqlite3.connect("instance/ruokareseptit.sqlite")
-db.execute("DELETE FROM users WHERE username like \"nobody_%\"")
-db.execute("DELETE FROM users WHERE username like \"test_%\"")
-db.execute("DELETE FROM recipes WHERE title like \"%[TEST]%\"")
 
 SANA_URL = "https://kaino.kotus.fi/lataa/nykysuomensanalista2024.csv"
 SANA_FILENAME = "instance/nykysuomensanalista2024.csv"
@@ -91,6 +88,7 @@ def insert_random_recipe(author_id):
             INSERT INTO instructions (recipe_id, order_number, instructions)
             VALUES (?,?,?)
             """, [recipe_id, i, instructions])
+    return recipe_id
 
 def add_user_review(user_id, recipe_id):
     """Give a random user review
@@ -106,77 +104,55 @@ def add_user_review(user_id, recipe_id):
 def main():
     """Create some testdata in the database
     """
-    print("Creating empty users `nobody_N` where N is 1..1000000 ...")
-    for i in range(1, 10**6 + 1):
-        print(f"{i}/{10**6}                  ", end="\r")
-        cur = db.execute("INSERT INTO users (username, password_hash) VALUES (?,?)",
-                ["nobody_" + str(i), str(i)])
-    print()
-
-    print("Creating empty recipes `[TEST] N` where N is 1..1000000 ...")
-    for i in range(1, 10**6 + 1):
-        print(f"{i}/{10**6}                  ", end="\r")
-        cur = db.execute(
-            """
-            INSERT INTO recipes (title, summary)
-            VALUES (?,?)
-            """, ["[TEST] " + str(i), "[TEST] " + str(i)])
-    print()
-
-    user_count = 10000
-    print("Creating `test_N` users and 0..10 recipes with random content for each...")
-    for i in range(1, user_count + 1):
-        print(f"{i}/{user_count} ", end="")
-        cur = db.execute("INSERT INTO users (username, password_hash) VALUES (?,?)",
-                ["test_" + str(i), str(i)])
-        user_id = cur.lastrowid
+    test_users = []
+    test_recipes = []
+    start_from_user_id = db.execute("SELECT IFNULL(MAX(id),0) from users").fetchone()[0]
+    i_0 = start_from_user_id + 1
+    i_n = i_0 + 10000
+    print(f"Creating 10000 users `test_N` where N is {i_0}..{i_n - 1} and 0..10 recipes for each...")
+    for i in range(i_0, i_n):
+        print(f"test_{i} ", end="")
+        db.execute("INSERT INTO users (id, username, password_hash) VALUES (?,?,?)",
+                   [i, "test_" + str(i), ""])
+        test_users.append(i)
         for _ in range(random.randint(0, 10)):
             print(".", end="")
-            insert_random_recipe(user_id)
-        print("                     ", end="\r")
-    print()
-    rows = db.execute(
-            """
-            SELECT id from recipes
-            WHERE title like "%[TEST]"
-            AND published = 1
-            """).fetchall()
-    test_recipes = [row[0] for row in rows]
-    print("Number of published test recipies:", len(test_recipes))
-    print("Every `test_N` user will give 5..20 reviews with text to a random published recipe...")
-    rows = db.execute(
-            """
-            SELECT id from users
-            WHERE username like "test_%"
-            """).fetchall()
-    test_users = [row[0] for row in rows]
-    n_users = len(test_users)
+            recipe_id = insert_random_recipe(i)
+            test_recipes.append(recipe_id)
+        print(" " * 10, end="\r")
+    print("Number of new test recipies:", len(test_recipes))
+
+    print("Every new `test_N` user gives 5..20 reviews...")
     for i, user in enumerate(test_users):
-        print(f"{i + 1}/{n_users} ", end="")
+        print(f"{i + 1}/{len(test_users)} ", end="")
         for _ in range(random.randint(5, 20)):
             print(".", end="")
             add_user_review(user, random.choice(test_recipes))
-        print("                     ", end="\r")
-    print()
-    print("Every `nobody_N` user will give 0..5 numerical reviews (no text)...")
-    rows = db.execute(
-            """
-            SELECT id from users
-            WHERE username like "nobody_%"
-            """).fetchall()
-    nobody_users = [row[0] for row in rows]
-    n_users = len(nobody_users)
-    for i, user in enumerate(nobody_users):
-        print(f"{i + 1}/{n_users}           ", end="\r")
+        print(" " * 20, end="\r")
+
+    nobody_users = []
+    start_from_user_id = db.execute("SELECT max(id) from users").fetchone()[0]
+    i_0 = start_from_user_id + 1
+    i_n = i_0 + 10**6
+    print(f"Creating 10**6 empty users `nobody_N` where N is {i_0}..{i_n - 1} ...")
+    for i in range(i_0, i_n):
+        print(f"nobody_{i}                  ", end="\r")
+        db.execute("INSERT INTO users (id, username, password_hash) VALUES (?,?,?)",
+                   [i, "nobody_" + str(i), ""])
+        nobody_users.append(i)
+
+    print("Every new `nobody_N` user gives 0..5 numerical reviews to random recipes...")
+    for i, user_id in enumerate(nobody_users):
+        print(f"{i + 1}/{len(nobody_users)}           ", end="\r")
         for _ in range(random.randint(0, 5)):
-            rating = random.randint(1, 5)
             recipe_id = random.choice(test_recipes)
+            rating = recipe_id % 4  # 0..3
+            rating += random.randint(1, 2)  # 1..5
             db.execute(
                 """
                 INSERT INTO user_review (user_id, recipe_id, rating)
                 VALUES (?,?,?)
                 """, [user_id, recipe_id, rating])
-    print()
 
     print("Commit and vacuum...")
     db.commit()
