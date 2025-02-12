@@ -45,10 +45,11 @@ Sovellus on tämän jälkeen käytettävissä osoitteessa `http://localhost:5000
 
 Sovellukseen voi syöttää suuren määärän satunnaisia käyttäjiä, reseptejä
 ja arvosteluita projektin juuressa olevalla `seed.py` apuohjelmalla.
-Tietokanta on alustettava `init-db` komennolla ennen tätä (kts. edellä).
+Tietokannan skeeman tulee olla alustettuna ennen tätä `init-db` komennolla.
 Testidatalla tietokannan tiedostokoko kasvaa ~700 MiB kokoluokkaan.
 
 ```
+flask --app ruokareseptit init-db
 python3 seed.py
 ```
 
