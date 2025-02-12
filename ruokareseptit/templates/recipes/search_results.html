@@ -1,10 +1,13 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}Parhaat reseptit{% endblock %}</h1>
+<h1>{% block title %}Hakutulokset{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
+<form method="get">
+    &#x1F50E;<input name="q" placeholder="Hae reseptin nimestä, esim. &quot;banaani&quot;" value="{{ search_term }}" />
+</form>
 <hr>
 {% for recipe in recipes %}
 <p><a href="{{ url_for('recipes.index', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a>

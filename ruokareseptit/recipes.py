@@ -23,8 +23,9 @@ def index(recipe_id: int):
     if recipe_id is None:
         with get_db() as db:
             page = int(request.args.get("page", 0))
-            pub_recipes, remaining = list_published_recipes(db, page)
-            context = {"recipes": pub_recipes}
+            pub_recipes, pages, remaining = list_published_recipes(db, page)
+            context = {"recipes": pub_recipes,
+                       "page_number": page + 1, "total_pages": pages + 1 }
             if remaining > 0:
                 context["next_page"] = url_for("recipes.index", page=page + 1)
             if page > 0:
@@ -66,6 +67,18 @@ def browse_xyz():
 def search():
     """Contact page
     """
+    search_term = request.args.get("q")
+    if search_term is not None and search_term != "":
+        with get_db() as db:
+            page = int(request.args.get("page", 0))
+            matching_recipes, pages, remaining = search_recipes_title(db, search_term, page)
+            context = {"recipes": matching_recipes, "search_term": search_term,
+                       "page_number": page + 1, "total_pages": pages + 1 }
+            if remaining > 0:
+                context["next_page"] = url_for("recipes.search", q=search_term, page=page + 1)
+            if page > 0:
+                context["prev_page"] = url_for("recipes.search", q=search_term, page=page - 1)
+            return render_template("recipes/search_results.html", **context)
     context = {}
     return render_template("recipes/search.html", **context)
 
@@ -73,9 +86,37 @@ def search():
 # SQL queries for READ operations ########################################
 
 
+def search_recipes_title(db: Cursor, search_term: str, page: int):
+    """Search all published recipes, paginated. Returns a tuple of
+    Cursor, number of pages and number of remaining recipes after this page.
+    """
+    search_term = "%" + search_term + "%"
+    total_rows = db.execute(
+        """
+        SELECT count(*)
+        FROM recipes
+        WHERE published = 1
+        AND title LIKE ?
+        """, [search_term]).fetchone()[0]
+    page_size = current_app.config["RECIPE_LIST_PAGE_SIZE"]
+    offset = page * page_size
+    pub_recipes = db.execute(
+        """
+        SELECT recipes.*
+        FROM recipes
+        WHERE published = 1
+        AND title LIKE ?
+        LIMIT ? OFFSET ?
+        """, [search_term, page_size, offset]
+    )
+    recipes_remaining = max(total_rows - offset - page_size, 0)
+    pages = total_rows // page_size
+    return pub_recipes, pages, recipes_remaining
+
+
 def list_published_recipes(db: Cursor, page: int):
     """Query all published recipes, paginated. Returns a tuple of
-    Cursor and number of remaining recipes after this page.
+    Cursor, number of pages and number of remaining recipes after this page.
     """
     total_rows = db.execute(
         """
@@ -97,7 +138,8 @@ def list_published_recipes(db: Cursor, page: int):
         """, [page_size, offset]
     )
     recipes_remaining = max(total_rows - offset - page_size, 0)
-    return pub_recipes, recipes_remaining
+    pages = total_rows // page_size
+    return pub_recipes, pages, recipes_remaining
 
 
 def fetch_published_recipe_context(db: Cursor, recipe_id: int):

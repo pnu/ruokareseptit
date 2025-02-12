@@ -5,11 +5,12 @@
 Sovelluksessa käyttäjät pystyvät jakamaan ruokareseptejään. Reseptissä lukee tarvittavat ainekset ja valmistusohje.
 * -[x] Käyttäjä pystyy luomaan tunnuksen ja kirjautumaan sisään sovellukseen.
 * -[x] Käyttäjä pystyy lisäämään reseptejä ja muokkaamaan ja poistamaan niitä.
-* -[x] Käyttäjä näkee sovellukseen lisätyt reseptit.
-* -[ ] Käyttäjä pystyy etsimään reseptejä hakusanalla.
-* -[x] Käyttäjäsivu näyttää, montako reseptiä käyttäjä on lisännyt ja listan käyttäjän lisäämistä resepteistä.
 * -[ ] Käyttäjä pystyy valitsemaan reseptille yhden tai useamman luokittelun (esim. alkuruoka, intialainen, vegaaninen).
+* -[x] Käyttäjä näkee ja voi selailla muiden käyttäjien julkaisemia reseptejä.
+* -[x] Käyttäjä pystyy etsimään reseptejä hakusanalla.
 * -[ ] Käyttäjä pystyy antamaan reseptille kommentin ja arvosanan. Reseptistä näytetään kommentit ja keskimääräinen arvosana.
+* -[x] Käyttäjäsivu näyttää, montako reseptiä käyttäjä on lisännyt ja listan käyttäjän lisäämistä resepteistä.
+* -[ ] Käyttäjäsivulla voi muokata omia kommentteja ja arvosteluita.
 
 ## Asennus
 
