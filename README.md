@@ -11,7 +11,7 @@ Sovelluksessa käyttäjät pystyvät jakamaan ruokareseptejään. Reseptissä lu
 * -[ ] Käyttäjä pystyy valitsemaan reseptille yhden tai useamman luokittelun (esim. alkuruoka, intialainen, vegaaninen).
 * -[ ] Käyttäjä pystyy antamaan reseptille kommentin ja arvosanan. Reseptistä näytetään kommentit ja keskimääräinen arvosana.
 
-## Sovelluksen asennus
+## Asennus
 
 Kloonaa git-repositorio omaan ympäristöösi ja siirry sen
 juurihakemistoon. Ota käyttöön `venv` ympäristö ja asenna
@@ -31,28 +31,41 @@ tietokanta on jo olemassa.
 flask --app ruokareseptit init-db
 ```
 
-Käynnistä sovellus `flask run` komennolla. Debug-tilassa
-kirjautuminen ei tarkista salasanan oikeellisuutta.
+Käynnistä sovellus `flask run` komennolla. Sovelluksen
+testaamista varten kts. lisäohjeet alla kohdassa
+"Testaaminen".
+
+```
+flask --app ruokareseptit run
+```
+
+Sovellus on tämän jälkeen käytettävissä osoitteessa `http://localhost:5000/`
+
+## Testaaminen
+
+Sovellukseen voi syöttää suuren määärän satunnaisia käyttäjiä, reseptejä
+ja arvosteluita projektin juuressa olevalla `seed.py` apuohjelmalla.
+Tietokanta on alustettava `init-db` komennolla ennen tätä (kts. edellä).
+Testidatalla tietokannan tiedostokoko kasvaa ~700 MiB kokoluokkaan.
+
+```
+python3 seed.py
+```
+
+Käynnistä sovellus debug tilaan, jolloin sisäänkirjautuminen
+ei tarkista salasanaa. Tämä mahdollistaa kirjautumisen testikäyttäjillä,
+joilla ei ole mitään toimivaa salasanaa. Debug tilassa flask ohjelman
+tulosteessa (konsolissa) näkyy myös tehdyt SQL-kyselyt.
 
 ```
 flask --app ruokareseptit --debug run
 ```
 
-Sovellus on tämän jälkeen käytettävissä osoitteessa `http://localhost:5000/`
-
-## Testaaminen suurella tietomäärällä
-
-Sovellukseen voi syöttää suuren määärän satunnaisia käyttäjiä, reseptejä
-ja arvosteluita komennolla `python3 seed.py` projektin juurihakemistossa.
-Tietokanta on alustettava `init-db` komennolla ennen tätä (kts. edellä).
-Testidatalla tietokannan tiedostokoko kasvaa ~500 MiB kokoluokkaan.
-
-Testikäyttäjien nimet on `test_N`, missä N on 1 ja 10000 väliltä.
-Kun sovellusta ajetaan `--debug` tilassa, näillä käyttäjillä voi helposti
-kirjautua tietämättä salasanaa (kts. edellä). Scripti luo lisäksi miljoona
+Testikäyttäjien nimet on `test_N`, missä N on 1 ja 10000 väliltä. Jokainen
+testikäyttäjä tekee useamman reseptin satunnaisella sisällöllä, sekä antaa
+arvosteluita toisista resepteistä. `seed.py` luo lisäksi miljoona
 `nobody_N` käyttäjää, joilla ei ole omia reseptejä mutta ovat antaneet
-arvosteluita eri resepteille. Testidatassa on kaikkiaan ~ 2.5 miljoonaa
-arvostelua.
+arvosteluita.
 
 ## Asetukset ja tuotantoon vieminen
 
@@ -77,7 +90,7 @@ alla näkyvän komennon tuloste.
 python -c 'import secrets; print("SECRET_KEY =",secrets.token_hex())'
 ```
 
-## Sovelluksen hakemistorakenne
+## Hakemistorakenne
 
 Sovellus on toteutettu Python pakettina, joka löytyy
 sovelluksen juuresta `ruokareseptit` hakemistosta.

@@ -1,31 +1,70 @@
 """Generate random content to the database
 """
+import csv
 import random
 import sqlite3
-import string
+import urllib.request
+import os
 
 db = sqlite3.connect("instance/ruokareseptit.sqlite")
 db.execute("DELETE FROM users WHERE username like \"nobody_%\"")
 db.execute("DELETE FROM users WHERE username like \"test_%\"")
 db.execute("DELETE FROM recipes WHERE title like \"%[TEST]%\"")
 
-def random_text_generator(n: int) -> str:
-    """n random words
+SANA_URL = "https://kaino.kotus.fi/lataa/nykysuomensanalista2024.csv"
+SANA_FILENAME = "instance/nykysuomensanalista2024.csv"
+if not os.path.isfile(SANA_FILENAME):
+    print("Fetching", SANA_URL, "...")
+    urllib.request.urlretrieve(SANA_URL, SANA_FILENAME)
+
+sanasto = []
+substantiivit = []
+with open(SANA_FILENAME, encoding="utf-8", newline="") as csvfile:
+    sana_rows = csv.reader(csvfile, delimiter="\t")
+    for row in sana_rows:
+        hakusana = row[0]
+        sanasto.append(hakusana)
+        if "substantiivi" in row[2]:
+            substantiivit.append(hakusana)
+
+def random_title() -> str:
+    """Generate random title of 1..3 words
     """
-    words = []
+    k = random.randint(1, 3)
+    w = random.choices(sanasto, k=k)
+    w[0] = w[0].title()
+    return " ".join(w)
+
+def random_noun() -> str:
+    """Random noun
+    """
+    return random.choice(substantiivit)
+
+def random_sentences(n: int) -> str:
+    """Generate n random sentences
+    """
+    all_words = []
     for _ in range(n):
-        word_length = random.randint(2, 10)
-        word = ''.join(random.choice(string.ascii_letters) for _ in range(word_length))
-        words.append(word)
-    return " ".join(words)
+        k = random.randint(2, 10)
+        w = random.choices(sanasto, k=k)
+        w[0] = w[0].title()
+        w[-1] += "."
+        all_words.extend(w)
+    return " ".join(all_words)
+
+def random_paragraph(n: int) -> str:
+    """Generate n random paragraphs
+    """
+    p = []
+    for _ in range(n):
+        p.append(random_sentences(random.randint(3,10)))
+    return "\n\n".join(p)
 
 def insert_random_recipe(author_id):
     """Insert a random recipe into the database
     """
-    title = random_text_generator(random.randint(1, 5)) + " [TEST]"
-    text_paragraphs = [random_text_generator(random.randrange(10, 50))
-                       for _ in range(random.randint(1, 5))]
-    summary = "\n\n".join(text_paragraphs)
+    title = random_title() + " [TEST]"
+    summary = random_paragraph(random.randint(1,3))
     prep_time = random.randint(0, 120)
     cook_time = random.randint(0, 600)
     skill = random.randint(1,4)
@@ -36,7 +75,7 @@ def insert_random_recipe(author_id):
         INSERT INTO recipes (title, summary, preparation_time,
         cooking_time, skill_level, portions, published, author_id)
         VALUES (?,?,?,?,?,?,?,?)
-        """, [title.title(), summary, prep_time, cook_time, skill, portions, pub, author_id])
+        """, [title, summary, prep_time, cook_time, skill, portions, pub, author_id])
     recipe_id = curs.lastrowid
     for i in range(random.randint(3,10)):
         db.execute(
@@ -44,12 +83,9 @@ def insert_random_recipe(author_id):
             INSERT INTO ingredients (recipe_id, order_number, amount, unit, title)
             VALUES (?,?,?,?,?)
             """,
-            [recipe_id, i, random.randint(1, 15), random_text_generator(1),
-             random_text_generator(random.randint(2, 5)).title()])
+            [recipe_id, i, random.randint(1, 15), random_noun(), random_title()])
     for i in range(random.randint(3, 10)):
-        text_paragraphs = [random_text_generator(random.randrange(10, 50))
-                    for _ in range(random.randint(1, 3))]
-        instructions = "\n\n".join(text_paragraphs)
+        instructions = random_paragraph(random.randint(1,2))
         db.execute(
             """
             INSERT INTO instructions (recipe_id, order_number, instructions)
@@ -59,9 +95,7 @@ def insert_random_recipe(author_id):
 def add_user_review(user_id, recipe_id):
     """Give a random user review
     """
-    text_paragraphs = [random_text_generator(random.randrange(10, 20))
-                for _ in range(random.randint(1, 3))]
-    review = "\n\n".join(text_paragraphs)
+    review = random_paragraph(random.randint(1,3))
     rating = random.randint(1, 5)
     db.execute(
         """
@@ -149,6 +183,5 @@ def main():
     db.execute("VACUUM")
     db.close()
     print("Thanks, bye.")
-
 
 main()
