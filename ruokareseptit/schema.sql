@@ -74,43 +74,41 @@ CREATE INDEX idx_recipe_category ON recipe_category(recipe_id);
 CREATE INDEX idx_recipe_title ON recipes(title COLLATE NOCASE);
 CREATE INDEX idx_ingredient_title ON ingredients(title COLLATE NOCASE);
 
--- Initial content
+-- INSERT INTO users (id, username, password_hash) VALUES
+-- (1, 'user1', 'pass'),
+-- (2, 'user2', 'pass');
 
-INSERT INTO users (id, username, password_hash) VALUES
-(1, 'user1', 'pass'),
-(2, 'user2', 'pass');
+-- INSERT INTO recipes (title, summary, preparation_time, cooking_time, skill_level, portions, published, author_id) VALUES
+-- ('Suolajauho', 'Perinteinen suolajauho itämaisella twistillä.', 10, 20, 1, 2, 1, 1),
+-- ('Voiperuna', 'Peruna maistuu voin kanssa hyvältä.', 10, 20, 1, 2, 1, 2);
 
-INSERT INTO recipes (title, summary, preparation_time, cooking_time, skill_level, portions, published, author_id) VALUES
-('Suolajauho', 'Perinteinen suolajauho itämaisella twistillä.', 10, 20, 1, 2, 1, 1),
-('Voiperuna', 'Peruna maistuu voin kanssa hyvältä.', 10, 20, 1, 2, 1, 2);
+-- INSERT INTO ingredients (recipe_id, order_number, amount, unit, title) VALUES
+-- (1, 1, 2, 'dl', 'Jauhoja'),
+-- (1, 2, 1, 'tl', 'Suolaa'),
+-- (1, 3, 1, 'nippu', 'Korianteria'),
+-- (2, 1, 1, 'kg', 'Pottuja'),
+-- (2, 2, 1, 'nyrkillinen', 'Voita')
+-- ;
 
-INSERT INTO ingredients (recipe_id, order_number, amount, unit, title) VALUES
-(1, 1, 2, 'dl', 'Jauhoja'),
-(1, 2, 1, 'tl', 'Suolaa'),
-(1, 3, 1, 'nippu', 'Korianteria'),
-(2, 1, 1, 'kg', 'Pottuja'),
-(2, 2, 1, 'nyrkillinen', 'Voita')
-;
+-- INSERT INTO instructions (recipe_id, order_number, instructions) VALUES
+-- (1, 1, 'Sekoita jauhot ja suola huolellisesti.'),
+-- (1, 2, 'Kaada seos lattialle.'),
+-- (2, 1, 'Kuori ja keitä perunat.'),
+-- (2, 2, 'Annostele lautaselle voin kera.');
 
-INSERT INTO instructions (recipe_id, order_number, instructions) VALUES
-(1, 1, 'Sekoita jauhot ja suola huolellisesti.'),
-(1, 2, 'Kaada seos lattialle.'),
-(2, 1, 'Kuori ja keitä perunat.'),
-(2, 2, 'Annostele lautaselle voin kera.');
+-- INSERT INTO categories (title) VALUES
+-- ('Perinteinen'),
+-- ('Itämainen'),
+-- ('Arkiruoka');
 
-INSERT INTO categories (title) VALUES
-('Perinteinen'),
-('Itämainen'),
-('Arkiruoka');
+-- INSERT INTO recipe_category (recipe_id, category_id) VALUES
+-- (1, 1),
+-- (1, 2),
+-- (2, 3);
 
-INSERT INTO recipe_category (recipe_id, category_id) VALUES
-(1, 1),
-(1, 2),
-(2, 3);
-
-INSERT INTO user_review (user_id, recipe_id, rating, review) VALUES
-(1, 1, 5, 'Erinomainen suolajauho!'),
-(1, 1, 2, 'En pitänyt.'),
-(1, 2, 4, 'Maistui voin kanssa todella hyvälle.');
+-- INSERT INTO user_review (user_id, recipe_id, rating, review) VALUES
+-- (1, 1, 5, 'Erinomainen suolajauho!'),
+-- (1, 1, 2, 'En pitänyt.'),
+-- (1, 2, 4, 'Maistui voin kanssa todella hyvälle.');
 
 VACUUM;
