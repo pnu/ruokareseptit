@@ -8,17 +8,14 @@
 <form method="get">
     &#x1F50E;<input name="q" placeholder="Hae reseptin nimestä, esim. &quot;banaani&quot;" value="{{ search_term }}" />
 </form>
+<p>
+    Haku tuotti {{ recipes_count }} osumaa.
+</p>
 <hr>
 {% for recipe in recipes %}
 <p><a href="{{ url_for('recipes.index', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a>
     {{ recipe.title }} {{ recipe.published > 0 }} {{ recipe.rating }}</p>
 {% endfor %}
 <hr>
-<p>Sivu {{ page_number }} / {{ total_pages }}</p>
-{% if prev_page %}
-<p><a href="{{ prev_page }}">&lt;&lt; edellinen sivu</a></p>
-{% endif %}
-{% if next_page %}
-<p><a href="{{ next_page }}">seuraava sivu &gt;&gt;</a></p>
-{% endif %}
+{% include "common/pager.html" %}
 {% endblock %}

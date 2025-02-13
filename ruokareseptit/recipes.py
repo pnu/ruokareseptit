@@ -22,13 +22,14 @@ def index(recipe_id: int):
     """
     if recipe_id is None:
         with get_db() as db:
-            page = int(request.args.get("page", 0))
-            pub_recipes, pages, remaining = list_published_recipes(db, page)
-            context = {"recipes": pub_recipes,
-                       "page_number": page + 1, "total_pages": pages + 1 }
-            if remaining > 0:
+            page = int(request.args.get("page", 1))
+            recipes, count, pages = list_published_recipes(db, page)
+            page = max(min(pages, page), 1)
+            context = {"recipes": recipes, "recipes_count": count,
+                       "page_number": page, "total_pages": pages }
+            if page < pages:
                 context["next_page"] = url_for("recipes.index", page=page + 1)
-            if page > 0:
+            if page > 1:
                 context["prev_page"] = url_for("recipes.index", page=page - 1)
             return render_template("recipes/list.html", **context)
 
@@ -71,12 +72,14 @@ def search():
     if search_term is not None and search_term != "":
         with get_db() as db:
             page = int(request.args.get("page", 0))
-            matching_recipes, pages, remaining = search_recipes_title(db, search_term, page)
-            context = {"recipes": matching_recipes, "search_term": search_term,
-                       "page_number": page + 1, "total_pages": pages + 1 }
-            if remaining > 0:
+            recipes, count, pages = search_recipes_title(db, search_term, page)
+            page = max(min(pages, page), 1)
+            context = {"recipes": recipes, "recipes_count": count,
+                       "search_term": search_term, "page_number": page,
+                       "total_pages": pages }
+            if page < pages:
                 context["next_page"] = url_for("recipes.search", q=search_term, page=page + 1)
-            if page > 0:
+            if page > 1:
                 context["prev_page"] = url_for("recipes.search", q=search_term, page=page - 1)
             return render_template("recipes/search_results.html", **context)
     context = {}
@@ -88,18 +91,19 @@ def search():
 
 def search_recipes_title(db: Cursor, search_term: str, page: int):
     """Search all published recipes, paginated. Returns a tuple of
-    Cursor, number of pages and number of remaining recipes after this page.
+    Cursor, number of recipes and number of pages.
     """
     search_term = "%" + search_term + "%"
-    total_rows = db.execute(
+    total_rows: int = db.execute(
         """
         SELECT count(*)
         FROM recipes
         WHERE published = 1
         AND title LIKE ?
         """, [search_term]).fetchone()[0]
-    page_size = current_app.config["RECIPE_LIST_PAGE_SIZE"]
-    offset = page * page_size
+    page_size = int(current_app.config["RECIPE_LIST_PAGE_SIZE"])
+    total_pages = (total_rows - 1) // page_size + 1
+    offset = max(min(total_pages - 1, page - 1), 0) * page_size
     pub_recipes = db.execute(
         """
         SELECT recipes.*
@@ -109,23 +113,22 @@ def search_recipes_title(db: Cursor, search_term: str, page: int):
         LIMIT ? OFFSET ?
         """, [search_term, page_size, offset]
     )
-    recipes_remaining = max(total_rows - offset - page_size, 0)
-    pages = total_rows // page_size
-    return pub_recipes, pages, recipes_remaining
+    return pub_recipes, total_rows, total_pages
 
 
 def list_published_recipes(db: Cursor, page: int):
     """Query all published recipes, paginated. Returns a tuple of
-    Cursor, number of pages and number of remaining recipes after this page.
+    Cursor, number of recipes and number of pages.
     """
-    total_rows = db.execute(
+    total_rows: int = db.execute(
         """
         SELECT count(*)
         FROM recipes
         WHERE published = 1
         """).fetchone()[0]
-    page_size = current_app.config["RECIPE_LIST_PAGE_SIZE"]
-    offset = page * page_size
+    page_size = int(current_app.config["RECIPE_LIST_PAGE_SIZE"])
+    total_pages = (total_rows - 1) // page_size + 1
+    offset = max(min(total_pages - 1, page - 1), 0) * page_size
     pub_recipes = db.execute(
         """
         SELECT recipes.*, AVG(user_review.rating) AS rating
@@ -137,9 +140,7 @@ def list_published_recipes(db: Cursor, page: int):
         LIMIT ? OFFSET ?
         """, [page_size, offset]
     )
-    recipes_remaining = max(total_rows - offset - page_size, 0)
-    pages = total_rows // page_size
-    return pub_recipes, pages, recipes_remaining
+    return pub_recipes, total_rows, total_pages
 
 
 def fetch_published_recipe_context(db: Cursor, recipe_id: int):

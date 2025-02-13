@@ -31,11 +31,13 @@ def recipe(recipe_id: int, tab: int):
     if recipe_id is None:
         with get_db() as db:
             page = int(request.args.get("page", 0))
-            u_recipes, count, more = list_user_recipes(db, g.user["id"], page)
-            context = {"recipes": u_recipes, "count": count}
-            if more > 0:
+            recipes, count, pages = list_user_recipes(db, g.user["id"], page)
+            page = max(min(pages, page), 1)
+            context = {"recipes": recipes, "recipes_count": count,
+                       "page_number": page, "total_pages": pages }
+            if page < pages:
                 context["next_page"] = url_for("edit.recipe", page=page + 1)
-            if page > 0:
+            if page > 1:
                 context["prev_page"] = url_for("edit.recipe", page=page - 1)
             return render_template("edit/recipes.html", **context)
 
@@ -228,8 +230,9 @@ def list_user_recipes(db: Connection, author_id: int, page: int):
         FROM recipes
         WHERE author_id = ?
         """, [author_id]).fetchone()[0]
-    page_size = current_app.config["RECIPE_LIST_PAGE_SIZE"]
-    offset = page * page_size
+    page_size = int(current_app.config["RECIPE_LIST_PAGE_SIZE"])
+    total_pages = (total_rows - 1) // page_size + 1
+    offset = max(min(total_pages - 1, page - 1), 0) * page_size
     user_recipes = db.execute(
         """
         SELECT *
@@ -237,8 +240,7 @@ def list_user_recipes(db: Connection, author_id: int, page: int):
         WHERE author_id = ? LIMIT ? OFFSET ?
         """, [author_id, page_size, offset]
     )
-    recipes_remaining = total_rows - offset - page_size
-    return user_recipes, total_rows, recipes_remaining
+    return user_recipes, total_rows, total_pages
 
 
 def fetch_author_recipe_context(db: Connection, recipe_id: int, author_id: int):

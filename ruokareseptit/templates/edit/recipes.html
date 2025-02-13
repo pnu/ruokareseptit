@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{% if count == 0 %}
+{% if recipes_count == 0 %}
 <p>
     Sinulla ei ole yhtään omaa reseptiä.
 </p>
@@ -14,11 +14,9 @@
 </p>
 {% else %}
 <p>
-    Valitse resepti jota haluat muokata tai poistaa.
+    Sinulla on {{ recipes_count }} resepti{{ "ä" if recipes_count > 1 else "" }}.
 </p>
-<p>
-    Sinulla on {{ count }} resepti{{ "ä" if count > 1 else "" }}.
-</p>
+<hr>
 <table>
     <tr>
         <th>Nro</th>
@@ -46,13 +44,7 @@
     </tr>
     {% endfor %}
 </table>
+<hr>
+{% include "common/pager.html" %}
 {% endif %}
-
-{% if prev_page %}
-<p><a href="{{ prev_page }}">&lt;&lt; edellinen sivu</a></p>
-{% endif %}
-{% if next_page %}
-<p><a href="{{ next_page }}">seuraava sivu &gt;&gt;</a></p>
-{% endif %}
-
 {% endblock %}

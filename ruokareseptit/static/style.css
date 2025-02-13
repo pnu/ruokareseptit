@@ -12,6 +12,21 @@ section.content {
   padding-inline: 1em;
 }
 
+.pager {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  .previous {
+    justify-self: left;
+  }
+  .count {
+    justify-self: center;
+  }
+  .next {
+    justify-self: right;
+  }
+}
+
 /* Main navigation bar at the top of page */
 nav.navigation-bar {
   min-width: fit-content;

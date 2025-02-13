@@ -1,0 +1,13 @@
+<p class="pager">
+    <span class="previous">
+        {% if prev_page %}
+        <a href="{{ prev_page }}">&lt;&lt; edellinen sivu</a></span>
+    {% endif %}
+    </span>
+    <span class="count">Sivu {{ page_number }} / {{ total_pages }}</span>
+    <span class="next">
+        {% if next_page %}
+        <a href="{{ next_page }}">seuraava sivu &gt;&gt;</a>
+        {% endif %}
+    </span>
+</p>

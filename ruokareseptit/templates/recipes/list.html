@@ -5,17 +5,24 @@
 {% endblock %}
 
 {% block content %}
+{% if recipes_count == 0 %}
+<p>
+    Tietokannassa ei ole yhtään julkaistua reseptiä.<br/>
+    Kts. README.md testidatan lisäämiseksi.
+</p>
+<p>
+    <a href="{{ url_for('edit.create') }}">Lisää resepti</a>
+</p>
+{% else %}
+<p>
+    Tietokannassa on {{ recipes_count }} resepti{{ "ä" if recipes_count > 1 else "" }}.
+</p>
 <hr>
 {% for recipe in recipes %}
 <p><a href="{{ url_for('recipes.index', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a>
     {{ recipe.title }} {{ recipe.published > 0 }} {{ recipe.rating }}</p>
 {% endfor %}
 <hr>
-<p>Sivu {{ page_number }} / {{ total_pages }}</p>
-{% if prev_page %}
-<p><a href="{{ prev_page }}">&lt;&lt; edellinen sivu</a></p>
-{% endif %}
-{% if next_page %}
-<p><a href="{{ next_page }}">seuraava sivu &gt;&gt;</a></p>
+{% include "common/pager.html" %}
 {% endif %}
 {% endblock %}
