@@ -70,10 +70,10 @@
 {% if g.user.id == recipe.author_id %}
 <p>
 <em>Tämä on sinun laatima resepti;
-<a href="{{ url_for('edit.recipe', recipe_id=recipe.id, back=request.url) }}">muokkaa reseptiä.</a><br/>
+<a href="{{ url_for('my.recipes.index', recipe_id=recipe.id, back=request.url) }}">muokkaa reseptiä.</a><br/>
 Löydät sen myös omista resepteistäsi.
 </em>
 </p>
 {% endif %}
-<a href="{{ request.args.get('back', url_for('recipes.index')) }}">&lt;&lt; Takaisin reseptilistaukseen </a>
+<a href="{{ request.args.get('back', url_for('.index')) }}">&lt;&lt; Takaisin reseptilistaukseen </a>
 {% endblock %}

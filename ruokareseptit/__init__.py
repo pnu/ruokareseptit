@@ -1,12 +1,14 @@
-"""Ruokareseptit application module
+"""Ruokareseptit application factory
 """
 
 import os
 from flask import Flask
 
+from . import db, navigation, auth
+
 
 def create_app():
-    """Flask application factory.
+    """Create app, register handlers and blueprints
     """
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
@@ -21,20 +23,12 @@ def create_app():
     except OSError:
         pass
 
-    # pylint: disable=import-outside-toplevel
-
-    from . import db
     db.init_app(app)
+    auth.register_before_request(app)
+    navigation.register_context_processor(app)
 
-    from . import navigation
-    from . import home
-    from . import recipes
-    from . import edit
-    from . import auth
-    app.context_processor(navigation.navigation_context)
-    app.register_blueprint(home.bp)
-    app.register_blueprint(recipes.bp)
-    app.register_blueprint(edit.bp)
-    app.register_blueprint(auth.bp)
+    # pylint: disable=import-outside-toplevel
+    from . import blueprints
+    blueprints.register_blueprints(app)
 
     return app

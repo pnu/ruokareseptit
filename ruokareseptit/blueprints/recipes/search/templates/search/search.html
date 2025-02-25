@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>
+    {% block title %}
+    {% if search_term %}
+    Hakutulokset: {{ search_term }}
+    {% else %}
+    Haku
+    {% endif %}
+    {% endblock %}
+</h1>
+{% endblock %}
+
+{% block content %}
+<form method="get">
+    &#x1F50E;<input name="q" placeholder="Hae reseptin nimestä, esim. &quot;banaani&quot;" value="{{ search_term }}" autofocus />
+</form>
+{% if search_term %}
+{% if recipes_count == 0 %}
+<p>
+    Hakuehdolla ei löytynyt yhtään reseptiä.
+</p>
+{% else %}
+<p>
+    Hakuehdolla löytyi {{ recipes_count }} resepti{{ "ä" if recipes_count > 1 else "" }}.
+</p>
+<hr>
+{% for recipe in recipes %}
+<p><a href="{{ url_for('recipes.index', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a>
+    {{ recipe.title }} {{ recipe.published > 0 }} {{ recipe.rating }}</p>
+{% endfor %}
+<hr>
+{% include "common/pager.html" %}
+{% endif %}
+{% endif %}
+{% endblock %}

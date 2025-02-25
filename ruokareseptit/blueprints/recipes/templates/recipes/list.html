@@ -11,7 +11,7 @@
     Kts. README.md testidatan lisäämiseksi.
 </p>
 <p>
-    <a href="{{ url_for('edit.create') }}">Lisää resepti</a>
+    <a href="{{ url_for('me.recipes.create') }}">Lisää resepti</a>
 </p>
 {% else %}
 <p>
@@ -19,7 +19,7 @@
 </p>
 <hr>
 {% for recipe in recipes %}
-<p><a href="{{ url_for('recipes.index', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a>
+<p><a href="{{ url_for('.index', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a>
     {{ recipe.title }} {{ recipe.published > 0 }} {{ recipe.rating }}</p>
 {% endfor %}
 <hr>

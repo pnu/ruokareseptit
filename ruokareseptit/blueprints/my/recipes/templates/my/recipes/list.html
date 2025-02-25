@@ -10,7 +10,7 @@
     Sinulla ei ole yhtään omaa reseptiä.
 </p>
 <p>
-    <a href="{{ url_for('edit.create') }}">Lisää uusi</a>
+    <a href="{{ url_for('.create') }}">Lisää uusi</a>
 </p>
 {% else %}
 <p>
@@ -29,7 +29,7 @@
             {{ recipe.id }}
         </td>
         <td>
-            <a href="{{ url_for('edit.recipe', recipe_id=recipe.id, back=request.url) }}">
+            <a href="{{ url_for('.index', recipe_id=recipe.id, back=request.url) }}">
                 {{ recipe.title }}
             </a>
         </td>
