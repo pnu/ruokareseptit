@@ -10,9 +10,8 @@ from flask import url_for
 from flask import session
 from flask import g
 
-from ruokareseptit.db import get_db
-from ruokareseptit.auth import auth_user_id
-from ruokareseptit.auth import insert_user
+from ruokareseptit.model.db import get_db
+from ruokareseptit.model.auth import auth_user_id, insert_user
 
 bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
 

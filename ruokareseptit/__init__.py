@@ -4,7 +4,7 @@
 import os
 from flask import Flask
 
-from . import db, navigation, auth
+from .model import auth, db, navigation
 
 
 def create_app():

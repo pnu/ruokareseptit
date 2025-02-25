@@ -13,7 +13,7 @@ from flask import current_app
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
-from ruokareseptit.db import get_db
+from ruokareseptit.model.db import get_db
 
 
 def login_required(view):

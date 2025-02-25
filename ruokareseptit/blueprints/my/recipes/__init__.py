@@ -9,16 +9,15 @@ from flask import request
 from flask import flash
 from flask import redirect
 
-from ruokareseptit.db import get_db
-from ruokareseptit.auth import login_required
-
-from ruokareseptit.recipes import list_user_recipes
-from ruokareseptit.recipes import fetch_author_recipe_context
-from ruokareseptit.recipes import insert_recipe
-from ruokareseptit.recipes import update_author_recipe
-from ruokareseptit.recipes import update_recipe_ingredients
-from ruokareseptit.recipes import update_recipe_instructions
-from ruokareseptit.recipes import delete_author_recipe
+from ruokareseptit.model.db import get_db
+from ruokareseptit.model.auth import login_required
+from ruokareseptit.model.recipes import list_user_recipes
+from ruokareseptit.model.recipes import fetch_author_recipe_context
+from ruokareseptit.model.recipes import insert_recipe
+from ruokareseptit.model.recipes import update_author_recipe
+from ruokareseptit.model.recipes import update_recipe_ingredients
+from ruokareseptit.model.recipes import update_recipe_instructions
+from ruokareseptit.model.recipes import delete_author_recipe
 
 bp = Blueprint("recipes", __name__, url_prefix="/recipes", template_folder="templates")
 

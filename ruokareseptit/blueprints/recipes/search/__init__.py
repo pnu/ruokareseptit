@@ -6,8 +6,8 @@ from flask import render_template
 from flask import url_for
 from flask import request
 
-from ruokareseptit.db import get_db
-from ruokareseptit.recipes import search_recipes_title
+from ruokareseptit.model.db import get_db
+from ruokareseptit.model.recipes import search_recipes_title
 
 bp = Blueprint("search", __name__, url_prefix="/search", template_folder="templates")
 

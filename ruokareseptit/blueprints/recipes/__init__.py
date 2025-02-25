@@ -7,9 +7,9 @@ from flask import redirect
 from flask import url_for
 from flask import request
 
-from ruokareseptit.db import get_db
-from ruokareseptit.recipes import list_published_recipes
-from ruokareseptit.recipes import fetch_published_recipe_context
+from ruokareseptit.model.db import get_db
+from ruokareseptit.model.recipes import list_published_recipes
+from ruokareseptit.model.recipes import fetch_published_recipe_context
 
 from . import categories
 from . import search
