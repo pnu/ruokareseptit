@@ -13,6 +13,7 @@ from ruokareseptit.model.db import get_db
 from ruokareseptit.model.auth import login_required
 from ruokareseptit.model.reviews import list_user_reviews
 from ruokareseptit.model.reviews import fetch_author_review_context
+from ruokareseptit.model.recipes import fetch_published_recipe_context
 
 
 bp = Blueprint("reviews", __name__, url_prefix="/reviews", template_folder="templates")
@@ -41,6 +42,11 @@ def index(review_id: int):
         review_context = fetch_author_review_context(db, review_id, g.user["id"])
         if review_context is None:
             return redirect(url_for(".index"))
+
+        recipe_id = review_context["review"]["recipe_id"]
+        recipe_context = fetch_published_recipe_context(db, recipe_id)
+        if recipe_context is not None:
+            review_context = {**review_context, **recipe_context}
 
         back = request.args.get("back", url_for(".index"))
         submit_url = url_for(".update", review_id=review_id, back=back)
