@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}{{ review.id }}{% endblock %}
+{% block content %}
+<form class="dialog grid recipe" action="{{ submit_url }}" method="post">
+    <h1>{{ review.review_id }}</h1>
+
+    <fieldset class="control full-width flex">
+        <legend>Arvosana</legend>
+        <label><input type="radio" name="rating" value="1" {{ 'checked' if review.rating==1 }}>★</label>
+        <label><input type="radio" name="rating" value="2" {{ 'checked' if review.rating==2 }}>★★</label>
+        <label><input type="radio" name="rating" value="3" {{ 'checked' if review.rating==3 }}>★★★</label>
+        <label><input type="radio" name="rating" value="4" {{ 'checked' if review.rating==4 }}>★★★★</label>
+        <label><input type="radio" name="rating" value="4" {{ 'checked' if review.rating==4 }}>★★★★★</label>
+    </fieldset>
+
+    <label for="review">Arvostelu</label>
+    <textarea class="control" name="review" id="review" rows="5">{{ review.review }}</textarea>
+
+    <nav>
+        <button type="submit" name="return" value="1">④ Tallenna ja palaa listaukseen</button>
+        <button class="danger" type="submit" name="delete" value="1">ⓧ Poista arvostelu</button>
+    </nav>
+</form>
+{% endblock %}

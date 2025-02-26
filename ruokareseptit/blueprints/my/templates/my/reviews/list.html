@@ -5,6 +5,43 @@
 {% endblock %}
 
 {% block content %}
-<p>SISÄLTÖ TBD</p>
-<p>Lista arvosteluista joita on antanut tms...</p>
+{% if reviews_count == 0 %}
+<p>
+    Et ole antanut yhtään arvostelua.
+</p>
+{% else %}
+<p>
+    Olen jättänyt {{ reviews_count }} arvotelu{{ "a" if reviews_count > 1 else "n" }}.
+</p>
+<hr>
+<table>
+    <tr>
+        <th>Nro</th>
+        <th>Reseptin nro</th>
+        <th>Arvosana</th>
+        <th>Arviointi</th>
+        <th></th>
+    </tr>
+    {% for review in reviews %}
+    <tr>
+        <td>
+            <a href="{{ url_for('.index', review_id=review.id, back=request.url) }}">
+                {{ review.id }}
+            </a>
+        </td>
+        <td>
+            {{ review.recipe_id }}
+        </td>
+        <td>
+            {{ review.rating }}
+        </td>
+        <td>
+            {{ review.review }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<hr>
+{% include "common/pager.html" %}
+{% endif %}
 {% endblock %}
