@@ -1,9 +1,12 @@
 """ Applications views
 """
 
-from . import home, recipes, auth, my
+from . import home
+from . import recipes
+from . import auth
+from . import my
 
-def register_blueprints(app):
+def register_app_blueprints(app):
     """ Register views
     """
     app.register_blueprint(home.bp)

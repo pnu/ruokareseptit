@@ -29,6 +29,6 @@ def index():
                 context["next_page"] = url_for(".index", q=search_term, page=page + 1)
             if page > 1:
                 context["prev_page"] = url_for(".index", q=search_term, page=page - 1)
-            return render_template("search/search.html", **context)
+            return render_template("recipes/search/search.html", **context)
     context = {}
-    return render_template("search/search.html", **context)
+    return render_template("recipes/search/search.html", **context)

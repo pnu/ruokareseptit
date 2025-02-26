@@ -2,7 +2,9 @@
 """
 
 from flask import Blueprint
-from . import recipes, reviews
+
+from . import recipes
+from . import reviews
 
 
 bp = Blueprint("my", __name__, url_prefix="/my")

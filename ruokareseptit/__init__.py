@@ -28,7 +28,7 @@ def create_app():
     navigation.register_context_processor(app)
 
     # pylint: disable=import-outside-toplevel
-    from . import blueprints
-    blueprints.register_blueprints(app)
+    from .blueprints import register_app_blueprints
+    register_app_blueprints(app)
 
     return app
