@@ -97,7 +97,7 @@ def add_user_review(user_id, recipe_id):
     rating = random.randint(1, 5)
     db.execute(
         """
-        INSERT INTO user_review (user_id, recipe_id, rating, review)
+        INSERT INTO user_reviews (author_id, recipe_id, rating, review)
         VALUES (?,?,?,?)
         """, [user_id, recipe_id, rating, review])
 
@@ -150,7 +150,7 @@ def main():
             rating += random.randint(1, 2)  # 1..5
             db.execute(
                 """
-                INSERT INTO user_review (user_id, recipe_id, rating)
+                INSERT INTO user_reviews (author_id, recipe_id, rating)
                 VALUES (?,?,?)
                 """, [user_id, recipe_id, rating])
 

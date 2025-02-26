@@ -51,9 +51,9 @@ def list_published_recipes(db: Cursor, page: int):
     offset = max(min(total_pages - 1, page - 1), 0) * page_size
     pub_recipes = db.execute(
         """
-        SELECT recipes.*, AVG(user_review.rating) AS rating
-        FROM recipes LEFT JOIN user_review
-        ON recipes.id = user_review.recipe_id
+        SELECT recipes.*, AVG(user_reviews.rating) AS rating
+        FROM recipes LEFT JOIN user_reviews
+        ON recipes.id = user_reviews.recipe_id
         WHERE published = 1
         GROUP BY recipes.id
         ORDER BY rating DESC
@@ -115,9 +115,9 @@ def fetch_recipe_related(db: Cursor, recipe_id):
     user_reviews_limit = current_app.config["RECIPE_USER_REVIEWS_MAX"]
     user_reviews = db.execute(
         """
-        SELECT user_review.*, users.username
-        FROM user_review JOIN users ON user_review.user_id = users.id
-        WHERE user_review.recipe_id = ?
+        SELECT user_reviews.*, users.username
+        FROM user_reviews JOIN users ON user_reviews.author_id = users.id
+        WHERE user_reviews.recipe_id = ?
         LIMIT ?
         """, [recipe_id, user_reviews_limit])
 

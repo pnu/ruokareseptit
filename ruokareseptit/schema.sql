@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS ingredients;
 DROP TABLE IF EXISTS instructions;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS recipe_category;
-DROP TABLE IF EXISTS user_review;
+DROP TABLE IF EXISTS user_reviews;
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE users (
@@ -55,9 +55,9 @@ CREATE TABLE recipe_category (
   category_id INTEGER REFERENCES categories ON DELETE CASCADE
 );
 
-CREATE TABLE user_review (
+CREATE TABLE user_reviews (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER REFERENCES users ON DELETE SET NULL,
+  author_id INTEGER REFERENCES users ON DELETE SET NULL,
   recipe_id INTEGER REFERENCES recipes ON DELETE CASCADE,
   rating INTEGER,
   review TEXT
@@ -66,7 +66,7 @@ CREATE TABLE user_review (
 -- Specific indexes used in the app
 CREATE INDEX idx_published_recipes ON recipes(published);
 CREATE INDEX idx_author_recipes ON recipes(author_id);
-CREATE INDEX idx_recipe_ratings ON user_review(recipe_id, rating DESC);
+CREATE INDEX idx_recipe_ratings ON user_reviews(recipe_id, rating DESC);
 CREATE INDEX idx_recipe_ingredients_order ON ingredients(recipe_id, order_number);
 CREATE INDEX idx_recipe_instructions_order ON instructions(recipe_id, order_number);
 CREATE INDEX idx_recipe_category ON recipe_category(recipe_id);
@@ -106,7 +106,7 @@ CREATE INDEX idx_ingredient_title ON ingredients(title COLLATE NOCASE);
 -- (1, 2),
 -- (2, 3);
 
--- INSERT INTO user_review (user_id, recipe_id, rating, review) VALUES
+-- INSERT INTO user_reviews (user_id, recipe_id, rating, review) VALUES
 -- (1, 1, 5, 'Erinomainen suolajauho!'),
 -- (1, 1, 2, 'En pitänyt.'),
 -- (1, 2, 4, 'Maistui voin kanssa todella hyvälle.');
