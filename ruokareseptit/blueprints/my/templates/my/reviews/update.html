@@ -18,8 +18,8 @@
         <label><input type="radio" name="rating" value="5" {{ 'checked' if review.rating==5 }}>★★★★★</label>
     </fieldset>
 
-    <label for="review">Arvostelu</label>
-    <textarea class="control" name="review" id="review" rows="10">{{ review.review }}</textarea>
+    <label for="review">Kirjoita arvostelu</label>
+    <textarea class="control" name="review" id="review" rows="10">{{ review.review or '' }}</textarea>
 
     <nav>
         <button type="submit" name="return" value="1">④ Tallenna ja palaa listaukseen</button>

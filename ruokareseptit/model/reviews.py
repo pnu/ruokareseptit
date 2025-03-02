@@ -51,3 +51,17 @@ def fetch_author_review_context(db: Cursor, recipe_id: int, author_id: int):
         return None
 
     return {"review": review_row}
+
+# SQL queries for authenticated CREATE / UPDATE operations ###############
+
+
+def insert_review(db: Cursor, author_id: int, recipe_id: int):
+    """Insert new review to database. Fields must include keys
+    `title`, `summary` and `author_id`.
+    """
+    cursor = db.execute(
+        """
+        INSERT INTO user_reviews (author_id, recipe_id)
+        VALUES (?, ?)
+        """, [author_id, recipe_id])
+    return cursor
