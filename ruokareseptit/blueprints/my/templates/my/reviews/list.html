@@ -18,40 +18,43 @@
     Muokkaa arvostelua seuraamalla linkkiä reseptin nimessä. Arvostelut ovat antamasi
     arvosanan mukaisessa laskevassa järjestyksessä.
 </p>
-    {% for review in reviews %}
-    <div class="review-card">
-        <div class="header">
+{% for review in reviews %}
+<div class="review-card">
+    <div class="header">
+        <div>
+            <span class="recipe-id">#{{ review["recipe_id"] }}</span>
             <h1>
                 <a href="{{ url_for('.index', review_id=review.id, back=request.url) }}">
-                {% if review.title %}
-                {{ review.title }}
-                {% if review.published == 0 %}
-                <em>(julkaisematon)</em>
-                {% endif %}
-                {% else %}
-                <em>(poistettu resepti)</em>
-                {% endif %}
-            </a>
-        </h1>
+                    {% if review.title %}
+                    {{ review.title }}
+                    {% if review.published == 0 %}
+                    <em>(julkaisematon)</em>
+                    {% endif %}
+                    {% else %}
+                    <em>(poistettu resepti)</em>
+                    {% endif %}
+                </a>
+            </h1>
+        </div>
         <span>{{ "★" * review.rating }}</span>
-        </div>
-        {% if review.review %}
-        <div class="content">
-            {% set review_paragraphs = review.review.splitlines() %}
-            {% for p in review_paragraphs %}
-            <p>{{ p }}</p>
-            {% endfor %}
-        </div>
-        {% endif %}
     </div>
-        <td class="recipe-title">
-        </td>
-        <td class="review-actions">
-        </td>
-        <td>
-        </td>
-    </tr>
-    {% endfor %}
+    {% if review.review %}
+    <div class="content">
+        {% set review_paragraphs = review.review.splitlines() %}
+        {% for p in review_paragraphs %}
+        <p>{{ p }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+<td class="recipe-title">
+</td>
+<td class="review-actions">
+</td>
+<td>
+</td>
+</tr>
+{% endfor %}
 </table>
 {% include "common/pager.html" %}
 {% endif %}

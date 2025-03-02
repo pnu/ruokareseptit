@@ -1,6 +1,9 @@
 <div class="recipe-card">
     <div class="header">
+        <div>
+        <span class="recipe-id">#{{ recipe.id }}</span>
         <h1>{{ recipe.title }}</h1>
+        </div>
         {% if recipe.rating_count > 0 %}
         <span title="{{ recipe.rating|round(2) }}">{{
             "★" * (recipe.rating | int) }}{{
