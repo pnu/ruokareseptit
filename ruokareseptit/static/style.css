@@ -1,6 +1,8 @@
 body {
   font-family: sans-serif;
   background-color: burlywood;
+  margin: 0;
+  font-size: large;
 }
 
 body.dialog {
@@ -9,19 +11,22 @@ body.dialog {
 }
 
 section.content {
-  padding-inline: 1em;
+  padding: 2em;
 }
 
 .pager {
   display: grid;
   grid-auto-columns: minmax(0, 1fr);
   grid-auto-flow: column;
+
   .previous {
     justify-self: left;
   }
+
   .count {
     justify-self: center;
   }
+
   .next {
     justify-self: right;
   }
@@ -30,7 +35,6 @@ section.content {
 /* Main navigation bar at the top of page */
 nav.navigation-bar {
   min-width: fit-content;
-  margin-bottom: 1em;
 
   /* <a> fully covers all child elements */
   a {
@@ -254,12 +258,19 @@ form {
   }
 }
 
+form.search input {
+  grid-column: 1 / -1;
+  padding: 1em;
+  font-size: medium;
+  border-radius: 256px;
+}
+
 /* Centered dialog form */
 form.dialog {
   background-color: antiquewhite;
   padding: 1.5em;
   outline-style: solid;
-  margin: 3em;
+  margin: 1em;
 
   h1 {
     text-align: center;

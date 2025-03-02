@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}{{ review.id }}{% endblock %}
+{% block title %}Arvostelu {{ review.id }}{% endblock %}
 {% block content %}
 <form class="dialog grid recipe" action="{{ submit_url }}" method="post">
 
     <h1>
-        {% if review.title %}
-        {{ review.title }}
-        {% endif %}
+        Muokkaa antamaasi arvostelua
     </h1>
 
     <fieldset class="control full-width flex">
@@ -19,7 +17,7 @@
     </fieldset>
 
     <label for="review">Arvostelu</label>
-    <textarea class="control" name="review" id="review" rows="5">{{ review.review }}</textarea>
+    <textarea class="control" name="review" id="review" rows="10">{{ review.review }}</textarea>
 
     <nav>
         <button type="submit" name="return" value="1">④ Tallenna ja palaa listaukseen</button>

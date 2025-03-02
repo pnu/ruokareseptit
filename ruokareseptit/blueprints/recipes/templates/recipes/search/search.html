@@ -13,8 +13,12 @@
 {% endblock %}
 
 {% block content %}
-<form method="get">
-    &#x1F50E;<input name="q" placeholder="Hae reseptin nimestä, esim. &quot;banaani&quot;" value="{{ search_term }}" autofocus />
+
+<form class="search" method="get">
+    <input name="q" placeholder="&#x1F50E;&nbsp;&nbsp;Hae reseptin nimestä, esim. &quot;banaani&quot;"
+        value="{{ search_term }}" autofocus="" title="Search" aria-label="Search"
+        aria-autocomplete="both" aria-expanded="false" aria-haspopup="false" autocapitalize="off" autocomplete="off"
+        autocorrect="off" maxlength="20" spellcheck="false" autofocus />
 </form>
 {% if search_term %}
 {% if recipes_count == 0 %}
@@ -40,9 +44,9 @@
             {% if recipe.rating %}
             <td class="recipe-actions" title="{{ recipe.rating|round(2) }}">{{
                 "★" * (recipe.rating | int) }}{{
-                "★" if 0.75 <= recipe.rating - (recipe.rating | int) else
-                "☆" if 0.25 <=recipe.rating - (recipe.rating | int) else "" }} ({{ recipe.rating_count }} kpl)</td>
-            {% endif %}
+                "★" if 0.75 <= recipe.rating - (recipe.rating | int) else "☆" if 0.25 <=recipe.rating - (recipe.rating |
+                    int) else "" }} ({{ recipe.rating_count }} kpl)</td>
+                    {% endif %}
         </tr>
         {% endfor %}
     </tbody>
