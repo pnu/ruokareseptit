@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}{{ recipe.title }}{% endblock %}</h1>
 {% endblock %}
+{% block title %}{{ recipe.title }}{% endblock %}
 
 {% block content %}
 {% include "recipes/common/recipe.html" %}
-<hr />
+
 {% if g.user.id == recipe.author_id %}
 <p>
 <em>Tämä on sinun laatima resepti;

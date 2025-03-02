@@ -1,3 +1,7 @@
+
+<div class="recipe-card">
+<h1>{{ recipe.title }}</h1>
+<div class="content">
 {% set summary_paragraphs = recipe.summary.splitlines() %}
 {% for p in summary_paragraphs %}
     <p>{{ p }}</p>
@@ -34,9 +38,9 @@
     ({{ recipe.portions }} annosta)
     {% endif %}
 </h3>
-<ul>
+<ul class="recipe-ingredients-list">
     {% endif %}
-    <li>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.title }}</li>
+    <li><span class="amount">{{ ingredient.amount }}</span> <span class="unit">{{ ingredient.unit }}</span> <span class="ingredient">{{ ingredient.title }}</span></li>
     {% if loop.last %}
 </ul>
 {% endif %}
@@ -45,15 +49,17 @@
 {% for step in instructions %}
 {% if loop.first %}
 <h3>Valmistusohjeet</h3>
-<ul>
+<ol class="recipe-instructions-list">
     {% endif %}
-    <li>{{ loop.index }}:
+    <li>
         {% set instruction_paragraphs = step.instructions.splitlines() %}
         {% for p in instruction_paragraphs %}
             <p>{{ p }}</p>
         {% endfor %}
     </li>
     {% if loop.last %}
-</ul>
+</ol>
 {% endif %}
 {% endfor %}
+</div>
+</div>
