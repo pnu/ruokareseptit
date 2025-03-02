@@ -185,7 +185,7 @@ ol.recipe-instructions-list {
     }
   }
   .content {
-    padding: 1.5em;
+    padding-inline: 1.5em;
   }
   margin-top: 1em;
   margin-bottom: 1em;
@@ -210,7 +210,7 @@ ol.recipe-instructions-list {
     }
   }
   .content {
-    padding: 1.5em;
+    padding-inline: 1.5em;
   }
   margin-top: 1em;
   margin-bottom: 1em;

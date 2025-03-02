@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}Omat arvostelut{% endblock %}</h1>
+<h1>{% block title %}Antamasi arvostelut{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -12,6 +12,8 @@
 {% else %}
 <p>
     Olen antanut {{ reviews_count }} arvostelu{{ "a" if reviews_count > 1 else "n" }}.
+    Muokkaa arvostelua seuraamalla reseptin nimen linkkiä. Arvostelut ovat antamasi
+    arvosanan mukaisessa laskevassa järjestyksessä.
 </p>
     {% for review in reviews %}
     <div class="review-card">

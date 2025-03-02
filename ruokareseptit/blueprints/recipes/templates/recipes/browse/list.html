@@ -29,10 +29,16 @@
         <tr>
             <td class="recipe-title"><a href="{{ url_for('.index', recipe_id=recipe.id,
                 back=request.url) }}">{{ recipe.title }}</a></td>
-            <td class="recipe-actions" title="{{ recipe.rating|round(2) }}"><span>{{
+            {% if recipe.rating_count %}
+            <td class="recipe-actions" title="{{ recipe.rating|round(2) }}">
+                <span>{{
                     "★" * (recipe.rating | int) }}{{
                     "★" if 0.75 <= recipe.rating - (recipe.rating | int) else "☆" if 0.25 <=recipe.rating -
-                        (recipe.rating | int) else "" }}</span> <span>({{ recipe.rating_count }} kpl)</span></td>
+                        (recipe.rating | int) else "" }}</span> <span>({{ recipe.rating_count }} kpl)</span>
+            </td>
+            {% else %}
+            <td></td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>

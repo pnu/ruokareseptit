@@ -26,6 +26,7 @@ def list_user_reviews(db: Cursor, author_id: int, page: int):
         FROM user_reviews LEFT JOIN recipes
         ON user_reviews.recipe_id = recipes.id
         WHERE user_reviews.author_id = ?
+        ORDER BY user_reviews.rating DESC
         LIMIT ? OFFSET ?
         """, [author_id, page_size, offset]
     )
