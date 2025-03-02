@@ -11,33 +11,38 @@
     </nav>
 
     <label for="title">Reseptin nimi</label>
-    <input class="control" type="text" name="title" id="title" value="{{ recipe.title }}" autofocus />
+    <input id="title" class="control" type="text" name="title" value="{{ recipe.title }}" autofocus title="Resptin nimi"
+        autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="100" />
 
     <label for="summary">Kuvaus</label>
-    <textarea class="control" name="summary" id="summary" rows="5">{{ recipe.summary }}</textarea>
+    <textarea id="summary" class="control" name="summary" rows="5" autofocus title="Resptin kuvaus" autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" maxlength="2000">{{ recipe.summary }}</textarea>
 
     <label for="preparation_time">Valmisteluaika (aktiivinen)</label>
-    <input class="control with-unit" type="number" name="preparation_time" value="{{ recipe.preparation_time }}" />
+    <input id="preparation_time" class="control with-unit" type="number" name="preparation_time"
+        title="Valmistusaika (aktiivinen)" value="{{ recipe.preparation_time }}" min="0" max="525600" />
     <span class="unit">minuuttia</span>
 
     <label for="cooking_time">Valmistusaika (passiivinen)</label>
-    <input class="control with-unit" type="number" name="cooking_time" value="{{ recipe.cooking_time }}" />
+    <input id="cooking_time" class="control with-unit" type="number" name="cooking_time"
+        title="Valmistusaika (passiivinen)" value="{{ recipe.cooking_time }}" min="0" max="525600" />
     <span class="unit">minuuttia</span>
 
-    <fieldset class="control full-width flex">
+    <fieldset class="control full-width flex" title="Vaikeustaso">
         <legend>Vaikeustaso</legend>
-        <label><input type="radio" name="skill_level" value="1" {{ 'checked' if recipe.skill_level==1 }}>Helppo</label>
-        <label><input type="radio" name="skill_level" value="2" {{ 'checked' if recipe.skill_level==2
+        <label><input type="radio" name="skill_level" value="1" title="Helppo" aria-label="Helppo" {{ 'checked' if
+                recipe.skill_level==1 }}>Helppo</label>
+        <label><input type="radio" name="skill_level" value="2" title="Normaali" {{ 'checked' if recipe.skill_level==2
                 }}>Normaali</label>
-        <label><input type="radio" name="skill_level" value="3" {{ 'checked' if recipe.skill_level==3 }}>Vaikea </label>
-        <label><input type="radio" name="skill_level" value="4" {{ 'checked' if recipe.skill_level==4 }}>Erittäin
+        <label><input type="radio" name="skill_level" value="3" title="Vaikea" {{ 'checked' if recipe.skill_level==3 }}>Vaikea </label>
+        <label><input type="radio" name="skill_level" value="4" title="Erittäin vaativa" {{ 'checked' if recipe.skill_level==4 }}>Erittäin
             vaativa </label>
     </fieldset>
 
-    <fieldset class="control full-width flex">
+    <fieldset class="control full-width flex" title="Julkaise resepti">
         <legend>Julkaise resepti</legend>
         <input type="hidden" name="published.default" value="0" />
-        <label><input type="checkbox" name="published" value="1" {{ 'checked' if recipe.published==1 }}>Julkinen</label>
+        <label><input type="checkbox" name="published" title="Julkinen" value="1" {{ 'checked' if recipe.published==1 }}>Julkinen</label>
     </fieldset>
 
     <nav>
@@ -46,7 +51,7 @@
     </nav>
 </form>
 <p>
-    <a href="{{ request.args.get('back', url_for('.index')) }}">&lt;&lt; Takaisin</a><br/>
+    <a href="{{ request.args.get('back', url_for('.index')) }}">&lt;&lt; Takaisin</a><br />
 </p>
 
 {% endblock %}

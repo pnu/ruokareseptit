@@ -11,23 +11,28 @@
     </nav>
 
     <div class="full-width instructions">
-        <span class="controls">Ohje</span>
-        <span class="actions">Siirrä / Poista</span>
+        <label class="controls" id="instructions">Ohje</label>
+        <label class="actions" id="actions">Siirrä / Poista</label>
         {% for instruction in instructions %}
-        <label class="step" for="summary">{{ loop.index }}</label>
-        <textarea class="controls" name="instructions_{{ instruction.id }}_instructions" rows="5">{{ instruction.instructions |default('', True)}}</textarea>
+        <label class="step" for="step_{{ loop.index }}" title="Vaihe {{ loop.index }}">{{ loop.index }}.</label>
+        <textarea id="step_{{ loop.index }}" class="controls" name="instructions_{{ instruction.id }}_instructions" rows="5" autofocus
+            title="Ohje" aria-labelledby="instructions" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"
+            maxlength="2000">{{ instruction.instructions |default('', True)}}</textarea>
         <div class="actions">
             {% if not loop.first %}
-            <button class="up" name="instructions_{{ instruction.id }}_up" value="1">↑</button>
+            <button class="up" title="Siirrä ylös" aria-label="Siirrä ylös" name="instructions_{{ instruction.id }}_up"
+                value="1">↑</button>
             {% else %}
             <span></span>
             {% endif %}
             {% if not loop.last %}
-            <button class="down" name="instructions_{{ instruction.id }}_down" value="1">↓</button>
+            <button class="down" title="Siirrä alas" aria-label="Siirrä alas"
+                name="instructions_{{ instruction.id }}_down" value="1">↓</button>
             {% else %}
             <span></span>
             {% endif %}
-            <button class="delete danger" name="instructions_{{ instruction.id }}_delete" value="1">✗</button>
+            <button class="delete danger" title="Poista rivi" aria-label="Poista rivi"
+                name="instructions_{{ instruction.id }}_delete" value="1">✗</button>
         </div>
         {% endfor %}
         <div class="actions">

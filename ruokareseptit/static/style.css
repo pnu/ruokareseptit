@@ -446,6 +446,7 @@ form.recipe {
 
     .controls {
       grid-column: controls;
+      text-align: left;
     }
 
     .actions {

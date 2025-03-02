@@ -11,36 +11,44 @@
     </nav>
 
     <label for="portions">Annosten määrä koko ohjeessa:</label>
-    <input class="control" type="number" min="1" max="100" name="portions" value="{{ recipe.portions }}" />
+    <input id="portions" class="control" type="number" min="1" max="1000" title="Annosten määrä" name="portions"
+        value="{{ recipe.portions }}" />
 
     <div class="full-width ingredients">
-        <label class="amount">Määrä</label>
-        <label class="unit">Yksikkö</label>
-        <label class="title">Nimi</label>
-        <label class="actions">Siirrä / Poista</label>
+        <label class="amount" id="amount">Määrä</label>
+        <label class="unit" id="unit">Yksikkö</label>
+        <label class="title" id="title">Nimi</label>
+        <label class="actions" id="actions">Siirrä / Poista</label>
         {% for ingredient in ingredients %}
-        <input class="amount" type="number" name="ingredients_{{ ingredient.id }}_amount" min="0" max="100"
+        <input class="amount" title="Määrä" aria-labelledby="amount" type="number"
+            name="ingredients_{{ ingredient.id }}_amount" min="0" max="100"
             value="{{ ingredient.amount |default('', True)}}" />
-        <input class="unit" type="text" name="ingredients_{{ ingredient.id }}_unit" size="8"
+        <input class="unit" title="Yksikkö" aria-labelledby="unit" type="text" autocapitalize="off" autocomplete="off"
+            autocorrect="off" spellcheck="false" maxlength="6" name="ingredients_{{ ingredient.id }}_unit" size="8"
             value="{{ ingredient.unit |default('', True)}}" />
-        <input class="title" type="text" name="ingredients_{{ ingredient.id }}_title"
+        <input class="title" title="Nimi" aria-labelledby="title" type="text" autocapitalize="off" autocomplete="off"
+            autocorrect="off" spellcheck="false" maxlength="80" name="ingredients_{{ ingredient.id }}_title"
             value="{{ ingredient.title |default('', True)}}" />
         <div class="actions">
             {% if not loop.first %}
-            <button class="up" name="ingredients_{{ ingredient.id }}_up" value="1">↑</button>
+            <button class="up" title="Siirrä ylös" aria-label="Siirrä ylös" name="ingredients_{{ ingredient.id }}_up"
+                value="1">↑</button>
             {% else %}
             <span></span>
             {% endif %}
             {% if not loop.last %}
-            <button class="down" name="ingredients_{{ ingredient.id }}_down" value="1">↓</button>
+            <button class="down" title="Siirrä alas" aria-label="Siirrä alas"
+                name="ingredients_{{ ingredient.id }}_down" value="1">↓</button>
             {% else %}
             <span></span>
             {% endif %}
-            <button class="delete danger" name="ingredients_{{ ingredient.id }}_delete" value="1">✗</button>
+            <button class="delete danger" title="Poista rivi" aria-label="Poista rivi"
+                name="ingredients_{{ ingredient.id }}_delete" value="1">✗</button>
         </div>
         {% endfor %}
         <div class="actions">
-            <button class="actions" name="ingredients_add_row" value="1">Lisää rivi</button>
+            <button class="actions" name="ingredients_add_row"
+                value="1">Lisää rivi</button>
         </div>
     </div>
 
