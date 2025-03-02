@@ -1,8 +1,8 @@
 <div class="recipe-card">
     <div class="header">
         <div>
-        <span class="recipe-id">#{{ recipe.id }}</span>
-        <h1>{{ recipe.title }}</h1>
+            <span class="recipe-id" title="Reseptin numero">#{{ recipe.id }}</span>
+            <h1>{{ recipe.title }}</h1>
         </div>
         {% if recipe.rating_count > 0 %}
         <span title="{{ recipe.rating|round(2) }}">{{
@@ -10,6 +10,19 @@
             "★" if 0.75 <= recipe.rating - (recipe.rating | int) else "☆" if 0.25 <=recipe.rating - (recipe.rating |
                 int) else "" }} ({{ recipe.rating_count }} kpl)</span>
                 {% endif %}
+    </div>
+    <div class="sub-header">
+        <span title="Reseptin laatija">👤 {{ recipe.username }}</span>
+        {% if recipe.preparation_time and recipe.cooking_time %}
+        <span>Valmistusaika, aktiivinen: {{ recipe.preparation_time }} min, yhteensä: {{ recipe.preparation_time +
+            recipe.cooking_time }} min</span>
+        {% endif %}
+        {% if recipe.skill_level > 0 and recipe.skill_level <= 4 %} <span>Taso: {{
+            "Helppo" if recipe.skill_level == 1 else
+            "Normaali" if recipe.skill_level == 2 else
+            "Vaikea" if recipe.skill_level == 3 else
+            "Erittäin vaativa" if recipe.skill_level == 4 else None }}</span>
+            {% endif %}
     </div>
     <div class="content">
         {% if recipe.summary %}
@@ -19,14 +32,6 @@
         {% endfor %}
         {% endif %}
         <ul>
-            <li>Reseptin laatija: {{ recipe.username }}</li>
-            {% if recipe.preparation_time and recipe.cooking_time %}
-            <li>Valmistusaika, aktiivinen: {{ recipe.preparation_time }} min</li>
-            <li>Valmistusaika, yhteensä {{ recipe.preparation_time + recipe.cooking_time }} min</li>
-            {% endif %}
-            {% if recipe.skill_level %}
-            <li>Vaikeustaso: {{ recipe.skill_level }}</li>
-            {% endif %}
             {% for category in categories %}
             {% if loop.first %}
             <li>Kategoriat:

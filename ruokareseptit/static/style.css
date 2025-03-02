@@ -199,6 +199,26 @@ ol.recipe-instructions-list {
     }
   }
 
+  .sub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-wrap-mode: nowrap;
+    gap: 1em;
+    background: lightblue;
+    margin: 0;
+    padding-inline: 1em;
+    padding-block: 0.5em;
+    font-size: medium;
+
+    button {
+      border-radius: 5em;
+      border: none;
+      padding-inline: 1em;
+      padding-block: 0.2em;
+    }
+  }
+
   .content {
     padding-inline: 1.5em;
   }
