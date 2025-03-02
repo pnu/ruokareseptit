@@ -20,8 +20,8 @@
 <table class="recipe-list">
     <thead>
         <tr>
-            <th>Resepti</th>
-            <th>Käyttäjien arviot</th>
+            <th class="recipe-title">Resepti</th>
+            <th class="recipe-actions">Käyttäjien arviot</th>
         </tr>
     </thead>
     <tbody>
@@ -29,10 +29,10 @@
         <tr>
             <td class="recipe-title"><a href="{{ url_for('.index', recipe_id=recipe.id,
                 back=request.url) }}">{{ recipe.title }}</a></td>
-            <td class="recipe-actions" title="{{ recipe.rating|round(2) }}">{{
-                "★" * (recipe.rating | int) }}{{
-                "★" if 0.75 <= recipe.rating - (recipe.rating | int) else
-                "☆" if 0.25 <=recipe.rating - (recipe.rating | int) else "" }} ({{ recipe.rating_count }} kpl)</td>
+            <td class="recipe-actions" title="{{ recipe.rating|round(2) }}"><span>{{
+                    "★" * (recipe.rating | int) }}{{
+                    "★" if 0.75 <= recipe.rating - (recipe.rating | int) else "☆" if 0.25 <=recipe.rating -
+                        (recipe.rating | int) else "" }}</span> <span>({{ recipe.rating_count }} kpl)</span></td>
         </tr>
         {% endfor %}
     </tbody>

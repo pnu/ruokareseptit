@@ -131,7 +131,11 @@ table.recipe-list {
   }
 
   .recipe-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     text-wrap-mode: nowrap;
+    gap: 1em;
   }
 }
 

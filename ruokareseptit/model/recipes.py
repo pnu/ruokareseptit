@@ -26,10 +26,14 @@ def search_recipes_title(db: Cursor, search_term: str, page: int):
     offset = max(min(total_pages - 1, page - 1), 0) * page_size
     pub_recipes = db.execute(
         """
-        SELECT recipes.*
-        FROM recipes
+        SELECT recipes.*, AVG(user_reviews.rating) AS rating,
+        COUNT(user_reviews.rating) AS rating_count
+        FROM recipes LEFT JOIN user_reviews
+        ON recipes.id = user_reviews.recipe_id
         WHERE published = 1
         AND title LIKE ?
+        GROUP BY recipes.id
+        ORDER BY rating DESC
         LIMIT ? OFFSET ?
         """, [search_term, page_size, offset]
     )
