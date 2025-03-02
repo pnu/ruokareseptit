@@ -16,35 +16,31 @@
 <p>
     Sinulla on {{ recipes_count }} resepti{{ "ä" if recipes_count > 1 else "" }}.
 </p>
-<hr>
-<table>
-    <tr>
-        <th>Nro</th>
-        <th>Reseptin nimi</th>
-        <th></th>
-    </tr>
-    {% for recipe in recipes %}
-    <tr>
-        <td>
-            {{ recipe.id }}
-        </td>
-        <td>
-            <a href="{{ url_for('.index', recipe_id=recipe.id, back=request.url) }}">
-                {{ recipe.title }}
-            </a>
-        </td>
-        <td>
-            {% if recipe.published > 0 %}
-            {% else %}
-            <em>Ei julkaistu</em>
-            {% endif %}
-        </td>
-        <td>
-        </td>
-    </tr>
-    {% endfor %}
+<table class="recipe-list">
+    <thead>
+        <tr>
+            <th>Resepti</th>
+            <th>Tila</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for recipe in recipes %}
+        <tr>
+            <td class="recipe-title">
+                <a href="{{ url_for('.index', recipe_id=recipe.id, back=request.url) }}">
+                    {{ recipe.title }}
+                </a>
+            </td>
+            <td class="recipe-actions">
+                {% if recipe.published > 0 %}
+                {% else %}
+                <em>Ei julkaistu</em>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
-<hr>
 {% include "common/pager.html" %}
 {% endif %}
 {% endblock %}

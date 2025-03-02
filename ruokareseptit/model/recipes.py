@@ -51,7 +51,8 @@ def list_published_recipes(db: Cursor, page: int):
     offset = max(min(total_pages - 1, page - 1), 0) * page_size
     pub_recipes = db.execute(
         """
-        SELECT recipes.*, AVG(user_reviews.rating) AS rating
+        SELECT recipes.*, AVG(user_reviews.rating) AS rating,
+        COUNT(user_reviews.rating) AS rating_count
         FROM recipes LEFT JOIN user_reviews
         ON recipes.id = user_reviews.recipe_id
         WHERE published = 1

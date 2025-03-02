@@ -13,7 +13,6 @@
 <p>
     Olen antanut {{ reviews_count }} arvostelu{{ "a" if reviews_count > 1 else "n" }}.
 </p>
-<hr>
 <table>
     <tr>
         <th>Resepti</th>
@@ -44,7 +43,6 @@
     </tr>
     {% endfor %}
 </table>
-<hr>
 {% include "common/pager.html" %}
 {% endif %}
 {% endblock %}

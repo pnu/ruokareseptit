@@ -7,7 +7,7 @@
 {% block content %}
 {% if recipes_count == 0 %}
 <p>
-    Tietokannassa ei ole yhtään julkaistua reseptiä.<br/>
+    Tietokannassa ei ole yhtään julkaistua reseptiä.<br />
     Kts. README.md testidatan lisäämiseksi.
 </p>
 <p>
@@ -17,12 +17,26 @@
 <p>
     Tietokannassa on {{ recipes_count }} resepti{{ "ä" if recipes_count > 1 else "" }}.
 </p>
-<hr>
-{% for recipe in recipes %}
-<p><a href="{{ url_for('.index', recipe_id=recipe.id, back=request.url) }}">{{ recipe.id }}</a>
-    {{ recipe.title }} {{ recipe.published > 0 }} {{ recipe.rating }}</p>
-{% endfor %}
-<hr>
+<table class="recipe-list">
+    <thead>
+        <tr>
+            <th>Resepti</th>
+            <th>Käyttäjien arviot</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for recipe in recipes %}
+        <tr>
+            <td class="recipe-title"><a href="{{ url_for('.index', recipe_id=recipe.id,
+                back=request.url) }}">{{ recipe.title }}</a></td>
+            <td class="recipe-actions" title="{{ recipe.rating|round(2) }}">{{
+                "★" * (recipe.rating | int) }}{{
+                "★" if 0.75 <= recipe.rating - (recipe.rating | int) else
+                "☆" if 0.25 <=recipe.rating - (recipe.rating | int) else "" }} ({{ recipe.rating_count }} kpl)</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% include "common/pager.html" %}
 {% endif %}
 {% endblock %}

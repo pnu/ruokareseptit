@@ -109,6 +109,70 @@ nav.navigation-bar {
   }
 }
 
+table.recipe-list {
+  width: 100%;
+  text-align: left;
+
+  tr {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  td,
+  th {
+    padding: 1em;
+  }
+
+  .recipe-title {
+    width: 100%;
+  }
+
+  .recipe-actions {
+    text-wrap-mode: nowrap;
+  }
+}
+
+ul.recipe-ingredients-list {
+  li {
+    display: table-row;
+  }
+
+  .amount {
+    display: table-cell;
+    text-align: right;
+  }
+
+  .unit {
+    display: table-cell;
+    padding-inline: 0.5em;
+  }
+
+  .ingredient {
+    display: table-cell;
+  }
+}
+
+ol.recipe-instructions-list {
+  li::marker {
+    font-size: larger;
+    font-weight: bold;
+  }
+}
+
+.recipe-card {
+  margin: 1em;
+  border: 1px solid;
+  background-color: antiquewhite;
+  min-width: fit-content;
+  h1 {
+    background: lightgreen;
+    margin: 0;
+    padding: 1em;
+  }
+  .content {
+    padding: 1.5em;
+  }
+}
+
 /* Message box is a list of flash messages */
 ul.message-box {
   list-style: none;
