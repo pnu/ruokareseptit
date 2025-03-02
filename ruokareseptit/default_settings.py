@@ -1,7 +1,5 @@
 """Default configuration"""
 
-HELLO_WHAT = "Configurable Default World"
-
 RECIPE_INGREDIENTS_MAX = 20
 RECIPE_INSTRUCTIONS_MAX = 20
 RECIPE_CATEGORIES_MAX = 20

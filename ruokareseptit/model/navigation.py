@@ -14,12 +14,12 @@ NAVIGATION_COMMON_ITEMS = [
     ["home.index", "Ruokareseptit"],
     ["recipes.browse.index", "Reseptit", [
         ["recipes.browse.index", "Kaikki"],
-        ["recipes.categories.index", "Kategoriat", [
-            ["recipes.categories.index", "Kaikki"],
-            ["recipes.categories.abc", "ABC"],
-            ["recipes.categories.xyz", "XYZ"],
-            ["https://www.google.com/", "Google"]
-        ]],
+        # ["recipes.categories.index", "Kategoriat", [
+        #     ["recipes.categories.index", "Kaikki"],
+        #     ["recipes.categories.abc", "ABC"],
+        #     ["recipes.categories.xyz", "XYZ"],
+        #     ["https://www.google.com/", "Google"]
+        # ]],
         ["recipes.search.index", "Haku"]
     ]],
 ]
@@ -55,7 +55,7 @@ def navigation_context():
     """Function to be register as context processor, used to inject
     `navigation` to the context.
     """
-    if session.get("uid") is not None:
+    if session.get("uid"):
         navigation = get_navigation(NAVIGATION_LOGGED_IN, request.endpoint)
     else:
         navigation = get_navigation(NAVIGATION, request.endpoint)
@@ -85,7 +85,7 @@ def flatten(tree: NavigationTree, level: int = 0) -> Navigation:
     for item in tree:
         endpoint, title = item[0], item[1]
         endpoint = url_for_endpoint(endpoint)
-        if "__USERNAME__" in title and g.get("user") is not None:
+        if "__USERNAME__" in title and g.get("user"):
             title = title.replace("__USERNAME__", g.user["username"])
         itemdict = {"title": title, "url": endpoint}
         if len(item) > 2:
@@ -96,7 +96,7 @@ def flatten(tree: NavigationTree, level: int = 0) -> Navigation:
     if len(this_level) == 0:
         return []
     all_levels = [(level, enumerate(this_level))]
-    if next_level is not None:
+    if next_level:
         all_levels.extend(next_level)
     return all_levels
 
@@ -132,7 +132,7 @@ def prune(tree: NavigationTree, current: str) -> tuple[NavigationTree, bool]:
         nav_item = [endpoint, title]
         if endpoint == current or submatch:
             any_match = True
-            if subtree is not None:
+            if subtree:
                 nav_item.append(subtree)
             else:
                 nav_item.append([])

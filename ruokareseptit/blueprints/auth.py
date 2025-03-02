@@ -12,7 +12,8 @@ from flask import session
 from ruokareseptit.model.db import get_db, log_db_error
 from ruokareseptit.model.auth import auth_user_id, insert_user
 
-bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
+bp = Blueprint("auth", __name__, url_prefix="/auth",
+               template_folder="templates")
 
 
 @bp.route("/login", methods=["GET", "POST"])
@@ -30,7 +31,7 @@ def login():
         password = request.form["password"]
         user_id = auth_user_id(db, username, password)
 
-    if user_id is None:
+    if not user_id:
         flash_error("Väärä käyttäjätunnus tai salasana.")
         return redirect(url_for(".login", **redir_params))
 

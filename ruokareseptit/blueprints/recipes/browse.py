@@ -22,17 +22,19 @@ bp = Blueprint("browse", __name__, url_prefix="/", template_folder="templates")
 def index(recipe_id: int):
     """View published recipes
     """
-    if recipe_id is None:
+    if not recipe_id:
         with get_db() as db:
             page = int(request.args.get("page", 1))
             recipes, count, pages = list_published_recipes(db, page)
             page = max(min(pages, page), 1)
             context = {"recipes": recipes, "recipes_count": count,
-                       "page_number": page, "total_pages": pages }
+                       "page_number": page, "total_pages": pages}
             if page < pages:
-                context["next_page"] = url_for(".index", page=page + 1)
+                next_p = url_for(".index", page=page + 1)
+                context["next_page"] = next_p
             if page > 1:
-                context["prev_page"] = url_for(".index", page=page - 1)
+                prev_p = url_for(".index", page=page - 1)
+                context["prev_page"] = prev_p
             return render_template("recipes/browse/list.html", **context)
 
     with get_db() as db:
@@ -40,6 +42,7 @@ def index(recipe_id: int):
         if recipe_context is None:
             return redirect(url_for(".index"))
         return render_template("recipes/browse/view.html", **recipe_context)
+
 
 @bp.route("/<int:recipe_id>/review")
 def review(recipe_id: int):
@@ -54,4 +57,5 @@ def review(recipe_id: int):
         flash("Arvostelun luominen epäonnistui.")
         return redirect(request.args.get("back", url_for(".index")))
 
-    return redirect(url_for("my.reviews.index", review_id=review_id, **request.args))
+    return redirect(url_for("my.reviews.index", review_id=review_id,
+                            **request.args))

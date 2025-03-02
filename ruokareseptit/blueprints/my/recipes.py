@@ -19,7 +19,8 @@ from ruokareseptit.model.recipes import update_recipe_ingredients
 from ruokareseptit.model.recipes import update_recipe_instructions
 from ruokareseptit.model.recipes import delete_author_recipe
 
-bp = Blueprint("recipes", __name__, url_prefix="/recipes", template_folder="templates")
+bp = Blueprint("recipes", __name__, url_prefix="/recipes",
+               template_folder="templates")
 
 
 @bp.route("/", defaults={"recipe_id": None, "tab": None})
@@ -30,22 +31,25 @@ bp = Blueprint("recipes", __name__, url_prefix="/recipes", template_folder="temp
 def index(recipe_id: int, tab: int):
     """Own recipes
     """
-    if recipe_id is None:
+    if not recipe_id:
         with get_db() as db:
             page = int(request.args.get("page", 0))
             rows, count, pages = list_user_recipes(db, g.user["id"], page)
             page = max(min(pages, page), 1)
             context = {"recipes": rows, "recipes_count": count,
-                       "page_number": page, "total_pages": pages }
+                       "page_number": page, "total_pages": pages}
             if page < pages:
-                context["next_page"] = url_for(".index", page=page + 1)
+                next_p = url_for(".index", page=page + 1)
+                context["next_page"] = next_p
             if page > 1:
-                context["prev_page"] = url_for(".index", page=page - 1)
+                prev_p = url_for(".index", page=page - 1)
+                context["prev_page"] = prev_p
             return render_template("my/recipes/list.html", **context)
 
     with get_db() as db:
-        recipe_context = fetch_author_recipe_context(db, recipe_id, g.user["id"])
-        if recipe_context is None:
+        recipe_context = fetch_author_recipe_context(db, recipe_id,
+                                                     g.user["id"])
+        if not recipe_context:
             return redirect(url_for(".index"))
 
         back = request.args.get("back", url_for(".index"))
@@ -53,7 +57,8 @@ def index(recipe_id: int, tab: int):
                              tab=tab, back=back)
         recipe_context["submit_url"] = submit_url
         tmpl = ["main", "ingredients", "instructions"][tab - 1]
-        return render_template("my/recipes/update/" + tmpl + ".html", **recipe_context)
+        return render_template("my/recipes/update/" + tmpl + ".html",
+                               **recipe_context)
 
 
 @bp.route("/create", methods=["GET", "POST"])

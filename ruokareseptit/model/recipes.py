@@ -83,7 +83,8 @@ def fetch_published_recipe_context(db: Cursor, recipe_id: int):
         ON recipes.author_id = users.id
         WHERE recipes.id = ? AND published = 1
         """, [recipe_id]).fetchone()
-    if recipe_row["title"] is None:
+
+    if not recipe_row["title"]:
         # have to check for title nullness because row is returned and it has
         # rating_count (0) even for recipies that do not exist in the database
         return None
@@ -175,11 +176,11 @@ def fetch_author_recipe_context(db: Cursor, recipe_id: int, author_id: int):
         FROM recipes
         WHERE id = ? AND author_id = ?
         """, [recipe_id, author_id]).fetchone()
-    if recipe_row is None:
-        return None
 
-    related = fetch_recipe_related(db, recipe_id)
-    return {"recipe": recipe_row, **related}
+    if recipe_row:
+        related = fetch_recipe_related(db, recipe_id)
+        return {"recipe": recipe_row, **related}
+    return None
 
 
 # Helper functions for mapping form data to SQL operations ###############
@@ -194,7 +195,7 @@ def update_recipe_ingredients(
     ingredient_data = {}
     for key in fields:
         field = re.match(r"^ingredients_(\d+)_(\w+)$", key)
-        if field is not None:
+        if field:
             i_id = field.group(1)
             column = field.group(2)
             value = fields[key]
@@ -225,7 +226,7 @@ def update_recipe_instructions(
     instruction_data = {}
     for key in fields:
         field = re.match(r"^instructions_(\d+)_(\w+)$", key)
-        if field is not None:
+        if field:
             i_id = field.group(1)
             column = field.group(2)
             value = fields[key]
@@ -293,8 +294,8 @@ def update_author_recipe(
         published = IFNULL(?, published)
         WHERE id = ? AND author_id = ?
         """, (title, summary, preparation_time,
-        cooking_time, skill_level, portions, published,
-        recipe_id, author_id))
+              cooking_time, skill_level, portions, published,
+              recipe_id, author_id))
     return cursor
 
 
@@ -322,7 +323,8 @@ def add_ingredients_row(db: Cursor, recipe_id: int):
     return cursor
 
 
-def delete_ingredients_row(db: Cursor, recipe_id: int, ingredient_id: int) -> bool:
+def delete_ingredients_row(db: Cursor, recipe_id: int,
+                           ingredient_id: int) -> bool:
     """Delete s ingredients row from a recipe
     """
     cursor = db.execute(
@@ -349,7 +351,8 @@ def update_ingredients_row(
     return cursor
 
 
-def move_ingredients_row_up(db: Cursor, recipe_id: int, ingredient_id: int) -> bool:
+def move_ingredients_row_up(db: Cursor, recipe_id: int,
+                            ingredient_id: int) -> bool:
     """Move ingredient up by swapping order_number values
     with the previous ingredient (in order of appearance).
     """
@@ -369,7 +372,8 @@ def move_ingredients_row_up(db: Cursor, recipe_id: int, ingredient_id: int) -> b
     return cursor
 
 
-def move_ingredients_row_down(db: Cursor, recipe_id: int, ingredient_id: int) -> bool:
+def move_ingredients_row_down(db: Cursor, recipe_id: int,
+                              ingredient_id: int) -> bool:
     """Move ingredient down by swapping order_number values
     with the next ingredient (in order of appearance).
     """
@@ -380,7 +384,8 @@ def move_ingredients_row_down(db: Cursor, recipe_id: int, ingredient_id: int) ->
         WHEN ingredients.id = this.id THEN next_order_number
         END FROM ingredients AS this, (SELECT id,
             lead(id) OVER (ORDER BY order_number) AS next_id,
-            lead(order_number) OVER (ORDER BY order_number) AS next_order_number
+            lead(order_number) OVER (ORDER BY order_number)
+            AS next_order_number
             FROM ingredients WHERE recipe_id = ?) AS next
         WHERE this.id = next.id
         AND this.id = ?
@@ -402,7 +407,8 @@ def add_instructions_row(db: Cursor, recipe_id: int):
     return cursor
 
 
-def delete_instructions_row(db: Cursor, recipe_id: int, instruction_id: int) -> bool:
+def delete_instructions_row(db: Cursor, recipe_id: int,
+                            instruction_id: int) -> bool:
     """Delete s instructions row from a recipe
     """
     cursor = db.execute(
@@ -429,7 +435,8 @@ def update_instructions_row(
     return cursor
 
 
-def move_instructions_row_up(db: Cursor, recipe_id: int, instruction_id: int) -> bool:
+def move_instructions_row_up(db: Cursor, recipe_id: int,
+                             instruction_id: int) -> bool:
     """Move instruction up by swapping order_number values
     with the previous instruction (in order of appearance).
     """
@@ -449,7 +456,8 @@ def move_instructions_row_up(db: Cursor, recipe_id: int, instruction_id: int) ->
     return cursor
 
 
-def move_instructions_row_down(db: Cursor, recipe_id: int, instruction_id: int) -> bool:
+def move_instructions_row_down(db: Cursor, recipe_id: int,
+                               instruction_id: int) -> bool:
     """Move instruction down by swapping order_number values
     with the next instruction (in order of appearance).
     """
@@ -460,7 +468,8 @@ def move_instructions_row_down(db: Cursor, recipe_id: int, instruction_id: int) 
         WHEN instructions.id = this.id THEN next_order_number
         END FROM instructions AS this, (SELECT id,
             lead(id) OVER (ORDER BY order_number) AS next_id,
-            lead(order_number) OVER (ORDER BY order_number) AS next_order_number
+            lead(order_number) OVER (ORDER BY order_number)
+            AS next_order_number
             FROM instructions WHERE recipe_id = ?) AS next
         WHERE this.id = next.id
         AND this.id = ?

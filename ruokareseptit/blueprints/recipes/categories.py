@@ -4,7 +4,8 @@
 from flask import Blueprint
 from flask import render_template
 
-bp = Blueprint("categories", __name__, url_prefix="/categories", template_folder="templates")
+bp = Blueprint("categories", __name__, url_prefix="/categories",
+               template_folder="templates")
 
 
 @bp.route("/")

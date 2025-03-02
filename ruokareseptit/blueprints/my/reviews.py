@@ -16,7 +16,8 @@ from ruokareseptit.model.reviews import fetch_author_review_context
 from ruokareseptit.model.recipes import fetch_published_recipe_context
 
 
-bp = Blueprint("reviews", __name__, url_prefix="/reviews", template_folder="templates")
+bp = Blueprint("reviews", __name__, url_prefix="/reviews",
+               template_folder="templates")
 
 
 @bp.route("/", defaults={"review_id": None})
@@ -25,27 +26,30 @@ bp = Blueprint("reviews", __name__, url_prefix="/reviews", template_folder="temp
 def index(review_id: int):
     """Own reviews
     """
-    if review_id is None:
+    if not review_id:
         with get_db() as db:
             page = int(request.args.get("page", 0))
             rows, count, pages = list_user_reviews(db, g.user["id"], page)
             page = max(min(pages, page), 1)
             context = {"reviews": rows, "reviews_count": count,
-                       "page_number": page, "total_pages": pages }
+                       "page_number": page, "total_pages": pages}
             if page < pages:
-                context["next_page"] = url_for(".index", page=page + 1)
+                next_p = url_for(".index", page=page + 1)
+                context["next_page"] = next_p
             if page > 1:
-                context["prev_page"] = url_for(".index", page=page - 1)
+                prev_p = url_for(".index", page=page - 1)
+                context["prev_page"] = prev_p
             return render_template("my/reviews/list.html", **context)
 
     with get_db() as db:
-        review_context = fetch_author_review_context(db, review_id, g.user["id"])
-        if review_context is None:
+        review_context = fetch_author_review_context(db, review_id,
+                                                     g.user["id"])
+        if not review_context:
             return redirect(url_for(".index"))
 
         recipe_id = review_context["review"]["recipe_id"]
         recipe_context = fetch_published_recipe_context(db, recipe_id)
-        if recipe_context is not None:
+        if recipe_context:
             review_context = {**review_context, **recipe_context}
 
         back = request.args.get("back", url_for(".index"))

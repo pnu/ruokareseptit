@@ -29,10 +29,10 @@ def get_db():
 def close_db(e=None):
     """Close the connection.
     """
-    if e is not None:
+    if e:
         print("Unhandled exception:", e)
     db = g.pop("db", None)
-    if db is not None:
+    if db:
         db.close()
 
 

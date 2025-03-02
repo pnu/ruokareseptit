@@ -6,6 +6,7 @@ from . import recipes
 from . import auth
 from . import my
 
+
 def register_app_blueprints(app):
     """ Register views
     """

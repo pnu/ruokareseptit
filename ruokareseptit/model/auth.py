@@ -22,7 +22,7 @@ def login_required(view):
     """
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if g.user is None:
+        if not g.user:
             return redirect(url_for("auth.login", next=request.url))
         return view(**kwargs)
     return wrapped_view
@@ -36,19 +36,19 @@ def register_before_request(app):
         """Set g.user if logged in. Clear session if user
         has been deleted from db.
         """
-        if session.get("uid") is None:
-            g.user = None
-            return
         uid = session.get("uid")
-        user_in_db = get_db().execute(
-            """
-            SELECT id, username
-            FROM users
-            WHERE id = ?
-            """, [uid]).fetchone()
-        if user_in_db is None:
+        if uid:
+            user_in_db = get_db().execute(
+                """
+                SELECT id, username
+                FROM users
+                WHERE id = ?
+                """, [uid]).fetchone()
+            if user_in_db:
+                g.user = user_in_db
+                return
+            g.user = None
             session.clear()
-        g.user = user_in_db
 
 
 # SQL queries for READ operations ########################################
@@ -63,14 +63,13 @@ def auth_user_id(db: Cursor, username: str, password: str) -> int | None:
         FROM users
         WHERE username = ?
         """, [username]).fetchone()
-    if user is None:
-        return None
-    if current_app.debug:
-        # In debug mode accept any password
-        return user["id"]
-    if check_password_hash(user["password_hash"], password) is False:
-        return None
-    return user["id"]
+
+    if user:
+        if current_app.debug:  # Extra condition: In debug accept any
+            return user["id"]
+        if check_password_hash(user["password_hash"], password):
+            return user["id"]
+    return None
 
 
 # SQL queries for CREATE / UPDATE operations #############################
