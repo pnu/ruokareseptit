@@ -6,6 +6,11 @@
 
 {% block content %}
 {% include "recipes/common/recipe.html" %}
+<div class="recipe-actions">
+    <a href="{{ request.args.get('back', url_for('.index')) }}">&lt;&lt; Takaisin</a>
+    <a href="{{ url_for('recipes.browse.review', recipe_id=recipe.id, back=request.url) }}">Lisää uusi arvostelu</a>
+</div>
+
 {% if g.user.id == recipe.author_id %}
 <p>
 <em>Tämä on sinun laatima resepti;
@@ -14,5 +19,33 @@ Löydät sen myös omista resepteistäsi.
 </em>
 </p>
 {% endif %}
-<a href="{{ request.args.get('back', url_for('.index')) }}">&lt;&lt; Takaisin</a>
+
+{% for review in reviews %}
+{% if loop.first %}
+<h1>Reseptin arvostelut</h1>
+<p>
+    Arvostelu voi olla pelkkä arvosana tai se voi sisältää myös tekstiä.
+    Listassa ensimmäisenä on tekstiä sisältävät arvostelut.
+</p>
+{% endif %}
+<div class="review-card">
+    <div class="header">
+        <div>
+            👤 {{ review.username }}
+        </div>
+        {% if review.rating %}
+        <span>{{ "★" * review.rating }}</span>
+        {% endif %}
+    </div>
+    {% if review.review %}
+    <div class="content">
+        {% set review_paragraphs = review.review.splitlines() %}
+        {% for p in review_paragraphs %}
+        <p>{{ p }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
 {% endblock %}

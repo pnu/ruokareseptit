@@ -121,20 +121,21 @@ def fetch_recipe_related(db: Cursor, recipe_id):
         LIMIT ?
         """, [recipe_id, recipe_categories_limit])
 
-    user_reviews_limit = current_app.config["RECIPE_USER_REVIEWS_MAX"]
-    user_reviews = db.execute(
+    reviews_limit = current_app.config["RECIPE_USER_REVIEWS_MAX"]
+    reviews = db.execute(
         """
         SELECT user_reviews.*, users.username
         FROM user_reviews JOIN users ON user_reviews.author_id = users.id
         WHERE user_reviews.recipe_id = ?
+        ORDER BY user_reviews.review IS NOT NULL DESC
         LIMIT ?
-        """, [recipe_id, user_reviews_limit])
+        """, [recipe_id, reviews_limit])
 
     return {
         "ingredients": ingredients,
         "instructions": instructions,
         "categories": recipe_categories,
-        "user_reviews": user_reviews
+        "reviews": reviews
     }
 
 

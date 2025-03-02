@@ -227,6 +227,12 @@ ol.recipe-instructions-list {
   margin-bottom: 1em;
 }
 
+.recipe-actions {
+  display: flex;
+  justify-content: space-between;
+  text-wrap-mode: nowrap;
+}
+
 .review-card {
   border: 1px solid;
   background-color: antiquewhite;
