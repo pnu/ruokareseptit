@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}Omien reseptien muokkaus{% endblock %}</h1>
+<h1>{% block title %}Omat reseptit{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -10,11 +10,13 @@
     Sinulla ei ole yhtään omaa reseptiä.
 </p>
 <p>
-    <a href="{{ url_for('.create') }}">Lisää uusi</a>
+    <a href="{{ url_for('.create') }}">Luo uusi resepti</a>
 </p>
 {% else %}
 <p>
     Sinulla on {{ recipes_count }} resepti{{ "ä" if recipes_count > 1 else "" }}.
+    Voit muokata reseptiä seuraamalla linkkiä sen otsikossa. Alla olevassa listauksessa
+    näkyy myös se onko resepti julkaistussa tilassa.
 </p>
 <table class="recipe-list">
     <thead>

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}Parhaat reseptit{% endblock %}</h1>
+<h1>{% block title %}Kaikki julkaistut reseptit{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -16,6 +16,8 @@
 {% else %}
 <p>
     Tietokannassa on {{ recipes_count }} resepti{{ "ä" if recipes_count > 1 else "" }}.
+    Reseptit on alla listattu niiden arvosteluiden keskiarvon mukaisessa laskevassa
+    järjestyksessä.
 </p>
 <table class="recipe-list">
     <thead>

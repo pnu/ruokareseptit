@@ -12,7 +12,7 @@
 
     <label for="portions">Annosten määrä koko ohjeessa:</label>
     <input id="portions" class="control" type="number" min="1" max="1000" title="Annosten määrä" name="portions"
-        value="{{ recipe.portions }}" />
+        value="{{ recipe.portions or ''}}" />
 
     <div class="full-width ingredients">
         <label class="amount" id="amount">Määrä</label>

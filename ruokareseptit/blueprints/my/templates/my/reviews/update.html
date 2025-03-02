@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
-{% block title %}Arvostelu {{ review.id }}{% endblock %}
+{% block title %}Arvostelun {{ review.id }} muokkaus{% endblock %}
+{% block header %}<h1>Arvostelun muokkaus</h1>{% endblock %}
 {% block content %}
+<p>
+    Tällä lomakkeella voit muokata aiemmin antamaasi arvostelua tai poistaa sen
+    kokonaan. Arvostelun alapuolella näkyy se resepti jolle olet tämän arvostelun
+    antanut. Reseptiä ei kuitenkaan voida näyttää, jos se on poistettu tai se ei
+    ole julkaistussa tilassa.
+</p>
 <form class="dialog grid recipe" action="{{ submit_url }}" method="post">
-
-    <h1>
-        Muokkaa antamaasi arvostelua
-    </h1>
-
     <fieldset class="control full-width flex">
         <legend>Arvosana</legend>
         <label><input type="radio" name="rating" value="1" {{ 'checked' if review.rating==1 }}>★</label>
@@ -28,12 +30,13 @@
 {% include "recipes/common/recipe.html" %}
 {% else %}
 {% if review.title %}
-<em>Et voi nähdä reseptiä koska reseptin tekijä ei ole julkaissut sitä.</em>
+<em>Et voi nähdä arvostelemaasi reseptiä. Resepti ei ole tällä hetkellä julkaistuna.</em>
 {% else %}
-<em>Et voi nähdä reseptiä koska se on poistettu.</em>
+<em>Resepti on poistettu tietokannasta arvostelusi jälkeen. Voit poistaa myös
+    antamasi arvostelusi yllä olevalla lomakkeella.</em>
 {% endif %}
 {% endif %}
 <p>
-    <a href="{{ request.args.get('back', url_for('.index')) }}">&lt;&lt; Takaisin</a><br/>
+    <a href="{{ request.args.get('back', url_for('.index')) }}">&lt;&lt; Takaisin</a><br />
 </p>
 {% endblock %}

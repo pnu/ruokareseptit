@@ -83,7 +83,9 @@ def fetch_published_recipe_context(db: Cursor, recipe_id: int):
         ON recipes.author_id = users.id
         WHERE recipes.id = ? AND published = 1
         """, [recipe_id]).fetchone()
-    if recipe_row is None:
+    if recipe_row["title"] is None:
+        # have to check for title nullness because row is returned and it has
+        # rating_count (0) even for recipies that do not exist in the database
         return None
 
     related = fetch_recipe_related(db, recipe_id)
@@ -172,7 +174,6 @@ def fetch_author_recipe_context(db: Cursor, recipe_id: int, author_id: int):
         FROM recipes
         WHERE id = ? AND author_id = ?
         """, [recipe_id, author_id]).fetchone()
-
     if recipe_row is None:
         return None
 
