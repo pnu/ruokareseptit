@@ -9,7 +9,7 @@ from flask import request
 from flask import flash
 from flask import redirect
 
-from ruokareseptit.model.db import get_db
+from ruokareseptit.model.db import get_db, log_db_error
 from ruokareseptit.model.auth import login_required
 from ruokareseptit.model.recipes import list_user_recipes
 from ruokareseptit.model.recipes import fetch_author_recipe_context
@@ -72,7 +72,8 @@ def create():
         with get_db() as db:
             cursor = insert_recipe(db, g.user["id"], request.form)
             recipe_id = cursor.lastrowid
-    except db.IntegrityError:
+    except db.Error as err:
+        log_db_error(err)
         flash("Reseptin luonti epäonnistui.")
         return redirect(url_for(".create", **request.form))
 
@@ -109,7 +110,8 @@ def update(recipe_id: int):
             update_author_recipe(db, recipe_id, g.user["id"], request.form)
             update_recipe_ingredients(db, recipe_id, request.form)
             update_recipe_instructions(db, recipe_id, request.form)
-    except db.IntegrityError:
+    except db.Error as err:
+        log_db_error(err)
         flash("Reseptin päivittäminen epäonnistui.")
         return redirect(url_for(".index", **edit_params))
 
@@ -135,7 +137,8 @@ def delete(recipe_id: int):
             c = delete_author_recipe(db, recipe_id, g.user["id"])
             if c.rowcount > 0:
                 flash("Resepti on poistettu.")
-    except db.IntegrityError:
+    except db.Error as err:
+        log_db_error(err)
         flash("Reseptin poistaminen epäonnistui.", "error")
 
     return redirect(request.args.get("next", url_for(".index")))

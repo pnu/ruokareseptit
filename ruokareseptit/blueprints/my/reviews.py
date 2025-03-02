@@ -9,7 +9,7 @@ from flask import url_for
 from flask import g
 from flask import flash
 
-from ruokareseptit.model.db import get_db
+from ruokareseptit.model.db import get_db, log_db_error
 from ruokareseptit.model.auth import login_required
 from ruokareseptit.model.reviews import list_user_reviews
 from ruokareseptit.model.reviews import fetch_author_review_context
@@ -66,7 +66,8 @@ def update(review_id: int):
     try:
         with get_db() as db:
             print("TODO: update review_id", review_id)
-    except db.IntegrityError:
+    except db.Error as err:
+        log_db_error(err)
         flash("Arvostelun päivittäminen epäonnistui.")
         return redirect(url_for(".index", **edit_params))
 
@@ -92,7 +93,8 @@ def delete(review_id: int):
             # c = delete_author_review(db, review_id, g.user["id"])
             # if c.rowcount > 0:
             #     flash("Resepti on poistettu.")
-    except db.IntegrityError:
+    except db.Error as err:
+        log_db_error(err)
         flash("Arvostelun poistaminen epäonnistui.", "error")
 
     return redirect(request.args.get("next", url_for(".index")))

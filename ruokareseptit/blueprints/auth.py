@@ -8,9 +8,8 @@ from flask import render_template
 from flask import request
 from flask import url_for
 from flask import session
-from flask import g
 
-from ruokareseptit.model.db import get_db
+from ruokareseptit.model.db import get_db, log_db_error
 from ruokareseptit.model.auth import auth_user_id, insert_user
 
 bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
@@ -68,8 +67,9 @@ def register():
         with get_db() as db:
             password = request.form["password1"]
             insert_user(db, username, password)
-    except db.IntegrityError:
-        flash_error("Käyttäjätunnus " + username + " on jo varattu.")
+    except db.Error as err:
+        log_db_error(err)
+        flash_error("Käyttäjätunnus on jo varattu.")
         return redirect(url_for(".register", **redir_params))
 
     flash("Käyttäjätunnus " + username + " on luotu.")

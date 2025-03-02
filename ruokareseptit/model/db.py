@@ -36,6 +36,12 @@ def close_db(e=None):
         db.close()
 
 
+def log_db_error(err: sqlite3.Error):
+    """Log database error
+    """
+    print(f"Database error: {err.sqlite_errorcode} {err.sqlite_errorname}")
+
+
 def init_db():
     """Clear existing data and create new tables.
     """
