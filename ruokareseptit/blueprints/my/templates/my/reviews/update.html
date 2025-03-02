@@ -33,4 +33,7 @@
 <em>Et voi nähdä reseptiä koska se on poistettu.</em>
 {% endif %}
 {% endif %}
+<p>
+    <a href="{{ request.args.get('back', url_for('.index')) }}">&lt;&lt; Takaisin</a><br/>
+</p>
 {% endblock %}

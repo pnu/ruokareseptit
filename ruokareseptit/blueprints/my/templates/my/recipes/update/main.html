@@ -45,4 +45,8 @@
         <button class="danger" type="submit" name="delete" value="1">ⓧ Poista resepti</button>
     </nav>
 </form>
+<p>
+    <a href="{{ request.args.get('back', url_for('.index')) }}">&lt;&lt; Takaisin</a><br/>
+</p>
+
 {% endblock %}

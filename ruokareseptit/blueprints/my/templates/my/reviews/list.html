@@ -13,17 +13,11 @@
 <p>
     Olen antanut {{ reviews_count }} arvostelu{{ "a" if reviews_count > 1 else "n" }}.
 </p>
-<table>
-    <tr>
-        <th>Resepti</th>
-        <th>Arvosana</th>
-        <th>Arviointi</th>
-        <th></th>
-    </tr>
     {% for review in reviews %}
-    <tr>
-        <td>
-            <a href="{{ url_for('.index', review_id=review.id, back=request.url) }}">
+    <div class="review-card">
+        <div class="header">
+            <h1>
+                <a href="{{ url_for('.index', review_id=review.id, back=request.url) }}">
                 {% if review.title %}
                 {{ review.title }}
                 {% if review.published == 0 %}
@@ -33,12 +27,23 @@
                 <em>(poistettu resepti)</em>
                 {% endif %}
             </a>
+        </h1>
+        <span>{{ "★" * review.rating }}</span>
+        </div>
+        {% if review.review %}
+        <div class="content">
+            {% set review_paragraphs = review.review.splitlines() %}
+            {% for p in review_paragraphs %}
+            <p>{{ p }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+        <td class="recipe-title">
+        </td>
+        <td class="review-actions">
         </td>
         <td>
-            {{ "★" * review.rating }}
-        </td>
-        <td>
-            {{ review.review }}
         </td>
     </tr>
     {% endfor %}
