@@ -167,14 +167,22 @@ ol.recipe-instructions-list {
 }
 
 .recipe-card {
-  margin: 1em;
   border: 1px solid;
   background-color: antiquewhite;
   min-width: fit-content;
-  h1 {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-wrap-mode: nowrap;
+    gap: 1em;
     background: lightgreen;
     margin: 0;
     padding: 1em;
+    h1 {
+      font-size: large;
+      margin: 0;
+    }
   }
   .content {
     padding: 1.5em;
@@ -274,7 +282,7 @@ form.dialog {
   background-color: antiquewhite;
   padding: 1.5em;
   outline-style: solid;
-  margin: 1em;
+  margin-bottom: 1em;
 
   h1 {
     text-align: center;

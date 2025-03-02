@@ -1,65 +1,75 @@
-
 <div class="recipe-card">
-<h1>{{ recipe.title }}</h1>
-<div class="content">
-{% set summary_paragraphs = recipe.summary.splitlines() %}
-{% for p in summary_paragraphs %}
-    <p>{{ p }}</p>
-{% endfor %}
-
-<ul>
-    <li>Reseptin laatija: {{ recipe.username }}</li>
-    {% if recipe.preparation_time and recipe.cooking_time %}
-    <li>Valmistusaika, aktiivinen: {{ recipe.preparation_time }} min</li>
-    <li>Valmistusaika, yhteensä {{ recipe.preparation_time + recipe.cooking_time }} min</li>
-    {% endif %}
-    {% if recipe.skill_level %}
-    <li>Vaikeustaso: {{ recipe.skill_level }}</li>
-    {% endif %}
-    {% for category in categories %}
-    {% if loop.first %}
-    <li>Kategoriat:
-        {% endif %}
-        {{ category.title }}
-        {%- if not loop.last %}, {% else %}
-    </li>
-    {% endif %}
-    {% endfor %}
-    </li>
-</ul>
-
-{% for ingredient in ingredients %}
-{% if loop.first %}
-<h3>
-    Ainekset
-    {% if recipe.portions == 1 %}
-    ({{ recipe.portions }} annos)
-    {% elif recipe.portions %}
-    ({{ recipe.portions }} annosta)
-    {% endif %}
-</h3>
-<ul class="recipe-ingredients-list">
-    {% endif %}
-    <li><span class="amount">{{ ingredient.amount }}</span> <span class="unit">{{ ingredient.unit }}</span> <span class="ingredient">{{ ingredient.title }}</span></li>
-    {% if loop.last %}
-</ul>
-{% endif %}
-{% endfor %}
-
-{% for step in instructions %}
-{% if loop.first %}
-<h3>Valmistusohjeet</h3>
-<ol class="recipe-instructions-list">
-    {% endif %}
-    <li>
-        {% set instruction_paragraphs = step.instructions.splitlines() %}
-        {% for p in instruction_paragraphs %}
-            <p>{{ p }}</p>
+    <div class="header">
+        <h1>{{ recipe.title }}</h1>
+        {% if recipe.rating_count > 0 %}
+        <span title="{{ recipe.rating|round(2) }}">{{
+            "★" * (recipe.rating | int) }}{{
+            "★" if 0.75 <= recipe.rating - (recipe.rating | int) else "☆" if 0.25 <=recipe.rating - (recipe.rating |
+                int) else "" }} ({{ recipe.rating_count }} kpl)</span>
+                {% endif %}
+    </div>
+    <div class="content">
+        {% if recipe.summary %}
+        {% set summary_paragraphs = recipe.summary.splitlines() %}
+        {% for p in summary_paragraphs %}
+        <p>{{ p }}</p>
         {% endfor %}
-    </li>
-    {% if loop.last %}
-</ol>
-{% endif %}
-{% endfor %}
-</div>
+        {% endif %}
+        <ul>
+            <li>Reseptin laatija: {{ recipe.username }}</li>
+            {% if recipe.preparation_time and recipe.cooking_time %}
+            <li>Valmistusaika, aktiivinen: {{ recipe.preparation_time }} min</li>
+            <li>Valmistusaika, yhteensä {{ recipe.preparation_time + recipe.cooking_time }} min</li>
+            {% endif %}
+            {% if recipe.skill_level %}
+            <li>Vaikeustaso: {{ recipe.skill_level }}</li>
+            {% endif %}
+            {% for category in categories %}
+            {% if loop.first %}
+            <li>Kategoriat:
+                {% endif %}
+                {{ category.title }}
+                {%- if not loop.last %}, {% else %}
+            </li>
+            {% endif %}
+            {% endfor %}
+            </li>
+        </ul>
+
+        {% for ingredient in ingredients %}
+        {% if loop.first %}
+        <h3>
+            Ainekset
+            {% if recipe.portions == 1 %}
+            ({{ recipe.portions }} annos)
+            {% elif recipe.portions %}
+            ({{ recipe.portions }} annosta)
+            {% endif %}
+        </h3>
+        <ul class="recipe-ingredients-list">
+            {% endif %}
+            <li><span class="amount">{{ ingredient.amount }}</span> <span class="unit">{{ ingredient.unit }}</span>
+                <span class="ingredient">{{ ingredient.title }}</span>
+            </li>
+            {% if loop.last %}
+        </ul>
+        {% endif %}
+        {% endfor %}
+
+        {% for step in instructions %}
+        {% if loop.first %}
+        <h3>Valmistusohjeet</h3>
+        <ol class="recipe-instructions-list">
+            {% endif %}
+            <li>
+                {% set instruction_paragraphs = step.instructions.splitlines() %}
+                {% for p in instruction_paragraphs %}
+                <p>{{ p }}</p>
+                {% endfor %}
+            </li>
+            {% if loop.last %}
+        </ol>
+        {% endif %}
+        {% endfor %}
+    </div>
 </div>

@@ -75,8 +75,10 @@ def fetch_published_recipe_context(db: Cursor, recipe_id: int):
     """
     recipe_row = db.execute(
         """
-        SELECT recipes.*, users.username
-        FROM recipes
+        SELECT recipes.*, users.username, AVG(user_reviews.rating) AS rating,
+        COUNT(user_reviews.rating) AS rating_count
+        FROM recipes LEFT JOIN user_reviews
+        ON recipes.id = user_reviews.recipe_id
         JOIN users
         ON recipes.author_id = users.id
         WHERE recipes.id = ? AND published = 1

@@ -24,8 +24,7 @@
         <button class="danger" type="submit" name="delete" value="1">ⓧ Poista arvostelu</button>
     </nav>
 </form>
-
-{% if recipe %}
+{% if review.published %}
 {% include "recipes/common/recipe.html" %}
 {% else %}
 {% if review.title %}
