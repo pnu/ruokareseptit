@@ -2,6 +2,7 @@
 {% block title %}Arvostelun {{ review.id }} muokkaus{% endblock %}
 {% block content %}
 <form class="dialog grid recipe" action="{{ submit_url }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <fieldset class="control full-width flex">
         <legend>Anna arvosana reseptille</legend>
         <label><input type="radio" name="rating" value="1" {{ 'checked' if review.rating==1 }}>★</label>

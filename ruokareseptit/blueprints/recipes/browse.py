@@ -10,6 +10,7 @@ from flask import g
 from flask import flash
 
 from ruokareseptit.model.db import get_db, log_db_error
+from ruokareseptit.model.auth import login_required
 from ruokareseptit.model.recipes import list_published_recipes
 from ruokareseptit.model.recipes import fetch_published_recipe_context
 from ruokareseptit.model.reviews import insert_review
@@ -45,6 +46,7 @@ def index(recipe_id: int):
 
 
 @bp.route("/<int:recipe_id>/review")
+@login_required
 def review(recipe_id: int):
     """Add user review to a recipe
     """

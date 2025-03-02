@@ -2,6 +2,7 @@
 
 {% block content %}
 <form class="dialog login grid" method="post">
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
   <h1>Kirjautuminen</h1>
   <p>
     Kirjaudu sisään omalla käyttäjä&shy;tunnuksella ja salasanalla.

@@ -10,6 +10,7 @@ from flask import g
 from flask import request
 from flask import session
 from flask import current_app
+from flask import abort
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
@@ -49,6 +50,14 @@ def register_before_request(app):
                 return
             g.user = None
             session.clear()
+
+    @app.before_request
+    def check_csrf():
+        if "csrf_token" in session and request.method == "POST":
+            if "csrf_token" not in request.form:
+                abort(403)
+            if request.form["csrf_token"] != session["csrf_token"]:
+                abort(403)
 
 
 # SQL queries for READ operations ########################################

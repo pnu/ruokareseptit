@@ -1,6 +1,6 @@
 """User authentication
 """
-
+import secrets
 from flask import Blueprint
 from flask import flash
 from flask import redirect
@@ -37,6 +37,7 @@ def login():
 
     session.clear()
     session["uid"] = user_id
+    session["csrf_token"] = secrets.token_hex(16)
     flash("Kirjautuminen onnistui. Tervetuloa!")
     return redirect(next_url)
 
