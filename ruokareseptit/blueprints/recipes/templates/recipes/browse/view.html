@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 
-{% block header %}
-{% endblock %}
 {% block title %}{{ recipe.title }}{% endblock %}
-
 {% block content %}
 {% include "recipes/common/recipe.html" %}
 <div class="recipe-actions">
@@ -13,10 +10,10 @@
 
 {% if g.user.id == recipe.author_id %}
 <p>
-<em>Tämä on sinun laatima resepti;
-<a href="{{ url_for('my.recipes.index', recipe_id=recipe.id, back=request.url) }}">muokkaa reseptiä.</a><br/>
-Löydät sen myös omista resepteistäsi.
-</em>
+    <em>Tämä on sinun laatima resepti;
+        <a href="{{ url_for('my.recipes.index', recipe_id=recipe.id, back=request.url) }}">muokkaa reseptiä.</a><br />
+        Löydät sen myös omista resepteistäsi.
+    </em>
 </p>
 {% endif %}
 

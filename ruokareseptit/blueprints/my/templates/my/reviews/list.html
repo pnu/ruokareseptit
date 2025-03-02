@@ -36,7 +36,9 @@
                 </a>
             </h1>
         </div>
+        {% if review.rating %}
         <span>{{ "★" * review.rating }}</span>
+        {% endif %}
     </div>
     {% if review.review %}
     <div class="content">
@@ -47,15 +49,7 @@
     </div>
     {% endif %}
 </div>
-<td class="recipe-title">
-</td>
-<td class="review-actions">
-</td>
-<td>
-</td>
-</tr>
 {% endfor %}
-</table>
 {% include "common/pager.html" %}
 {% endif %}
 {% endblock %}

@@ -1,16 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}Arvostelun {{ review.id }} muokkaus{% endblock %}
-{% block header %}<h1>Arvostelun muokkaus</h1>{% endblock %}
 {% block content %}
-<p>
-    Tällä lomakkeella voit muokata aiemmin antamaasi arvostelua tai poistaa sen
-    kokonaan. Arvostelun alapuolella näkyy se resepti jolle olet tämän arvostelun
-    antanut. Reseptiä ei kuitenkaan voida näyttää, jos se on poistettu tai se ei
-    ole julkaistussa tilassa.
-</p>
 <form class="dialog grid recipe" action="{{ submit_url }}" method="post">
     <fieldset class="control full-width flex">
-        <legend>Arvosana</legend>
+        <legend>Anna arvosana reseptille</legend>
         <label><input type="radio" name="rating" value="1" {{ 'checked' if review.rating==1 }}>★</label>
         <label><input type="radio" name="rating" value="2" {{ 'checked' if review.rating==2 }}>★★</label>
         <label><input type="radio" name="rating" value="3" {{ 'checked' if review.rating==3 }}>★★★</label>
