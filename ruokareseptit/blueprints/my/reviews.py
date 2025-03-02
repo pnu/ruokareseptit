@@ -14,6 +14,8 @@ from ruokareseptit.model.auth import login_required
 from ruokareseptit.model.reviews import list_user_reviews
 from ruokareseptit.model.reviews import fetch_author_review_context
 from ruokareseptit.model.recipes import fetch_published_recipe_context
+from ruokareseptit.model.reviews import update_author_review
+from ruokareseptit.model.reviews import delete_author_review
 
 
 bp = Blueprint("reviews", __name__, url_prefix="/reviews",
@@ -69,8 +71,8 @@ def update(review_id: int):
     }
     try:
         with get_db() as db:
-            print("TODO: update review_id", review_id)
-    except db.Error as err:
+            update_author_review(db, review_id, g.user["id"], request.form)
+    except db.IntegrityError as err:
         log_db_error(err)
         flash("Arvostelun päivittäminen epäonnistui.")
         return redirect(url_for(".index", **edit_params))
@@ -93,10 +95,9 @@ def delete(review_id: int):
     """
     try:
         with get_db() as db:
-            print("TODO: remove review_id", review_id)
-            # c = delete_author_review(db, review_id, g.user["id"])
-            # if c.rowcount > 0:
-            #     flash("Resepti on poistettu.")
+            c = delete_author_review(db, review_id, g.user["id"])
+            if c.rowcount > 0:
+                flash("Arvostelu on poistettu.")
     except db.Error as err:
         log_db_error(err)
         flash("Arvostelun poistaminen epäonnistui.", "error")
