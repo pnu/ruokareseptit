@@ -29,6 +29,14 @@
         title="Valmistusaika (passiivinen)" value="{{ recipe.cooking_time }}" min="0" max="525600" />
     <span class="unit">minuuttia</span>
 
+    <fieldset class="control full-width flex categories-edit" title="Kategoriat">
+        <legend>Kategoriat</legend>
+            {% for category in categories %}
+            <div><span class="title">{{ category.title }}</span><span class="action"><button name="category_{{ category.id}}_remove" value="1">ⓧ</button></span></div>
+            {% endfor %}
+            <div class="add"><input name="category_add"/><button name="category_add">Lisää</button></div>
+    </fieldset>
+
     <fieldset class="control full-width flex" title="Vaikeustaso">
         <legend>Vaikeustaso</legend>
         <label><input type="radio" name="skill_level" value="1" title="Helppo" aria-label="Helppo" {{ 'checked' if

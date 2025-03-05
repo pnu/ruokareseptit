@@ -114,7 +114,7 @@ def fetch_recipe_related(db: Cursor, recipe_id):
     recipe_categories_limit = current_app.config["RECIPE_CATEGORIES_MAX"]
     recipe_categories = db.execute(
         """
-        SELECT categories.title
+        SELECT categories.id, categories.title
         FROM recipe_category
         JOIN categories
         ON recipe_category.category_id = categories.id
