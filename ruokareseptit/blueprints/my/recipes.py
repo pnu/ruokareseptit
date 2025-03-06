@@ -18,6 +18,7 @@ from ruokareseptit.model.recipes import update_author_recipe
 from ruokareseptit.model.recipes import update_recipe_ingredients
 from ruokareseptit.model.recipes import update_recipe_instructions
 from ruokareseptit.model.recipes import delete_author_recipe
+from ruokareseptit.model.recipes import update_recipe_category_actions
 
 bp = Blueprint("recipes", __name__, url_prefix="/recipes",
                template_folder="templates")
@@ -115,6 +116,7 @@ def update(recipe_id: int):
             update_author_recipe(db, recipe_id, g.user["id"], request.form)
             update_recipe_ingredients(db, recipe_id, request.form)
             update_recipe_instructions(db, recipe_id, request.form)
+            update_recipe_category_actions(db, recipe_id, request.form)
     except db.Error as err:
         log_db_error(err)
         flash("Reseptin päivittäminen epäonnistui.")

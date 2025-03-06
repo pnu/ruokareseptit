@@ -2,6 +2,7 @@
 {% block title %}Ainesosat - {{ recipe.title }}{% endblock %}
 {% block content %}
 <form class="dialog grid recipe" action="{{ submit_url }}" method="post">
+    <input type="submit" hidden />
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <h1>{{ recipe.title }}</h1>
 

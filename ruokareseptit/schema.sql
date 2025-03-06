@@ -47,12 +47,13 @@ CREATE TABLE instructions (
 
 CREATE TABLE categories (
   id INTEGER PRIMARY KEY,
-  title TEXT
+  title TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE recipe_category (
   recipe_id INTEGER REFERENCES recipes ON DELETE CASCADE,
-  category_id INTEGER REFERENCES categories ON DELETE CASCADE
+  category_id INTEGER REFERENCES categories ON DELETE CASCADE,
+  UNIQUE(recipe_id, category_id)
 );
 
 CREATE TABLE user_reviews (

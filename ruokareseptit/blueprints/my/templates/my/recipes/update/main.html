@@ -2,6 +2,7 @@
 {% block title %}{{ recipe.title }}{% endblock %}
 {% block content %}
 <form class="dialog grid recipe" action="{{ submit_url }}" method="post">
+    <input type="submit" hidden />
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <h1>{{ recipe.title }}</h1>
 
@@ -32,9 +33,9 @@
     <fieldset class="control full-width flex categories-edit" title="Kategoriat">
         <legend>Kategoriat</legend>
             {% for category in categories %}
-            <div><span class="title">{{ category.title }}</span><span class="action"><button name="category_{{ category.id}}_remove" value="1">ⓧ</button></span></div>
+            <div><span class="title">{{ category.title }}</span><span class="action"><button name="category_{{ category.id}}_delete" value="1">ⓧ</button></span></div>
             {% endfor %}
-            <div class="add"><input name="category_add"/><button name="category_add">Lisää</button></div>
+            <div class="add"><input name="category_add" type="text" maxlength="20" placeholder="Uusi kategoria" aria-label="Uusi kategoria" title="Uusi kategoria"/><button title="Lisää uusi kategoria">Lisää</button></div>
     </fieldset>
 
     <fieldset class="control full-width flex" title="Vaikeustaso">

@@ -248,6 +248,22 @@ def update_recipe_instructions(
         add_instructions_row(db, recipe_id)
 
 
+def update_recipe_category_actions(
+        db: Cursor, recipe_id: int, fields: dict[str, str]):
+    """Update categories add or remove from form keys ie.
+    `category_name`+`category_add` or `category_ID_delete`.
+    """
+    for key in fields:
+        field = re.match(r"^category_(\d+)_delete$", key)
+        if field:
+            category_id = field.group(1)
+            delete_recipe_category(db, recipe_id, category_id)
+    if fields.get("category_add"):
+        category_name = fields["category_add"].capitalize()
+        if category_name and category_name != "":
+            add_recipe_category(db, recipe_id, category_name)
+
+
 # SQL queries for authenticated CREATE / UPDATE operations ###############
 
 
@@ -476,3 +492,42 @@ def move_instructions_row_down(db: Cursor, recipe_id: int,
         AND instructions.id IN (this.id, next_id);
         """, [recipe_id, instruction_id])
     return cursor
+
+
+def delete_recipe_category(db: Cursor, recipe_id: int,
+                           category_id: int) -> bool:
+    """Delete category from recipe
+    """
+    db.execute(
+        """
+        DELETE FROM recipe_category
+        WHERE recipe_id = ? AND category_id = ?;
+        """, [recipe_id, category_id])
+
+    db.execute(
+        """
+        DELETE FROM categories WHERE id = ? AND NOT EXISTS
+        (SELECT 1 FROM recipe_category WHERE category_id = ?);
+        """, [category_id, category_id])
+
+
+def add_recipe_category(db: Cursor, recipe_id: int,
+                           category_name: str):
+    """Create the category if it does not exist and add it to the recipe
+    """
+    db.execute(
+        """
+        INSERT INTO categories (title) VALUES (?)
+        ON CONFLICT (title) DO NOTHING;
+        """, [category_name])
+
+    category_id = db.execute(
+        """
+        SELECT id FROM categories WHERE title = ?;
+        """, [category_name]).fetchone()["id"]
+
+    db.execute(
+        """
+        INSERT INTO recipe_category (recipe_id, category_id)
+        VALUES (?, ?) ON CONFLICT (recipe_id, category_id) DO NOTHING;
+        """, [recipe_id, category_id])
