@@ -24,6 +24,8 @@ with open(SANA_FILENAME, encoding="utf-8", newline="") as csvfile:
         if "substantiivi" in row[2]:
             substantiivit.append(hakusana)
 
+categories = [x.capitalize() for x in random.choices(substantiivit, k=20)]
+
 def random_title() -> str:
     """Generate random title of 1..3 words
     """
@@ -88,6 +90,23 @@ def insert_random_recipe(author_id):
             INSERT INTO instructions (recipe_id, order_number, instructions)
             VALUES (?,?,?)
             """, [recipe_id, i, instructions])
+    for i in range(random.randint(0, 6)):
+        category = random.choice(categories)
+        db.execute(
+            """
+            INSERT INTO categories (title)
+            VALUES (?) ON CONFLICT DO NOTHING
+            """, [category])
+        cid = db.execute(
+            """
+            SELECT id FROM categories
+            WHERE title = ?
+            """, [category]).fetchone()[0]
+        db.execute(
+            """
+            INSERT INTO recipe_category (recipe_id, category_id)
+            VALUES (?,?) ON CONFLICT DO NOTHING
+            """, [recipe_id, cid])
     return recipe_id
 
 def add_user_review(user_id, recipe_id):
