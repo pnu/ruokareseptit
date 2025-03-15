@@ -1,5 +1,4 @@
-"""Published recipe listings
-"""
+"""Published recipe listings"""
 
 from flask import Blueprint
 from flask import render_template
@@ -21,15 +20,18 @@ bp = Blueprint("browse", __name__, url_prefix="/", template_folder="templates")
 @bp.route("/", defaults={"recipe_id": None})
 @bp.route("/<int:recipe_id>")
 def index(recipe_id: int):
-    """View published recipes
-    """
+    """View published recipes"""
     if not recipe_id:
         with get_db() as db:
             page = int(request.args.get("page", 1))
             recipes, count, pages = list_published_recipes(db, page)
             page = max(min(pages, page), 1)
-            context = {"recipes": recipes, "recipes_count": count,
-                       "page_number": page, "total_pages": pages}
+            context = {
+                "recipes": recipes,
+                "recipes_count": count,
+                "page_number": page,
+                "total_pages": pages,
+            }
             if page < pages:
                 next_p = url_for(".index", page=page + 1)
                 context["next_page"] = next_p
@@ -48,8 +50,7 @@ def index(recipe_id: int):
 @bp.route("/<int:recipe_id>/review")
 @login_required
 def review(recipe_id: int):
-    """Add user review to a recipe
-    """
+    """Add user review to a recipe"""
     try:
         with get_db() as db:
             cursor = insert_review(db, g.user["id"], recipe_id)
@@ -59,5 +60,6 @@ def review(recipe_id: int):
         flash("Arvostelun luominen epäonnistui.")
         return redirect(request.args.get("back", url_for(".index")))
 
-    return redirect(url_for("my.reviews.index", review_id=review_id,
-                            **request.args))
+    return redirect(
+        url_for("my.reviews.index", review_id=review_id, **request.args)
+    )

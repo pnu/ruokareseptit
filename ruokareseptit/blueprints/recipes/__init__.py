@@ -1,5 +1,4 @@
-"""Public recipes listings and search
-"""
+"""Public recipes listings and search"""
 
 from flask import Blueprint
 

@@ -1,5 +1,4 @@
-""" Applications views
-"""
+"""Applications views"""
 
 from . import home
 from . import recipes
@@ -8,8 +7,7 @@ from . import my
 
 
 def register_app_blueprints(app):
-    """ Register views
-    """
+    """Register views"""
     app.register_blueprint(home.bp)
     app.register_blueprint(recipes.bp)
     app.register_blueprint(auth.bp)

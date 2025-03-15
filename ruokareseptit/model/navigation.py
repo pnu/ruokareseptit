@@ -1,5 +1,4 @@
-"""Navigation definition and utilities
-"""
+"""Navigation definition and utilities"""
 
 import re
 from flask import request
@@ -12,32 +11,40 @@ type NavigationTreeItem = list[str | NavigationTree | bool]
 
 NAVIGATION_COMMON_ITEMS = [
     ["home.index", "Ruokareseptit"],
-    ["recipes.browse.index", "Reseptit", [
-        ["recipes.browse.index", "Kaikki"],
-        # ["recipes.categories.index", "Kategoriat", [
-        #     ["recipes.categories.index", "Kaikki"],
-        #     ["recipes.categories.abc", "ABC"],
-        #     ["recipes.categories.xyz", "XYZ"],
-        #     ["https://www.google.com/", "Google"]
-        # ]],
-        ["recipes.search.index", "Haku"]
-    ]],
+    [
+        "recipes.browse.index",
+        "Reseptit",
+        [
+            ["recipes.browse.index", "Kaikki"],
+            # ["recipes.categories.index", "Kategoriat", [
+            #     ["recipes.categories.index", "Kaikki"],
+            #     ["recipes.categories.abc", "ABC"],
+            #     ["recipes.categories.xyz", "XYZ"],
+            #     ["https://www.google.com/", "Google"]
+            # ]],
+            ["recipes.search.index", "Haku"],
+        ],
+    ],
 ]
 
 NAVIGATION: NavigationTree = [
     *NAVIGATION_COMMON_ITEMS,
     ["auth.register", "Rekisteröidy"],
-    ["auth.login", "Kirjaudu"]
+    ["auth.login", "Kirjaudu"],
 ]
 
 NAVIGATION_LOGGED_IN: NavigationTree = [
     *NAVIGATION_COMMON_ITEMS,
-    ["my.recipes.index", "Omat  ( 👤 __USERNAME__ )", [
-        ["my.recipes.index", "Reseptit"],
-        ["my.recipes.create", "Luo uusi resepti"],
-        ["my.reviews.index", "Arvostelut"],
-        ["auth.logout", "Kirjaudu ulos"]
-    ]]
+    [
+        "my.recipes.index",
+        "Omat  ( 👤 __USERNAME__ )",
+        [
+            ["my.recipes.index", "Reseptit"],
+            ["my.recipes.create", "Luo uusi resepti"],
+            ["my.reviews.index", "Arvostelut"],
+            ["auth.logout", "Kirjaudu ulos"],
+        ],
+    ],
 ]
 
 type NavigationItem = tuple[int, dict[str, str]]
@@ -46,8 +53,7 @@ type Navigation = list[NavigationLayer]
 
 
 def register_context_processor(app):
-    """Register context processor
-    """
+    """Register context processor"""
     app.context_processor(navigation_context)
 
 

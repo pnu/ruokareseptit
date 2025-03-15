@@ -1,5 +1,4 @@
-"""Database connection and utilities
-"""
+"""Database connection and utilities"""
 
 import sqlite3
 from datetime import datetime
@@ -16,7 +15,7 @@ def get_db():
     if "db" not in g:
         g.db = sqlite3.connect(
             current_app.config["DATABASE"],
-            detect_types=sqlite3.PARSE_DECLTYPES
+            detect_types=sqlite3.PARSE_DECLTYPES,
         )
         if current_app.debug:
             g.db.set_trace_callback(print)
@@ -27,8 +26,7 @@ def get_db():
 
 
 def close_db(e=None):
-    """Close the connection.
-    """
+    """Close the connection."""
     if e:
         print("Unhandled exception:", e)
     db = g.pop("db", None)
@@ -37,14 +35,12 @@ def close_db(e=None):
 
 
 def log_db_error(err: sqlite3.Error):
-    """Log database error
-    """
+    """Log database error"""
     print(f"Database error: {err.sqlite_errorcode} {err.sqlite_errorname}")
 
 
 def init_db():
-    """Clear existing data and create new tables.
-    """
+    """Clear existing data and create new tables."""
     db = get_db()
 
     with current_app.open_resource("schema.sql") as f:
@@ -53,15 +49,13 @@ def init_db():
 
 @click.command("init-db")
 def init_db_command():
-    """Clear existing data and create new tables.
-    """
+    """Clear existing data and create new tables."""
     init_db()
     click.echo("Initialized the database.")
 
 
 sqlite3.register_converter(
-    "timestamp",
-    lambda v: datetime.fromisoformat(v.decode())
+    "timestamp", lambda v: datetime.fromisoformat(v.decode())
 )
 
 

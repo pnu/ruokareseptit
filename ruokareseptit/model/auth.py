@@ -1,5 +1,4 @@
-""" Authentication related handlers and SQL queries
-"""
+"""Authentication related handlers and SQL queries"""
 
 import functools
 from sqlite3 import Cursor
@@ -21,17 +20,19 @@ def login_required(view):
     """View decorator to check if user is logged in.
     Redirects to the login page if not.
     """
+
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if not g.user:
             return redirect(url_for("auth.login", next=request.url))
         return view(**kwargs)
+
     return wrapped_view
 
 
 def register_before_request(app):
-    """Register before request action
-    """
+    """Register before request action"""
+
     @app.before_request
     def g_user():
         """Set g.user if logged in. Clear session if user
@@ -39,12 +40,18 @@ def register_before_request(app):
         """
         uid = session.get("uid")
         if uid:
-            user_in_db = get_db().execute(
-                """
+            user_in_db = (
+                get_db()
+                .execute(
+                    """
                 SELECT id, username
                 FROM users
                 WHERE id = ?
-                """, [uid]).fetchone()
+                """,
+                    [uid],
+                )
+                .fetchone()
+            )
             if user_in_db:
                 g.user = user_in_db
                 return
@@ -64,14 +71,15 @@ def register_before_request(app):
 
 
 def auth_user_id(db: Cursor, username: str, password: str) -> int | None:
-    """Return user id for username if password is correct.
-    """
+    """Return user id for username if password is correct."""
     user: dict[str, any] = db.execute(
         """
         SELECT id, username, password_hash
         FROM users
         WHERE username = ?
-        """, [username]).fetchone()
+        """,
+        [username],
+    ).fetchone()
 
     if user:
         if current_app.debug:  # Extra condition: In debug accept any
@@ -85,11 +93,12 @@ def auth_user_id(db: Cursor, username: str, password: str) -> int | None:
 
 
 def insert_user(db: Cursor, username: str, password: str):
-    """Insert new user to database.
-    """
+    """Insert new user to database."""
     cursor = db.execute(
         """
         INSERT INTO users (username, password_hash)
         VALUES (?, ?)
-        """, [username, generate_password_hash(password)])
+        """,
+        [username, generate_password_hash(password)],
+    )
     return cursor

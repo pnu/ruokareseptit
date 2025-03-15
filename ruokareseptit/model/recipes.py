@@ -1,5 +1,4 @@
-""" SQL queries for recipes
-"""
+"""SQL queries for recipes"""
 
 import re
 from sqlite3 import Cursor
@@ -20,7 +19,9 @@ def search_recipes_title(db: Cursor, search_term: str, page: int):
         FROM recipes
         WHERE published = 1
         AND title LIKE ?
-        """, [search_term]).fetchone()[0]
+        """,
+        [search_term],
+    ).fetchone()[0]
     page_size = int(current_app.config["RECIPE_LIST_PAGE_SIZE"])
     total_pages = (total_rows - 1) // page_size + 1
     offset = max(min(total_pages - 1, page - 1), 0) * page_size
@@ -35,7 +36,8 @@ def search_recipes_title(db: Cursor, search_term: str, page: int):
         GROUP BY recipes.id
         ORDER BY rating DESC
         LIMIT ? OFFSET ?
-        """, [search_term, page_size, offset]
+        """,
+        [search_term, page_size, offset],
     )
     return pub_recipes, total_rows, total_pages
 
@@ -49,7 +51,8 @@ def list_published_recipes(db: Cursor, page: int):
         SELECT count(*)
         FROM recipes
         WHERE published = 1
-        """).fetchone()[0]
+        """
+    ).fetchone()[0]
     page_size = int(current_app.config["RECIPE_LIST_PAGE_SIZE"])
     total_pages = (total_rows - 1) // page_size + 1
     offset = max(min(total_pages - 1, page - 1), 0) * page_size
@@ -63,7 +66,8 @@ def list_published_recipes(db: Cursor, page: int):
         GROUP BY recipes.id
         ORDER BY rating DESC
         LIMIT ? OFFSET ?
-        """, [page_size, offset]
+        """,
+        [page_size, offset],
     )
     return pub_recipes, total_rows, total_pages
 
@@ -82,7 +86,9 @@ def fetch_published_recipe_context(db: Cursor, recipe_id: int):
         JOIN users
         ON recipes.author_id = users.id
         WHERE recipes.id = ? AND published = 1
-        """, [recipe_id]).fetchone()
+        """,
+        [recipe_id],
+    ).fetchone()
 
     if not recipe_row["title"]:
         # have to check for title nullness because row is returned and it has
@@ -102,14 +108,18 @@ def fetch_recipe_related(db: Cursor, recipe_id):
         """
         SELECT * FROM ingredients WHERE recipe_id = ?
         ORDER BY order_number LIMIT ?
-        """, [recipe_id, ingredients_limit])
+        """,
+        [recipe_id, ingredients_limit],
+    )
 
     instructions_limit = current_app.config["RECIPE_INSTRUCTIONS_MAX"]
     instructions = db.execute(
         """
         SELECT * FROM instructions WHERE recipe_id = ?
         ORDER BY order_number LIMIT ?
-        """, [recipe_id, instructions_limit])
+        """,
+        [recipe_id, instructions_limit],
+    )
 
     recipe_categories_limit = current_app.config["RECIPE_CATEGORIES_MAX"]
     recipe_categories = db.execute(
@@ -120,7 +130,9 @@ def fetch_recipe_related(db: Cursor, recipe_id):
         ON recipe_category.category_id = categories.id
         WHERE recipe_category.recipe_id = ?
         LIMIT ?
-        """, [recipe_id, recipe_categories_limit])
+        """,
+        [recipe_id, recipe_categories_limit],
+    )
 
     reviews_limit = current_app.config["RECIPE_USER_REVIEWS_MAX"]
     reviews = db.execute(
@@ -130,13 +142,15 @@ def fetch_recipe_related(db: Cursor, recipe_id):
         WHERE user_reviews.recipe_id = ?
         ORDER BY user_reviews.review IS NOT NULL DESC
         LIMIT ?
-        """, [recipe_id, reviews_limit])
+        """,
+        [recipe_id, reviews_limit],
+    )
 
     return {
         "ingredients": ingredients,
         "instructions": instructions,
         "categories": recipe_categories,
-        "reviews": reviews
+        "reviews": reviews,
     }
 
 
@@ -144,14 +158,15 @@ def fetch_recipe_related(db: Cursor, recipe_id):
 
 
 def list_user_recipes(db: Cursor, author_id: int, page: int):
-    """Query recipes of user `author_id`
-    """
+    """Query recipes of user `author_id`"""
     total_rows = db.execute(
         """
         SELECT count(*)
         FROM recipes
         WHERE author_id = ?
-        """, [author_id]).fetchone()[0]
+        """,
+        [author_id],
+    ).fetchone()[0]
     page_size = int(current_app.config["RECIPE_LIST_PAGE_SIZE"])
     total_pages = (total_rows - 1) // page_size + 1
     offset = max(min(total_pages - 1, page - 1), 0) * page_size
@@ -160,7 +175,8 @@ def list_user_recipes(db: Cursor, author_id: int, page: int):
         SELECT *
         FROM recipes
         WHERE author_id = ? LIMIT ? OFFSET ?
-        """, [author_id, page_size, offset]
+        """,
+        [author_id, page_size, offset],
     )
     return user_recipes, total_rows, total_pages
 
@@ -175,7 +191,9 @@ def fetch_author_recipe_context(db: Cursor, recipe_id: int, author_id: int):
         SELECT *
         FROM recipes
         WHERE id = ? AND author_id = ?
-        """, [recipe_id, author_id]).fetchone()
+        """,
+        [recipe_id, author_id],
+    ).fetchone()
 
     if recipe_row:
         related = fetch_recipe_related(db, recipe_id)
@@ -187,7 +205,8 @@ def fetch_author_recipe_context(db: Cursor, recipe_id: int, author_id: int):
 
 
 def update_recipe_ingredients(
-        db: Cursor, recipe_id: int, fields: dict[str, str]):
+    db: Cursor, recipe_id: int, fields: dict[str, str]
+):
     """Update all ingredients values from form keys eg.
     `ingredients_ID_amount` and `ingredients_ID_title`.
     Triggers also move, delete and add row actions.
@@ -218,7 +237,8 @@ def update_recipe_ingredients(
 
 
 def update_recipe_instructions(
-        db: Cursor, recipe_id: int, fields: dict[str, str]):
+    db: Cursor, recipe_id: int, fields: dict[str, str]
+):
     """Update all instructions text from form keys eg.
     `instructions_ID_instruction`. Triggers also move,
     delete and add row actions.
@@ -249,7 +269,8 @@ def update_recipe_instructions(
 
 
 def update_recipe_category_actions(
-        db: Cursor, recipe_id: int, fields: dict[str, str]):
+    db: Cursor, recipe_id: int, fields: dict[str, str]
+):
     """Update categories add or remove from form keys ie.
     `category_name`+`category_add` or `category_ID_delete`.
     """
@@ -276,14 +297,16 @@ def insert_recipe(db: Cursor, author_id: int, fields: dict[str, str]):
         """
         INSERT INTO recipes (title, summary, author_id)
         VALUES (:title, :summary, :author_id)
-        """, fields)
+        """,
+        fields,
+    )
     return cursor
 
 
 def update_author_recipe(
-        db: Cursor, recipe_id: int, author_id: int, fields: dict[str, str]):
-    """Update recipe to database. Recipe author_id must match.
-    """
+    db: Cursor, recipe_id: int, author_id: int, fields: dict[str, str]
+):
+    """Update recipe to database. Recipe author_id must match."""
     # Need to use "?" placeholders because some (or even all)
     # of the fields may be missing. Passing a dict and using named
     # parameters would raise an error about missing value.
@@ -309,50 +332,65 @@ def update_author_recipe(
         portions = IFNULL(?, portions),
         published = IFNULL(?, published)
         WHERE id = ? AND author_id = ?
-        """, (title, summary, preparation_time,
-              cooking_time, skill_level, portions, published,
-              recipe_id, author_id))
+        """,
+        (
+            title,
+            summary,
+            preparation_time,
+            cooking_time,
+            skill_level,
+            portions,
+            published,
+            recipe_id,
+            author_id,
+        ),
+    )
     return cursor
 
 
 def delete_author_recipe(db: Cursor, recipe_id: int, author_id: int):
-    """Delete recipe from database. Recipe author_id must match.
-    """
+    """Delete recipe from database. Recipe author_id must match."""
     cursor = db.execute(
         """
         DELETE FROM recipes
         WHERE id = ? and author_id = ?
-        """, [recipe_id, author_id])
+        """,
+        [recipe_id, author_id],
+    )
     return cursor
 
 
 def add_ingredients_row(db: Cursor, recipe_id: int):
-    """Add ingredients row to recipe
-    """
+    """Add ingredients row to recipe"""
     cursor = db.execute(
         """
         INSERT INTO ingredients (recipe_id, order_number)
         SELECT ?, IFNULL(MAX(order_number), 0) + 1
         FROM ingredients
         WHERE recipe_id = ?
-        """, [recipe_id, recipe_id])
+        """,
+        [recipe_id, recipe_id],
+    )
     return cursor
 
 
-def delete_ingredients_row(db: Cursor, recipe_id: int,
-                           ingredient_id: int) -> bool:
-    """Delete s ingredients row from a recipe
-    """
+def delete_ingredients_row(
+    db: Cursor, recipe_id: int, ingredient_id: int
+) -> bool:
+    """Delete s ingredients row from a recipe"""
     cursor = db.execute(
         """
         DELETE FROM ingredients
         WHERE recipe_id = ? AND id = ?
-        """, [recipe_id, ingredient_id])
+        """,
+        [recipe_id, ingredient_id],
+    )
     return cursor
 
 
 def update_ingredients_row(
-        db: Cursor, recipe_id: int, i_id: int, fields: dict[str, str]) -> bool:
+    db: Cursor, recipe_id: int, i_id: int, fields: dict[str, str]
+) -> bool:
     """Update specific ingredients row. Fields must contain keys
     `amount`, `unit` and `title`.
     """
@@ -363,12 +401,15 @@ def update_ingredients_row(
         SET (amount,  unit,  title)
          = (:amount, :unit, :title)
         WHERE recipe_id = :recipe_id AND id = :i_id
-        """, fields)
+        """,
+        fields,
+    )
     return cursor
 
 
-def move_ingredients_row_up(db: Cursor, recipe_id: int,
-                            ingredient_id: int) -> bool:
+def move_ingredients_row_up(
+    db: Cursor, recipe_id: int, ingredient_id: int
+) -> bool:
     """Move ingredient up by swapping order_number values
     with the previous ingredient (in order of appearance).
     """
@@ -384,12 +425,15 @@ def move_ingredients_row_up(db: Cursor, recipe_id: int,
         WHERE this.id = prev.id
         AND this.id = ?
         AND ingredients.id IN (this.id, prev_id);
-        """, [recipe_id, ingredient_id])
+        """,
+        [recipe_id, ingredient_id],
+    )
     return cursor
 
 
-def move_ingredients_row_down(db: Cursor, recipe_id: int,
-                              ingredient_id: int) -> bool:
+def move_ingredients_row_down(
+    db: Cursor, recipe_id: int, ingredient_id: int
+) -> bool:
     """Move ingredient down by swapping order_number values
     with the next ingredient (in order of appearance).
     """
@@ -406,37 +450,43 @@ def move_ingredients_row_down(db: Cursor, recipe_id: int,
         WHERE this.id = next.id
         AND this.id = ?
         AND ingredients.id IN (this.id, next_id);
-        """, [recipe_id, ingredient_id])
+        """,
+        [recipe_id, ingredient_id],
+    )
     return cursor
 
 
 def add_instructions_row(db: Cursor, recipe_id: int):
-    """Add instructions row to recipe
-    """
+    """Add instructions row to recipe"""
     cursor = db.execute(
         """
         INSERT INTO instructions (recipe_id, order_number)
         SELECT ?, IFNULL(MAX(order_number), 0) + 1
         FROM instructions
         WHERE recipe_id = ?
-        """, [recipe_id, recipe_id])
+        """,
+        [recipe_id, recipe_id],
+    )
     return cursor
 
 
-def delete_instructions_row(db: Cursor, recipe_id: int,
-                            instruction_id: int) -> bool:
-    """Delete s instructions row from a recipe
-    """
+def delete_instructions_row(
+    db: Cursor, recipe_id: int, instruction_id: int
+) -> bool:
+    """Delete s instructions row from a recipe"""
     cursor = db.execute(
         """
         DELETE FROM instructions
         WHERE recipe_id = ? AND id = ?
-        """, [recipe_id, instruction_id])
+        """,
+        [recipe_id, instruction_id],
+    )
     return cursor
 
 
 def update_instructions_row(
-        db: Cursor, recipe_id: int, i_id: int, fields: dict[str, str]) -> bool:
+    db: Cursor, recipe_id: int, i_id: int, fields: dict[str, str]
+) -> bool:
     """Update specific instructions row. Fields must contain key
     `instructions`.
     """
@@ -447,12 +497,15 @@ def update_instructions_row(
         SET (instructions)
          = (:instructions)
         WHERE recipe_id = :recipe_id AND id = :i_id
-        """, fields)
+        """,
+        fields,
+    )
     return cursor
 
 
-def move_instructions_row_up(db: Cursor, recipe_id: int,
-                             instruction_id: int) -> bool:
+def move_instructions_row_up(
+    db: Cursor, recipe_id: int, instruction_id: int
+) -> bool:
     """Move instruction up by swapping order_number values
     with the previous instruction (in order of appearance).
     """
@@ -468,12 +521,15 @@ def move_instructions_row_up(db: Cursor, recipe_id: int,
         WHERE this.id = prev.id
         AND this.id = ?
         AND instructions.id IN (this.id, prev_id);
-        """, [recipe_id, instruction_id])
+        """,
+        [recipe_id, instruction_id],
+    )
     return cursor
 
 
-def move_instructions_row_down(db: Cursor, recipe_id: int,
-                               instruction_id: int) -> bool:
+def move_instructions_row_down(
+    db: Cursor, recipe_id: int, instruction_id: int
+) -> bool:
     """Move instruction down by swapping order_number values
     with the next instruction (in order of appearance).
     """
@@ -490,44 +546,54 @@ def move_instructions_row_down(db: Cursor, recipe_id: int,
         WHERE this.id = next.id
         AND this.id = ?
         AND instructions.id IN (this.id, next_id);
-        """, [recipe_id, instruction_id])
+        """,
+        [recipe_id, instruction_id],
+    )
     return cursor
 
 
-def delete_recipe_category(db: Cursor, recipe_id: int,
-                           category_id: int) -> bool:
-    """Delete category from recipe
-    """
+def delete_recipe_category(
+    db: Cursor, recipe_id: int, category_id: int
+) -> bool:
+    """Delete category from recipe"""
     db.execute(
         """
         DELETE FROM recipe_category
         WHERE recipe_id = ? AND category_id = ?;
-        """, [recipe_id, category_id])
+        """,
+        [recipe_id, category_id],
+    )
 
     db.execute(
         """
         DELETE FROM categories WHERE id = ? AND NOT EXISTS
         (SELECT 1 FROM recipe_category WHERE category_id = ?);
-        """, [category_id, category_id])
+        """,
+        [category_id, category_id],
+    )
 
 
-def add_recipe_category(db: Cursor, recipe_id: int,
-                           category_name: str):
-    """Create the category if it does not exist and add it to the recipe
-    """
+def add_recipe_category(db: Cursor, recipe_id: int, category_name: str):
+    """Create the category if it does not exist and add it to the recipe"""
     db.execute(
         """
         INSERT INTO categories (title) VALUES (?)
         ON CONFLICT (title) DO NOTHING;
-        """, [category_name])
+        """,
+        [category_name],
+    )
 
     category_id = db.execute(
         """
         SELECT id FROM categories WHERE title = ?;
-        """, [category_name]).fetchone()["id"]
+        """,
+        [category_name],
+    ).fetchone()["id"]
 
     db.execute(
         """
         INSERT INTO recipe_category (recipe_id, category_id)
         VALUES (?, ?) ON CONFLICT (recipe_id, category_id) DO NOTHING;
-        """, [recipe_id, category_id])
+        """,
+        [recipe_id, category_id],
+    )

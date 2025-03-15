@@ -1,5 +1,5 @@
-"""User authentication
-"""
+"""User authentication"""
+
 import secrets
 from flask import Blueprint
 from flask import flash
@@ -12,14 +12,14 @@ from flask import session
 from ruokareseptit.model.db import get_db, log_db_error
 from ruokareseptit.model.auth import auth_user_id, insert_user
 
-bp = Blueprint("auth", __name__, url_prefix="/auth",
-               template_folder="templates")
+bp = Blueprint(
+    "auth", __name__, url_prefix="/auth", template_folder="templates"
+)
 
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
-    """Log in user
-    """
+    """Log in user"""
     if request.method == "GET":
         username = request.args.get("username")
         return render_template("auth/login.html", username=username)
@@ -44,8 +44,7 @@ def login():
 
 @bp.route("/logout")
 def logout():
-    """Log out user
-    """
+    """Log out user"""
     session.clear()
     flash("Olet kirjautunut ulos.")
     return redirect(url_for("home.index"))
@@ -53,8 +52,7 @@ def logout():
 
 @bp.route("/register", methods=["GET", "POST"])
 def register():
-    """Registration form
-    """
+    """Registration form"""
     if request.method == "GET":
         username = request.args.get("username")
         return render_template("auth/register.html", username=username)
@@ -80,8 +78,7 @@ def register():
 
 
 def validate_register_form(fields: dict[str, str]) -> bool:
-    """Validate register form fields
-    """
+    """Validate register form fields"""
     username = fields.get("username")
     password1 = fields.get("password1")
     password2 = fields.get("password2")
@@ -102,6 +99,5 @@ def validate_register_form(fields: dict[str, str]) -> bool:
 
 
 def flash_error(message: str):
-    """Flash form validation error
-    """
+    """Flash form validation error"""
     flash(message, "form_validation_error")

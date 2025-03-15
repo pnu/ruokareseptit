@@ -1,5 +1,4 @@
-"""Users' own reviews
-"""
+"""Users' own reviews"""
 
 from flask import Blueprint
 from flask import render_template
@@ -18,23 +17,27 @@ from ruokareseptit.model.reviews import update_author_review
 from ruokareseptit.model.reviews import delete_author_review
 
 
-bp = Blueprint("reviews", __name__, url_prefix="/reviews",
-               template_folder="templates")
+bp = Blueprint(
+    "reviews", __name__, url_prefix="/reviews", template_folder="templates"
+)
 
 
 @bp.route("/", defaults={"review_id": None})
 @bp.route("/<int:review_id>")
 @login_required
 def index(review_id: int):
-    """Own reviews
-    """
+    """Own reviews"""
     if not review_id:
         with get_db() as db:
             page = int(request.args.get("page", 0))
             rows, count, pages = list_user_reviews(db, g.user["id"], page)
             page = max(min(pages, page), 1)
-            context = {"reviews": rows, "reviews_count": count,
-                       "page_number": page, "total_pages": pages}
+            context = {
+                "reviews": rows,
+                "reviews_count": count,
+                "page_number": page,
+                "total_pages": pages,
+            }
             if page < pages:
                 next_p = url_for(".index", page=page + 1)
                 context["next_page"] = next_p
@@ -44,8 +47,9 @@ def index(review_id: int):
             return render_template("my/reviews/list.html", **context)
 
     with get_db() as db:
-        review_context = fetch_author_review_context(db, review_id,
-                                                     g.user["id"])
+        review_context = fetch_author_review_context(
+            db, review_id, g.user["id"]
+        )
         if not review_context:
             return redirect(url_for(".index"))
 
@@ -63,11 +67,10 @@ def index(review_id: int):
 @bp.route("/update/<int:review_id>", methods=["POST"])
 @login_required
 def update(review_id: int):
-    """Update review
-    """
+    """Update review"""
     edit_params = {
         "review_id": review_id,
-        "back": request.args.get("back", "")
+        "back": request.args.get("back", ""),
     }
     try:
         with get_db() as db:
@@ -82,8 +85,7 @@ def update(review_id: int):
 
     if request.form.get("delete"):
         back = request.args.get("back", url_for(".index"))
-        return redirect(url_for(
-            ".delete", review_id=review_id, next=back))
+        return redirect(url_for(".delete", review_id=review_id, next=back))
 
     return redirect(url_for(".index", **edit_params))
 
@@ -91,8 +93,7 @@ def update(review_id: int):
 @bp.route("/delete/<int:review_id>")
 @login_required
 def delete(review_id: int):
-    """Delete recipe
-    """
+    """Delete recipe"""
     try:
         with get_db() as db:
             c = delete_author_review(db, review_id, g.user["id"])

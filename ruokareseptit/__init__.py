@@ -1,5 +1,4 @@
-"""Ruokareseptit application factory
-"""
+"""Ruokareseptit application factory"""
 
 import os
 from flask import Flask
@@ -8,8 +7,7 @@ from .model import auth, db, navigation
 
 
 def create_app():
-    """Create app, register handlers and blueprints
-    """
+    """Create app, register handlers and blueprints"""
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY="dev",  # used for signing the session cookie
@@ -29,6 +27,7 @@ def create_app():
 
     # pylint: disable=import-outside-toplevel
     from .blueprints import register_app_blueprints
+
     register_app_blueprints(app)
 
     return app

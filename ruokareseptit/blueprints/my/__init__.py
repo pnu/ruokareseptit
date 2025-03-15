@@ -1,5 +1,4 @@
-"""User pages
-"""
+"""User pages"""
 
 from flask import Blueprint
 

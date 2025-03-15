@@ -1,5 +1,4 @@
-"""User edit pages and features
-"""
+"""User edit pages and features"""
 
 from flask import Blueprint
 from flask import render_template
@@ -20,8 +19,9 @@ from ruokareseptit.model.recipes import update_recipe_instructions
 from ruokareseptit.model.recipes import delete_author_recipe
 from ruokareseptit.model.recipes import update_recipe_category_actions
 
-bp = Blueprint("recipes", __name__, url_prefix="/recipes",
-               template_folder="templates")
+bp = Blueprint(
+    "recipes", __name__, url_prefix="/recipes", template_folder="templates"
+)
 
 
 @bp.route("/", defaults={"recipe_id": None, "tab": None})
@@ -30,15 +30,18 @@ bp = Blueprint("recipes", __name__, url_prefix="/recipes",
 @bp.route("/<int:recipe_id>/<int:tab>")
 @login_required
 def index(recipe_id: int, tab: int):
-    """Own recipes
-    """
+    """Own recipes"""
     if not recipe_id:
         with get_db() as db:
             page = int(request.args.get("page", 0))
             rows, count, pages = list_user_recipes(db, g.user["id"], page)
             page = max(min(pages, page), 1)
-            context = {"recipes": rows, "recipes_count": count,
-                       "page_number": page, "total_pages": pages}
+            context = {
+                "recipes": rows,
+                "recipes_count": count,
+                "page_number": page,
+                "total_pages": pages,
+            }
             if page < pages:
                 next_p = url_for(".index", page=page + 1)
                 context["next_page"] = next_p
@@ -48,25 +51,27 @@ def index(recipe_id: int, tab: int):
             return render_template("my/recipes/list.html", **context)
 
     with get_db() as db:
-        recipe_context = fetch_author_recipe_context(db, recipe_id,
-                                                     g.user["id"])
+        recipe_context = fetch_author_recipe_context(
+            db, recipe_id, g.user["id"]
+        )
         if not recipe_context:
             return redirect(url_for(".index"))
 
         back = request.args.get("back", url_for(".index"))
-        submit_url = url_for(".update", recipe_id=recipe_id,
-                             tab=tab, back=back)
+        submit_url = url_for(
+            ".update", recipe_id=recipe_id, tab=tab, back=back
+        )
         recipe_context["submit_url"] = submit_url
         tmpl = ["main", "ingredients", "instructions"][tab - 1]
-        return render_template("my/recipes/update/" + tmpl + ".html",
-                               **recipe_context)
+        return render_template(
+            "my/recipes/update/" + tmpl + ".html", **recipe_context
+        )
 
 
 @bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create():
-    """Create new recipe
-    """
+    """Create new recipe"""
     if request.method == "GET":
         return render_template("my/recipes/create.html", **request.args)
 
@@ -88,8 +93,7 @@ def create():
 
 
 def validate_create_form(fields: dict[str, str]) -> bool:
-    """Validate create recipe form fields
-    """
+    """Validate create recipe form fields"""
     title = fields.get("title")
     # summary = fields.get("summary")
     if title == "":
@@ -104,12 +108,11 @@ def validate_create_form(fields: dict[str, str]) -> bool:
 @bp.route("/update/<int:recipe_id>", methods=["POST"])
 @login_required
 def update(recipe_id: int):
-    """Update recipe
-    """
+    """Update recipe"""
     edit_params = {
         "recipe_id": recipe_id,
         "tab": int(request.args.get("tab", 1)),
-        "back": request.args.get("back", "")
+        "back": request.args.get("back", ""),
     }
     try:
         with get_db() as db:
@@ -127,8 +130,7 @@ def update(recipe_id: int):
 
     if request.form.get("delete"):
         back = request.args.get("back", url_for(".index"))
-        return redirect(url_for(
-            ".delete", recipe_id=recipe_id, next=back))
+        return redirect(url_for(".delete", recipe_id=recipe_id, next=back))
 
     edit_params["tab"] = int(request.form.get("tab", edit_params["tab"]))
     return redirect(url_for(".index", **edit_params))
@@ -137,8 +139,7 @@ def update(recipe_id: int):
 @bp.route("/delete/<int:recipe_id>")
 @login_required
 def delete(recipe_id: int):
-    """Delete recipe
-    """
+    """Delete recipe"""
     try:
         with get_db() as db:
             c = delete_author_recipe(db, recipe_id, g.user["id"])
@@ -155,6 +156,5 @@ def delete(recipe_id: int):
 
 
 def flash_error(message: str):
-    """Flash form validation error
-    """
+    """Flash form validation error"""
     flash(message, "form_validation_error")
