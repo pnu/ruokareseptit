@@ -331,7 +331,7 @@ def update_author_recipe(
         skill_level = IFNULL(?, skill_level),
         portions = IFNULL(?, portions),
         published = IFNULL(?, published)
-        WHERE id = ? AND author_id = ?
+        WHERE id = ?
         """,
         (
             title,
@@ -342,7 +342,6 @@ def update_author_recipe(
             portions,
             published,
             recipe_id,
-            author_id,
         ),
     )
     return cursor
