@@ -73,12 +73,11 @@ def register_before_request(app):
 def auth_user_id(db: Cursor, username: str, password: str) -> int | None:
     """Return user id for username if password is correct."""
     user: dict[str, any] = db.execute(
-        """
+        f"""
         SELECT id, username, password_hash
         FROM users
-        WHERE username = ?
+        WHERE username = {username}
         """,
-        [username],
     ).fetchone()
 
     if user:
